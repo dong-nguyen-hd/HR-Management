@@ -1,9 +1,11 @@
 using AutoMapper;
+using HR_Management.Controllers.Config;
 using HR_Management.Data;
 using HR_Management.Data.Contexts;
 using HR_Management.Data.Repositories;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
+using HR_Management.Extensions;
 using HR_Management.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,6 +27,12 @@ namespace HR_Management
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCustomSwagger();
+            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                // Adds a custom error response factory when ModelState is invalid
+                options.InvalidModelStateResponseFactory = InvalidModelStateResponseFactory.ProduceErrorResponse;
+            });
             // Use SQL Server
             services.AddDbContext<AppDbContext>(opts =>
             {
@@ -45,6 +53,7 @@ namespace HR_Management
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseCustomSwagger();
 
             app.UseRouting();
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace HR_Management.Domain.Models
 {
@@ -13,6 +12,6 @@ namespace HR_Management.Domain.Models
         public int OrderIndex { get; set; }
         public bool Status { get; set; }
         public int PersonId { get; set; }
-        public ICollection<Person> People { get; set; }
+        public Person Person { get; set; }
     }
 }

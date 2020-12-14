@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using HR_Management.Domain.Models;
 using HR_Management.Domain.Services;
-using HR_Management.Resources;
+using HR_Management.Resources.Education;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HR_Management.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/education")]
+    [Produces("application/json")]
     [ApiController]
     public class EducationController : ControllerBase
     {
@@ -23,11 +22,18 @@ namespace HR_Management.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all record with personId in table Education
+        /// </summary>
+        /// <param name="personId"></param>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<EducationResource>> GetAllAsync()
+        [ProducesResponseType(typeof(IEnumerable<EducationResource>), 200)]
+        public async Task<IEnumerable<EducationResource>> GetAllWithPersonIdAsync(int personId)
         {
-            var listEducation = await _educationService.ListAsync();
+            var listEducation = await _educationService.ListAsync(personId);
             var resources = _mapper.Map<IEnumerable<Education>, IEnumerable<EducationResource>>(listEducation);
+
             return resources;
         }
 

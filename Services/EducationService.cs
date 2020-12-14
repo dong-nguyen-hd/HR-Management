@@ -11,15 +11,17 @@ namespace HR_Management.Services
     public class EducationService : IEducationService
     {
         private readonly IEducationRespository _educationRespository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EducationService(IEducationRespository educationRespository)
+        public EducationService(IEducationRespository educationRespository, IUnitOfWork unitOfWork)
         {
             this._educationRespository = educationRespository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<Education>> ListAsync()
+        public async Task<IEnumerable<Education>> ListAsync(int personId)
         {
-            return await _educationRespository.ListAsync();
+            return await _educationRespository.ListAsync(personId);
         }
     }
 }

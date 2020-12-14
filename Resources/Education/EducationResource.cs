@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HR_Management.Resources
+namespace HR_Management.Resources.Education
 {
     public class EducationResource
     {

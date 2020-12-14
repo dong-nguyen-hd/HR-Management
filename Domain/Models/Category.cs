@@ -6,9 +6,8 @@ namespace HR_Management.Domain.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int OrderIndex { get; set; }
         public bool Status { get; set; }
+        public CategoryPerson CategoryPerson { get; set; }
         public ICollection<Technology> Technologies { get; set; }
-        
     }
 }
