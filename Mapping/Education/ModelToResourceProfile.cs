@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using HR_Management.Domain.Models;
 using HR_Management.Resources.Education;
 
 namespace HR_Management.Mapping.Education
@@ -8,7 +7,7 @@ namespace HR_Management.Mapping.Education
     {
         public ModelToResourceProfile()
         {
-            CreateMap<Category, EducationResource>();
+            CreateMap<Domain.Models.Education, EducationResource>();
         }
     }
 }

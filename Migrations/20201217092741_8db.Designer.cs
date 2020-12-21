@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HR_Management.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20201213172905_4db")]
-    partial class _4db
+    [Migration("20201217092741_8db")]
+    partial class _8db
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -30,8 +30,7 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("Status")
                         .ValueGeneratedOnAdd()
@@ -66,8 +65,7 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Technology")
                         .IsRequired()
-                        .HasColumnType("varchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("varchar(max)");
 
                     b.HasKey("Id");
 
@@ -91,8 +89,7 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("OrderIndex")
                         .HasColumnType("int");
@@ -102,8 +99,7 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Provider")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("date");
@@ -129,16 +125,14 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("CollegeName")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Major")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("OrderIndex")
                         .HasColumnType("int");
@@ -170,18 +164,15 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Country")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("Status")
                         .ValueGeneratedOnAdd()
@@ -202,57 +193,48 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Avatar")
                         .IsRequired()
-                        .HasColumnType("varchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("varchar(250)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<byte>("Gender")
                         .HasColumnType("tinyint");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("LocationId")
+                    b.Property<int?>("LocationId")
                         .HasColumnType("int");
 
                     b.Property<string>("OrderIndex")
                         .IsRequired()
-                        .HasColumnType("varchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("varchar(250)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("varchar")
-                        .HasMaxLength(25);
+                        .HasColumnType("varchar(25)");
 
                     b.Property<string>("StaffId")
                         .IsRequired()
-                        .HasColumnType("varchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("varchar(25)");
 
                     b.Property<bool>("Status")
                         .ValueGeneratedOnAdd()
@@ -263,8 +245,7 @@ namespace HR_Management.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("YearOfBirth")
                         .HasColumnType("date");
@@ -285,16 +266,14 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("OrderIndex")
                         .HasColumnType("int");
@@ -304,13 +283,11 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Position")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Responsibilities")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("date");
@@ -325,8 +302,7 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Technology")
                         .IsRequired()
-                        .HasColumnType("varchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("varchar(max)");
 
                     b.HasKey("Id");
 
@@ -347,8 +323,7 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("Status")
                         .ValueGeneratedOnAdd()
@@ -371,8 +346,7 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("date");
@@ -385,8 +359,7 @@ namespace HR_Management.Migrations
 
                     b.Property<string>("Position")
                         .IsRequired()
-                        .HasColumnType("nvarchar")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("date");
@@ -440,9 +413,7 @@ namespace HR_Management.Migrations
                 {
                     b.HasOne("HR_Management.Domain.Models.Location", "Location")
                         .WithMany("People")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LocationId");
                 });
 
             modelBuilder.Entity("HR_Management.Domain.Models.Project", b =>

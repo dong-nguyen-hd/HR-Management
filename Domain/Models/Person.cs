@@ -20,7 +20,7 @@ namespace HR_Management.Domain.Models
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public bool Status { get; set; }
-        public int OrderIndex { get; set; }
+        public string OrderIndex { get; set; }
         public int? LocationId { get; set; }
         public Location Location { get; set; }
         public ICollection<Certificate> Certificates { get; set; }

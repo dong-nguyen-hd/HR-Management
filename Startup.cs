@@ -27,7 +27,9 @@ namespace HR_Management
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCustomSwagger();
+            services.AddControllers().AddNewtonsoftJson();
+            //services.AddCustomSwagger();
+            services.AddSwaggerGen();
             services.AddControllers().ConfigureApiBehaviorOptions(options =>
             {
                 // Adds a custom error response factory when ModelState is invalid
@@ -41,8 +43,10 @@ namespace HR_Management
             });
 
             // Use DI
-            services.AddScoped<IEducationRespository, EducationRepository>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IEducationRepository, EducationRepository>();
             services.AddScoped<IEducationService, EducationService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             // Use AutoMapper
             services.AddAutoMapper(typeof(Startup));
         }
@@ -53,17 +57,25 @@ namespace HR_Management
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseCustomSwagger();
+            //app.UseCustomSwagger();
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "HR_Management");
+            });
 
             app.UseRouting();
+
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
-            // Seed data
-            SeedData.EnsurePopulated(app);
         }
     }
 }
