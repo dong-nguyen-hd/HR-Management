@@ -17,6 +17,7 @@ namespace HR_Management.Data.Repositories
         {
             var temp =  await _context.Educations.Where(x => x.PersonId == personId && x.Status)
                 .OrderBy(x => x.OrderIndex)
+                .ThenBy(x => x.EndDate)
                 .ToListAsync();
             
             return temp;
@@ -46,7 +47,8 @@ namespace HR_Management.Data.Repositories
 
         public async Task<int> MaximumOrderIndexAsync(int personId)
         {
-            var maximum = await _context.Educations.Where(x => x.PersonId == personId && x.Status).MaxAsync(y => y.OrderIndex);
+            var tempList = await _context.Educations.Where(x => x.PersonId == personId && x.Status).ToListAsync();
+            int maximum = (tempList.Count == 0) ? 0 : tempList.Max(x => x.OrderIndex);
 
             return maximum;
         }

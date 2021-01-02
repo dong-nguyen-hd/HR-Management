@@ -89,6 +89,27 @@ namespace HR_Management.Controllers
         }
 
         /// <summary>
+        /// Swap OrderIndex value 
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType(typeof(EducationResource), 200)]
+        [ProducesResponseType(typeof(ErrorResource), 400)]
+        public async Task<IActionResult> SwapEducationAsync([FromBody] SwapResource resource)
+        {
+            var result = await _educationService.SwapAsync(resource);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ErrorResource(result.Message));
+            }
+            var resources = _mapper.Map<IEnumerable<Education>, IEnumerable<EducationResource>>(result.Object as IEnumerable<Education>);
+            
+            return Ok(resources);
+        }
+
+        /// <summary>
         /// Delete a record into Education by Id
         /// </summary>
         /// <param name="id"></param>

@@ -6,7 +6,13 @@
         public string Message { get; private set; }
         public T Resource { get; private set; }
         public object Object { get; private set; }
-        
+
+        public BaseResponse(bool isSuccess)
+        {
+            Success = isSuccess;
+            Message = string.Empty;
+        }
+
         protected BaseResponse(T resource)
         {
             Success = true;

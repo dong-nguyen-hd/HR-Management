@@ -1,11 +1,9 @@
 using AutoMapper;
 using HR_Management.Controllers.Config;
-using HR_Management.Data;
 using HR_Management.Data.Contexts;
 using HR_Management.Data.Repositories;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
-using HR_Management.Extensions;
 using HR_Management.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,8 +42,28 @@ namespace HR_Management
 
             // Use DI
             services.AddScoped<IPersonRepository, PersonRepository>();
+
             services.AddScoped<IEducationRepository, EducationRepository>();
             services.AddScoped<IEducationService, EducationService>();
+
+            services.AddScoped<ICertificateRepository, CertificateRepository>();
+            services.AddScoped<ICertificateService, CertificateService>();
+
+            services.AddScoped<IWorkHistoryRepository, WorkHistoryRepository>();
+            services.AddScoped<IWorkHistoryService, WorkHistoryService>();
+
+            services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<ILocationService, LocationService>();
+
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IProjectService, ProjectService>();
+
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ICategoryService, CategoryService>();
+
+            services.AddScoped<ITechnologyRepository, TechnologyRepository>();
+            services.AddScoped<ITechnologyService, TechnologyService>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             // Use AutoMapper
             services.AddAutoMapper(typeof(Startup));

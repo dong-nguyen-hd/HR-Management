@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="XUnitTest\**" />
+    <Content Remove="XUnitTest\**" />
+    <EmbeddedResource Remove="XUnitTest\**" />
+    <None Remove="XUnitTest\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove=".gitignore" />
     <None Remove="LICENSE" />
   </ItemGroup>

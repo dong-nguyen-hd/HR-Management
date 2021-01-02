@@ -4,6 +4,7 @@ using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
 using HR_Management.Extensions;
+using HR_Management.Resources;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -112,6 +113,34 @@ namespace HR_Management.Services
             catch (Exception ex)
             {
                 return new EducationResponse($"An error occurred when deleting the education: {ex.Message}");
+            }
+        }
+
+        public async Task<EducationResponse> SwapAsync(SwapResource obj)
+        {
+            // Validate Id duplicate
+            if (obj.CurrentId == obj.TurnedId)
+                return new EducationResponse("CurrentId/TurnedId is not valid.");
+            // Validate Id is existent?
+            var currentEducation = await _educationRepository.FindByIdAsync(obj.CurrentId);
+            var turnedEducation = await _educationRepository.FindByIdAsync(obj.TurnedId);
+            if (currentEducation is null || turnedEducation is null)
+                return new EducationResponse("Education not exist.");
+            // Swap property OrderIndex
+            int tempOrderIndex = -1;
+            tempOrderIndex = currentEducation.OrderIndex;
+            currentEducation.OrderIndex = turnedEducation.OrderIndex;
+            turnedEducation.OrderIndex = tempOrderIndex;
+
+            try
+            {
+                await _unitOfWork.CompleteAsync();
+
+                return new EducationResponse(new List<Education>(){ currentEducation, turnedEducation });
+            }
+            catch (Exception ex)
+            {
+                return new EducationResponse($"An error occurred when swapping the education: {ex.Message}");
             }
         }
     }
