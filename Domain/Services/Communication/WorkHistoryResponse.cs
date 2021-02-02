@@ -1,14 +1,8 @@
-﻿using HR_Management.Domain.Models;
-
-namespace HR_Management.Domain.Services.Communication
+﻿namespace HR_Management.Domain.Services.Communication
 {
-    public class WorkHistoryResponse : BaseResponse<WorkHistory>
+    public class WorkHistoryResponse<T> : BaseResponse<T>
     {
-        public WorkHistoryResponse(bool isSuccess) : base(isSuccess) { }
-
-        public WorkHistoryResponse(WorkHistory workHistory) : base(workHistory) { }
-
-        public WorkHistoryResponse(object objWorkHistory) : base(objWorkHistory) { }
+        public WorkHistoryResponse(T resource) : base(resource) { }
 
         public WorkHistoryResponse(string message) : base(message) { }
     }

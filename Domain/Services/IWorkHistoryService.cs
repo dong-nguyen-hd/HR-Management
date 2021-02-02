@@ -1,16 +1,17 @@
-﻿using HR_Management.Domain.Models;
-using HR_Management.Domain.Services.Communication;
+﻿using HR_Management.Domain.Services.Communication;
 using HR_Management.Resources;
+using HR_Management.Resources.WorkHistory;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Domain.Services
 {
     public interface IWorkHistoryService
     {
-        Task<WorkHistoryResponse> ListAsync(int personId);
-        Task<WorkHistoryResponse> CreateAsync(WorkHistory workHistory);
-        Task<WorkHistoryResponse> UpdateAsync(int id, WorkHistory workHistory);
-        Task<WorkHistoryResponse> DeleteAsync(int id);
-        Task<WorkHistoryResponse> SwapAsync(SwapResource obj);
+        Task<WorkHistoryResponse<IEnumerable<WorkHistoryResource>>> ListAsync(int personId);
+        Task<WorkHistoryResponse<WorkHistoryResource>> CreateAsync(CreateWorkHistoryResource resource);
+        Task<WorkHistoryResponse<WorkHistoryResource>> UpdateAsync(int id, UpdateWorkHistoryResource resource);
+        Task<WorkHistoryResponse<WorkHistoryResource>> DeleteAsync(int id);
+        Task<WorkHistoryResponse<WorkHistoryResource>> SwapAsync(SwapResource obj);
     }
 }

@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using AutoMapper;
-using HR_Management.Domain.Models;
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Certificate;
@@ -15,12 +13,10 @@ namespace HR_Management.Controllers
     public class CertificateController : ControllerBase
     {
         private readonly ICertificateService _certificateService;
-        private readonly IMapper _mapper;
 
-        public CertificateController(ICertificateService certificateService, IMapper mapper)
+        public CertificateController(ICertificateService certificateService)
         {
             _certificateService = certificateService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,17 +26,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpGet("{personId}")]
         [ProducesResponseType(typeof(IEnumerable<CertificateResource>), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync(int personId)
         {
             var result = await _certificateService.ListAsync(personId);
-            if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-            var resources = _mapper.Map<IEnumerable<Certificate>, IEnumerable<CertificateResource>>(result.Object as IEnumerable<Certificate>);
 
-            return Ok(resources);
+            if (!result.Success)
+                return BadRequest(new ResultResource(result.Message));
+            
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -50,19 +44,15 @@ namespace HR_Management.Controllers
         /// <returns>Response for the request.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(CertificateResource), 201)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateCertificateAsync([FromBody] CreateCertificateResource resource)
         {
-            var certificate = _mapper.Map<CreateCertificateResource, Certificate>(resource);
-            var result = await _certificateService.CreateAsync(certificate);
+            var result = await _certificateService.CreateAsync(resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var certificateResource = _mapper.Map<Certificate, CertificateResource>(result.Resource);
-            return StatusCode(201, certificateResource);
+            return StatusCode(201, result.Resource);
         }
 
         /// <summary>
@@ -73,19 +63,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(CertificateResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateCertificateAsync(int id, [FromBody] UpdateCertificateResource resource)
         {
-            var certificate = _mapper.Map<UpdateCertificateResource, Certificate>(resource);
-            var result = await _certificateService.UpdateAsync(id, certificate);
+            var result = await _certificateService.UpdateAsync(id, resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var certificateResource = _mapper.Map<Certificate, CertificateResource>(result.Resource);
-            return Ok(certificateResource);
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -95,18 +81,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(typeof(CertificateResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> SwapCertificateAsync([FromBody] SwapResource resource)
         {
             var result = await _certificateService.SwapAsync(resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-            var resources = _mapper.Map<IEnumerable<Certificate>, IEnumerable<CertificateResource>>(result.Object as IEnumerable<Certificate>);
-
-            return Ok(resources);
+                return BadRequest(new ResultResource(result.Message));
+            
+            return Ok(new ResultResource(result.Message, true));
         }
 
         /// <summary>
@@ -116,18 +99,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(CertificateResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteCertificateAsync(int id)
         {
             var result = await _certificateService.DeleteAsync(id);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var certificateResource = _mapper.Map<Certificate, CertificateResource>(result.Resource);
-            return Ok(certificateResource);
+            return Ok(result.Resource);
         }
     }
 }

@@ -1,14 +1,8 @@
-﻿using HR_Management.Domain.Models;
-
-namespace HR_Management.Domain.Services.Communication
+﻿namespace HR_Management.Domain.Services.Communication
 {
-    public class EducationResponse : BaseResponse<Education>
+    public class EducationResponse<T> : BaseResponse<T>
     {
-        public EducationResponse(bool isSuccess) : base(isSuccess) { }
-
-        public EducationResponse(Education education) : base(education) { }
-
-        public EducationResponse(object objEducation) : base(objEducation) { }
+        public EducationResponse(T resource) : base(resource) { }
 
         public EducationResponse(string message) : base(message) { }
     }

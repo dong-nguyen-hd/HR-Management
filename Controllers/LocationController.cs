@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using AutoMapper;
-using HR_Management.Domain.Models;
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Location;
@@ -15,12 +13,10 @@ namespace HR_Management.Controllers
     public class LocationController : ControllerBase
     {
         private readonly ILocationService _locationService;
-        private readonly IMapper _mapper;
-
-        public LocationController(ILocationService locationService, IMapper mapper)
+        
+        public LocationController(ILocationService locationService)
         {
             _locationService = locationService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,17 +26,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<LocationResource>), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync()
         {
             var result = await _locationService.ListAsync();
-            if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-            var resources = _mapper.Map<IEnumerable<Location>, IEnumerable<LocationResource>>(result.Object as IEnumerable<Location>);
 
-            return Ok(resources);
+            if (!result.Success)
+                return BadRequest(new ResultResource(result.Message));
+
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -50,19 +44,15 @@ namespace HR_Management.Controllers
         /// <returns>Response for the request.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(LocationResource), 201)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateLocationAsync([FromBody] CreateLocationResource resource)
         {
-            var location = _mapper.Map<CreateLocationResource, Location>(resource);
-            var result = await _locationService.CreateAsync(location);
+            var result = await _locationService.CreateAsync(resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var locationResource = _mapper.Map<Location, LocationResource>(result.Resource);
-            return StatusCode(201, locationResource);
+            return StatusCode(201, result.Resource);
         }
 
         /// <summary>
@@ -73,19 +63,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(LocationResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateLocationAsync(int id, [FromBody] CreateLocationResource resource)
         {
-            var location = _mapper.Map<CreateLocationResource, Location>(resource);
-            var result = await _locationService.UpdateAsync(id, location);
+            var result = await _locationService.UpdateAsync(id, resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var locationResource = _mapper.Map<Location, LocationResource>(result.Resource);
-            return Ok(locationResource);
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -95,18 +81,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(LocationResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteLocationAsync(int id)
         {
             var result = await _locationService.DeleteAsync(id);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var locationResource = _mapper.Map<Location, LocationResource>(result.Resource);
-            return Ok(locationResource);
+            return Ok(result.Resource);
         }
     }
 }

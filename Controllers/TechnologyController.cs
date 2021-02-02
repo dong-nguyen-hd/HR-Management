@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using AutoMapper;
-using HR_Management.Domain.Models;
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Technology;
@@ -15,12 +13,10 @@ namespace HR_Management.Controllers
     public class TechnologyController : ControllerBase
     {
         private readonly ITechnologyService _technologyService;
-        private readonly IMapper _mapper;
 
-        public TechnologyController(ITechnologyService technologyService, IMapper mapper)
+        public TechnologyController(ITechnologyService technologyService)
         {
             _technologyService = technologyService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,17 +26,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TechnologyResource>), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync()
         {
             var result = await _technologyService.ListAsync();
-            if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-            var resources = _mapper.Map<IEnumerable<Technology>, IEnumerable<TechnologyResource>>(result.Object as IEnumerable<Technology>);
 
-            return Ok(resources);
+            if (!result.Success)
+                return BadRequest(new ResultResource(result.Message));
+
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -50,17 +44,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpGet("{categoryId}")]
         [ProducesResponseType(typeof(IEnumerable<TechnologyResource>), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync(int categoryId)
         {
             var result = await _technologyService.ListAsync(categoryId);
-            if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-            var resources = _mapper.Map<IEnumerable<Technology>, IEnumerable<TechnologyResource>>(result.Object as IEnumerable<Technology>);
 
-            return Ok(resources);
+            if (!result.Success)
+                return BadRequest(new ResultResource(result.Message));
+
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -70,19 +62,15 @@ namespace HR_Management.Controllers
         /// <returns>Response for the request.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(TechnologyResource), 201)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateTechnologyAsync([FromBody] CreateTechnologyResource resource)
         {
-            var technology = _mapper.Map<CreateTechnologyResource, Technology>(resource);
-            var result = await _technologyService.CreateAsync(technology);
+            var result = await _technologyService.CreateAsync(resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var technologyResource = _mapper.Map<Technology, TechnologyResource>(result.Resource);
-            return StatusCode(201, technologyResource);
+            return StatusCode(201, result.Resource);
         }
 
         /// <summary>
@@ -93,19 +81,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(TechnologyResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateTechnologyAsync(int id, [FromBody] UpdateTechnologyResource resource)
         {
-            var technology = _mapper.Map<UpdateTechnologyResource, Technology>(resource);
-            var result = await _technologyService.UpdateAsync(id, technology);
+            var result = await _technologyService.UpdateAsync(id, resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var technologyResource = _mapper.Map<Technology, TechnologyResource>(result.Resource);
-            return Ok(technologyResource);
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -115,18 +99,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(TechnologyResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteTechnologyAsync(int id)
         {
             var result = await _technologyService.DeleteAsync(id);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var technologyResource = _mapper.Map<Technology, TechnologyResource>(result.Resource);
-            return Ok(technologyResource);
+            return Ok(result.Resource);
         }
     }
 }

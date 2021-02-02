@@ -1,75 +1,80 @@
 ﻿#nullable enable
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
-using HR_Management.Resources.WorkHistory;
+using HR_Management.Resources.CategoryPerson;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Controllers
 {
-    [Route("api/workHistory")]
+    [Route("api/categoryPerson")]
     [ApiController]
-    public class WorkHistoryController : ControllerBase
+    public class CategoryPersonController : ControllerBase
     {
-        private readonly IWorkHistoryService _workHistoryService;
+        private readonly ICategoryPersonService _categoryPersonService;
 
-        public WorkHistoryController(IWorkHistoryService workHistoryService)
+        public CategoryPersonController(ICategoryPersonService categoryPersonService)
         {
-            _workHistoryService = workHistoryService;
+            _categoryPersonService = categoryPersonService;
         }
 
         /// <summary>
-        /// Get all record with personId in table WorkHistory
+        /// Get all record with personId in table CategoryPerson
         /// </summary>
         /// <param name="personId"></param>
         /// <returns></returns>
         [HttpGet("{personId}")]
-        [ProducesResponseType(typeof(IEnumerable<WorkHistoryResource>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<CategoryPersonResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync(int personId)
         {
-            var result = await _workHistoryService.ListAsync(personId);
-
+            var result = await _categoryPersonService.ListAsync(personId);
             if (!result.Success)
+            {
                 return BadRequest(new ResultResource(result.Message));
+            }
 
             return Ok(result.Resource);
         }
 
         /// <summary>
-        /// Create a new record into table WorkHistory
+        /// Create a new record into table CategoryPerson
         /// </summary>
-        /// <param name="resource">WorkHistory data.</param>
+        /// <param name="resource">CategoryPerson data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(WorkHistoryResource), 201)]
+        [ProducesResponseType(typeof(CategoryPersonResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> CreateWorkHistoryAsync([FromBody] CreateWorkHistoryResource resource)
+        public async Task<IActionResult> CreateCategoryPersonAsync([FromBody] CreateCategoryPersonResource resource)
         {
-            var result = await _workHistoryService.CreateAsync(resource);
+            var result = await _categoryPersonService.CreateAsync(resource);
 
             if (!result.Success)
+            {
                 return BadRequest(new ResultResource(result.Message));
+            }
 
             return StatusCode(201, result.Resource);
         }
 
         /// <summary>
-        /// Update a record into WorkHistory by Id
+        /// Update a record into CategoryPerson by Id
         /// </summary>
         /// <param name="id"></param>
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(WorkHistoryResource), 200)]
+        [ProducesResponseType(typeof(CategoryPersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> UpdateWorkHistoryAsync(int id, [FromBody] UpdateWorkHistoryResource resource)
+        public async Task<IActionResult> UpdateCategoryPersonAsync(int id, [FromBody] UpdateCategoryPersonResource resource)
         {
-            var result = await _workHistoryService.UpdateAsync(id, resource);
+            var result = await _categoryPersonService.UpdateAsync(id, resource);
 
             if (!result.Success)
+            {
                 return BadRequest(new ResultResource(result.Message));
+            }
 
             return Ok(result.Resource);
         }
@@ -80,32 +85,36 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut]
-        [ProducesResponseType(typeof(WorkHistoryResource), 200)]
+        [ProducesResponseType(typeof(CategoryPersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> SwapWorkHistoryAsync([FromBody] SwapResource resource)
+        public async Task<IActionResult> SwapCategoryPersonAsync([FromBody] SwapResource resource)
         {
-            var result = await _workHistoryService.SwapAsync(resource);
+            var result = await _categoryPersonService.SwapAsync(resource);
 
             if (!result.Success)
+            {
                 return BadRequest(new ResultResource(result.Message));
+            }
 
             return Ok(new ResultResource(result.Message, true));
         }
 
         /// <summary>
-        /// Delete a record into WorkHistory by Id
+        /// Delete a record into CategoryPerson by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(WorkHistoryResource), 200)]
+        [ProducesResponseType(typeof(CategoryPersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> DeleteWorkHistoryAsync(int id)
+        public async Task<IActionResult> DeleteCategoryPersonAsync(int id)
         {
-            var result = await _workHistoryService.DeleteAsync(id);
+            var result = await _categoryPersonService.DeleteAsync(id);
 
             if (!result.Success)
+            {
                 return BadRequest(new ResultResource(result.Message));
+            }
 
             return Ok(result.Resource);
         }

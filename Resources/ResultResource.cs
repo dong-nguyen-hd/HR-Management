@@ -2,20 +2,21 @@
 
 namespace HR_Management.Resources
 {
-    public class ErrorResource
+    public class ResultResource
     {
-        public bool Success => false;
+        public bool Success { get; private set; }
         public List<string> Messages { get; private set; }
 
-        public ErrorResource(List<string> messages)
+        public ResultResource(List<string> messages, bool flag = false)
         {
             this.Messages = messages ?? new List<string>();
+            this.Success = flag;
         }
 
-        public ErrorResource(string message)
+        public ResultResource(string message, bool flag = false)
         {
             this.Messages = new List<string>();
-
+            this.Success = flag;
             if (!string.IsNullOrWhiteSpace(message))
             {
                 this.Messages.Add(message);

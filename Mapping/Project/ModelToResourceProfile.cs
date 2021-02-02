@@ -7,7 +7,7 @@ namespace HR_Management.Mapping.Project
     {
         public ModelToResourceProfile()
         {
-            CreateMap<Domain.Models.Project, ProjectResource>();
+            CreateMap<Domain.Models.Project, ProjectResource>().ForMember(x => x.Technology, opt => opt.Ignore());
         }
     }
 }

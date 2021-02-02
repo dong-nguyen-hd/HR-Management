@@ -7,6 +7,7 @@ namespace HR_Management.Resources.Education
     {
         [Required]
         [MaxLength(250)]
+        [Display(Name = "College Name")]
         public string CollegeName { get; set; }
 
         [Required]
@@ -15,12 +16,15 @@ namespace HR_Management.Resources.Education
 
         [Required]
         [DataType(DataType.Date)]
+        [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
         [DataType(DataType.Date)]
+        [Display(Name = "End Date")]
         public DateTime? EndDate { get; set; }
 
         [Required]
+        [Display(Name = "Person Id")]
         public int PersonId { get; set; }
     }
 }

@@ -5,26 +5,12 @@
         public bool Success { get; private set; }
         public string Message { get; private set; }
         public T Resource { get; private set; }
-        public object Object { get; private set; }
-
-        public BaseResponse(bool isSuccess)
-        {
-            Success = isSuccess;
-            Message = string.Empty;
-        }
 
         protected BaseResponse(T resource)
         {
             Success = true;
-            Message = string.Empty;
+            Message = "Success";
             Resource = resource;
-        }
-
-        protected BaseResponse(object resource)
-        {
-            Success = true;
-            Message = string.Empty;
-            Object = resource;
         }
 
         protected BaseResponse(string message)

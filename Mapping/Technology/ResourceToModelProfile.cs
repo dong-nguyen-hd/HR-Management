@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HR_Management.Extensions;
 using HR_Management.Resources.Technology;
 
 namespace HR_Management.Mapping.Technology
@@ -7,9 +8,14 @@ namespace HR_Management.Mapping.Technology
     {
         public ResourceToModelProfile()
         {
-            CreateMap<CreateTechnologyResource, Domain.Models.Technology>();
-            CreateMap<TechnologyResource, Domain.Models.Technology>();
-            CreateMap<UpdateTechnologyResource, Domain.Models.Technology>();
+            CreateMap<CreateTechnologyResource, Domain.Models.Technology>()
+                .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
+
+            CreateMap<TechnologyResource, Domain.Models.Technology>()
+                .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
+
+            CreateMap<UpdateTechnologyResource, Domain.Models.Technology>()
+                .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
         }
     }
 }

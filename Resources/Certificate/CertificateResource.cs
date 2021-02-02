@@ -20,12 +20,15 @@ namespace HR_Management.Resources.Certificate
 
         [Required]
         [JsonConverter(typeof(DateTimeConverter))]
+        [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
         [JsonConverter(typeof(DateTimeConverter))]
+        [Display(Name = "End Date")]
         public DateTime? EndDate { get; set; }
 
         [Required]
+        [Display(Name = "Order Index")]
         public int OrderIndex { get; set; }
     }
 }

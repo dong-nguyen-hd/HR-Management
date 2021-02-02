@@ -61,6 +61,9 @@ namespace HR_Management
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ICategoryService, CategoryService>();
 
+            services.AddScoped<ICategoryPersonRepository, CategoryPersonRepository>();
+            services.AddScoped<ICategoryPersonService, CategoryPersonService>();
+
             services.AddScoped<ITechnologyRepository, TechnologyRepository>();
             services.AddScoped<ITechnologyService, TechnologyService>();
 

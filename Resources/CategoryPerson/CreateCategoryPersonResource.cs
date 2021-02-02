@@ -1,17 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HR_Management.Resources.CategoryPerson
 {
     public class CreateCategoryPersonResource
     {
         [Required]
-        [MaxLength(250)]
-        public string Technology { get; set; }
+        public List<int> Technology { get; set; }
 
         [Required]
+        [Display(Name = "Category Id")]
         public int CategoryId { get; set; }
 
         [Required]
+        [Display(Name = "Person Id")]
         public int PersonId { get; set; }
     }
 }

@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using AutoMapper;
-using HR_Management.Domain.Models;
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Category;
@@ -15,12 +13,10 @@ namespace HR_Management.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
-        private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryService categoryService, IMapper mapper)
+        public CategoryController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,17 +26,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<CategoryResource>), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync()
         {
             var result = await _categoryService.ListAsync();
-            if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-            var resources = _mapper.Map<IEnumerable<Category>, IEnumerable<CategoryResource>>(result.Object as IEnumerable<Category>);
 
-            return Ok(resources);
+            if (!result.Success)
+                return BadRequest(new ResultResource(result.Message));
+
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -50,19 +44,15 @@ namespace HR_Management.Controllers
         /// <returns>Response for the request.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(CategoryResource), 201)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateCategoryAsync([FromBody] CreateCategoryResource resource)
         {
-            var category = _mapper.Map<CreateCategoryResource, Category>(resource);
-            var result = await _categoryService.CreateAsync(category);
+            var result = await _categoryService.CreateAsync(resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Resource);
-            return StatusCode(201, categoryResource);
+            return StatusCode(201, result.Resource);
         }
 
         /// <summary>
@@ -73,19 +63,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(CategoryResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateCategoryAsync(int id, [FromBody] CreateCategoryResource resource)
         {
-            var category = _mapper.Map<CreateCategoryResource, Category>(resource);
-            var result = await _categoryService.UpdateAsync(id, category);
+            var result = await _categoryService.UpdateAsync(id, resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-
-            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Resource);
-            return Ok(categoryResource);
+                return BadRequest(new ResultResource(result.Message));
+            
+            return Ok(result.Resource);
         }
         
         /// <summary>
@@ -95,18 +81,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(CategoryResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteCategoryAsync(int id)
         {
             var result = await _categoryService.DeleteAsync(id);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var categoryResource = _mapper.Map<Category, CategoryResource>(result.Resource);
-            return Ok(categoryResource);
+            return Ok(result.Resource);
         }
     }
 }

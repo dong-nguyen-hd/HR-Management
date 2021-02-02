@@ -1,10 +1,13 @@
 ﻿#nullable enable
+using AutoMapper;
 using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
 using HR_Management.Extensions;
+using HR_Management.Resources.Location;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
@@ -13,82 +16,93 @@ namespace HR_Management.Services
     {
         private readonly ILocationRepository _locationRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public LocationService(ILocationRepository locationRepository, IUnitOfWork unitOfWork)
+        public LocationService(ILocationRepository locationRepository, 
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
         {
             this._locationRepository = locationRepository;
-            _unitOfWork = unitOfWork;
+            this._unitOfWork = unitOfWork;
+            this._mapper = mapper;
         }
 
-        public async Task<LocationResponse> CreateAsync(Location location)
+        public async Task<LocationResponse<LocationResource>> CreateAsync(CreateLocationResource createLocationResource)
         {
-            // Assign value
-            location.Address = location.Address.RemoveSpaceCharacter();
-            location.City = location.City.RemoveSpaceCharacter();
-            location.Country = location.Country.RemoveSpaceCharacter();
+            // Mapping Resource to Location
+            var location = _mapper.Map<CreateLocationResource, Location>(createLocationResource);
 
             try
             {
                 await _locationRepository.AddAsync(location);
                 await _unitOfWork.CompleteAsync();
 
-                return new LocationResponse(location);
+                // Mapping
+                var resource = _mapper.Map<Location, LocationResource>(location);
+
+                return new LocationResponse<LocationResource>(resource);
             }
             catch (Exception ex)
             {
-                return new LocationResponse($"An error occurred when saving the location: {ex.Message}");
+                return new LocationResponse<LocationResource>($"An error occurred when saving the Location: {ex.Message}");
             }
         }
 
-        public async Task<LocationResponse> DeleteAsync(int id)
+        public async Task<LocationResponse<LocationResource>> DeleteAsync(int id)
         {
             // Validate Id is existent?
             var tempLocation = await _locationRepository.FindByIdAsync(id);
             if (tempLocation is null)
-                return new LocationResponse("Location not exist.");
+                return new LocationResponse<LocationResource>("Location is not existent.");
             // Change property Status: true -> false
             tempLocation.Status = false;
 
             try
             {
                 await _unitOfWork.CompleteAsync();
+                // Mapping
+                var resource = _mapper.Map<Location, LocationResource>(tempLocation);
 
-                return new LocationResponse(tempLocation);
+                return new LocationResponse<LocationResource>(resource);
             }
             catch (Exception ex)
             {
-                return new LocationResponse($"An error occurred when deleting the location: {ex.Message}");
+                return new LocationResponse<LocationResource>($"An error occurred when deleting the Location: {ex.Message}");
             }
         }
 
-        public async Task<LocationResponse> ListAsync()
+        public async Task<LocationResponse<IEnumerable<LocationResource>>> ListAsync()
         {
             // Get list record from DB
-            var temp = await _locationRepository.ListAsync();
+            var tempLocation = await _locationRepository.ListAsync();
+            // Mapping Project to Resource
+            var resource = _mapper.Map<IEnumerable<Location>, IEnumerable<LocationResource>>(tempLocation);
 
-            return new LocationResponse(temp);
+            return new LocationResponse<IEnumerable<LocationResource>>(resource);
         }
 
-        public async Task<LocationResponse> UpdateAsync(int id, Location location)
+        public async Task<LocationResponse<LocationResource>> UpdateAsync(int id, CreateLocationResource updateLocationResource)
         {
             // Validate Id is existent?
             var tempLocation = await _locationRepository.FindByIdAsync(id);
             if (tempLocation is null)
-                return new LocationResponse("Location not exist.");
+                return new LocationResponse<LocationResource>("Location is not existent.");
             // Update infomation
-            tempLocation.Address = location.Address.RemoveSpaceCharacter();
-            tempLocation.City = location.City.RemoveSpaceCharacter();
-            tempLocation.Country = location.Country;
+            tempLocation.Address = updateLocationResource.Address.RemoveSpaceCharacter();
+            tempLocation.City = updateLocationResource.City.RemoveSpaceCharacter();
+            tempLocation.Country = updateLocationResource.Country.RemoveSpaceCharacter();
 
             try
             {
                 await _unitOfWork.CompleteAsync();
+                // Mapping
+                var resource = _mapper.Map<Location, LocationResource>(tempLocation);
 
-                return new LocationResponse(tempLocation);
+                return new LocationResponse<LocationResource>(resource);
             }
             catch (Exception ex)
             {
-                return new LocationResponse($"An error occurred when updating the location: {ex.Message}");
+                return new LocationResponse<LocationResource>($"An error occurred when updating the Location: {ex.Message}");
             }
         }
     }

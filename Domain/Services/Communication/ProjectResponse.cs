@@ -1,14 +1,8 @@
-﻿using HR_Management.Domain.Models;
-
-namespace HR_Management.Domain.Services.Communication
+﻿namespace HR_Management.Domain.Services.Communication
 {
-    public class ProjectResponse : BaseResponse<Project>
+    public class ProjectResponse<T> : BaseResponse<T>
     {
-        public ProjectResponse(bool isSuccess) : base(isSuccess) { }
-
-        public ProjectResponse(Project project) : base(project) { }
-
-        public ProjectResponse(object objProject) : base(objProject) { }
+        public ProjectResponse(T project) : base(project) { }
 
         public ProjectResponse(string message) : base(message) { }
     }

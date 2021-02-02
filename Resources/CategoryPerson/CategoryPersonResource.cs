@@ -10,10 +10,11 @@ namespace HR_Management.Resources.CategoryPerson
         public int Id { get; set; }
 
         [Required]
+        [Display(Name = "Order Index")]
         public int OrderIndex { get; set; }
 
         [Required]
-        public List<string> Technology { get; set; }
+        public List<Dictionary<int, string>> Technology { get; set; } = new List<Dictionary<int, string>>();
 
         [Required]
         public string Category { get; set; }

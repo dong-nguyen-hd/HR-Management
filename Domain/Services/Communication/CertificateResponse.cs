@@ -1,14 +1,8 @@
-﻿using HR_Management.Domain.Models;
-
-namespace HR_Management.Domain.Services.Communication
+﻿namespace HR_Management.Domain.Services.Communication
 {
-    public class CertificateResponse : BaseResponse<Certificate>
+    public class CertificateResponse<T> : BaseResponse<T>
     {
-        public CertificateResponse(bool isSuccess) : base(isSuccess) { }
-
-        public CertificateResponse(Certificate certificate) : base(certificate) { }
-
-        public CertificateResponse(object objCertificate) : base(objCertificate) { }
+        public CertificateResponse(T resource) : base(resource) { }
 
         public CertificateResponse(string message) : base(message) { }
     }

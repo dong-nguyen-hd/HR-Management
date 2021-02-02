@@ -9,6 +9,7 @@ namespace HR_Management.Resources.Technology
         public string Name { get; set; }
 
         [Required]
+        [Display(Name = "Category Id")]
         public int CategoryId { get; set; }
     }
 }

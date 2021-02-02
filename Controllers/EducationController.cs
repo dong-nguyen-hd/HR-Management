@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using AutoMapper;
-using HR_Management.Domain.Models;
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Education;
@@ -15,12 +13,10 @@ namespace HR_Management.Controllers
     public class EducationController : ControllerBase
     {
         private readonly IEducationService _educationService;
-        private readonly IMapper _mapper;
 
-        public EducationController(IEducationService educationService, IMapper mapper)
+        public EducationController(IEducationService educationService)
         {
             _educationService = educationService;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,17 +26,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpGet("{personId}")]
         [ProducesResponseType(typeof(IEnumerable<EducationResource>), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync(int personId)
         {
             var result = await _educationService.ListAsync(personId);
-            if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-            var resources = _mapper.Map<IEnumerable<Education>, IEnumerable<EducationResource>>(result.Object as IEnumerable<Education>);
 
-            return Ok(resources);
+            if (!result.Success)
+                return BadRequest(new ResultResource(result.Message));
+
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -50,19 +44,15 @@ namespace HR_Management.Controllers
         /// <returns>Response for the request.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(EducationResource), 201)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateEducationAsync([FromBody] CreateEducationResource resource)
         {
-            var education = _mapper.Map<CreateEducationResource, Education>(resource);
-            var result = await _educationService.CreateAsync(education);
+            var result = await _educationService.CreateAsync(resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var educationResource = _mapper.Map<Education, EducationResource>(result.Resource);
-            return StatusCode(201, educationResource);
+            return StatusCode(201, result.Resource);
         }
 
         /// <summary>
@@ -73,19 +63,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(EducationResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateEducationAsync(int id, [FromBody] UpdateEducationResource resource)
         {
-            var education = _mapper.Map<UpdateEducationResource, Education>(resource);
-            var result = await _educationService.UpdateAsync(id, education);
+            var result = await _educationService.UpdateAsync(id, resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var educationResource = _mapper.Map<Education, EducationResource>(result.Resource);
-            return Ok(educationResource);
+            return Ok(result.Resource);
         }
 
         /// <summary>
@@ -95,18 +81,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(typeof(EducationResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> SwapEducationAsync([FromBody] SwapResource resource)
         {
             var result = await _educationService.SwapAsync(resource);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
-            var resources = _mapper.Map<IEnumerable<Education>, IEnumerable<EducationResource>>(result.Object as IEnumerable<Education>);
-            
-            return Ok(resources);
+                return BadRequest(new ResultResource(result.Message));
+
+            return Ok(new ResultResource(result.Message, true));
         }
 
         /// <summary>
@@ -116,18 +99,15 @@ namespace HR_Management.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(EducationResource), 200)]
-        [ProducesResponseType(typeof(ErrorResource), 400)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteEducationAsync(int id)
         {
             var result = await _educationService.DeleteAsync(id);
 
             if (!result.Success)
-            {
-                return BadRequest(new ErrorResource(result.Message));
-            }
+                return BadRequest(new ResultResource(result.Message));
 
-            var educationResource = _mapper.Map<Education, EducationResource>(result.Resource);
-            return Ok(educationResource);
+            return Ok(result.Resource);
         }
     }
 }
