@@ -6,14 +6,15 @@ namespace HR_Management.Resources.CategoryPerson
     public class CreateCategoryPersonResource
     {
         [Required]
-        public List<int> Technology { get; set; }
+        [Display(Name = "Person Id")]
+        public int PersonId { get; set; }
 
         [Required]
         [Display(Name = "Category Id")]
         public int CategoryId { get; set; }
 
         [Required]
-        [Display(Name = "Person Id")]
-        public int PersonId { get; set; }
+        [MaxLength(50)]
+        public List<int> Technology { get; set; }
     }
 }

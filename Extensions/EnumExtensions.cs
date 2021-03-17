@@ -5,6 +5,12 @@ namespace HR_Management.Extensions
 {
     public static class EnumExtensions
     {
+        /// <summary>
+        /// Get string in display-name dataanotation
+        /// </summary>
+        /// <typeparam name="TEnum"></typeparam>
+        /// <param name="enum"></param>
+        /// <returns></returns>
         public static string ToDescriptionString<TEnum>(this TEnum @enum)
         {
             FieldInfo info = @enum.GetType().GetField(@enum.ToString());

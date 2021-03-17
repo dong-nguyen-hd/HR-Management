@@ -12,5 +12,6 @@ namespace HR_Management.Domain.Services
         Task<TechnologyResponse<TechnologyResource>> CreateAsync(CreateTechnologyResource resource);
         Task<TechnologyResponse<TechnologyResource>> UpdateAsync(int id, UpdateTechnologyResource resource);
         Task<TechnologyResponse<TechnologyResource>> DeleteAsync(int id);
+        Task<List<TechnologyResource>> ConvertListAsync(string technology);
     }
 }

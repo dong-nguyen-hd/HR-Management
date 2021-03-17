@@ -71,6 +71,15 @@ namespace HR_Management.Services
             }
         }
 
+        public async Task<LocationResponse<LocationResource>> FindAsync(int id)
+        {
+            var tempLocation = await _locationRepository.FindByIdAsync(id);
+            // Mapping Project to Resource
+            var resource = _mapper.Map<Location, LocationResource>(tempLocation);
+
+            return new LocationResponse<LocationResource>(resource);
+        }
+
         public async Task<LocationResponse<IEnumerable<LocationResource>>> ListAsync()
         {
             // Get list record from DB
@@ -81,7 +90,7 @@ namespace HR_Management.Services
             return new LocationResponse<IEnumerable<LocationResource>>(resource);
         }
 
-        public async Task<LocationResponse<LocationResource>> UpdateAsync(int id, CreateLocationResource updateLocationResource)
+        public async Task<LocationResponse<LocationResource>> UpdateAsync(int id, UpdateLocationResource updateLocationResource)
         {
             // Validate Id is existent?
             var tempLocation = await _locationRepository.FindByIdAsync(id);
@@ -89,8 +98,7 @@ namespace HR_Management.Services
                 return new LocationResponse<LocationResource>("Location is not existent.");
             // Update infomation
             tempLocation.Address = updateLocationResource.Address.RemoveSpaceCharacter();
-            tempLocation.City = updateLocationResource.City.RemoveSpaceCharacter();
-            tempLocation.Country = updateLocationResource.Country.RemoveSpaceCharacter();
+            tempLocation.Name = updateLocationResource.Name.RemoveSpaceCharacter();
 
             try
             {

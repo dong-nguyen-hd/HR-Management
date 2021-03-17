@@ -27,9 +27,27 @@ namespace HR_Management.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<LocationResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> GetAllWithPersonIdAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             var result = await _locationService.ListAsync();
+
+            if (!result.Success)
+                return BadRequest(new ResultResource(result.Message));
+
+            return Ok(result.Resource);
+        }
+
+        /// <summary>
+        /// Find a record with Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(LocationResource), 200)]
+        [ProducesResponseType(typeof(ResultResource), 400)]
+        public async Task<IActionResult> GetWithIdAsync(int id)
+        {
+            var result = await _locationService.FindAsync(id);
 
             if (!result.Success)
                 return BadRequest(new ResultResource(result.Message));
@@ -45,7 +63,7 @@ namespace HR_Management.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(LocationResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> CreateLocationAsync([FromBody] CreateLocationResource resource)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateLocationResource resource)
         {
             var result = await _locationService.CreateAsync(resource);
 
@@ -64,7 +82,7 @@ namespace HR_Management.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(LocationResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> UpdateLocationAsync(int id, [FromBody] CreateLocationResource resource)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateLocationResource resource)
         {
             var result = await _locationService.UpdateAsync(id, resource);
 
@@ -82,7 +100,7 @@ namespace HR_Management.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(LocationResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> DeleteLocationAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _locationService.DeleteAsync(id);
 

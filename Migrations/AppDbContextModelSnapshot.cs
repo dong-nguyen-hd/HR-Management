@@ -164,11 +164,7 @@ namespace HR_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Country")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(500)");
 
@@ -182,6 +178,34 @@ namespace HR_Management.Migrations
                     b.ToTable("Location");
                 });
 
+            modelBuilder.Entity("HR_Management.Domain.Models.Log", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Perpose")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Log");
+                });
+
             modelBuilder.Entity("HR_Management.Domain.Models.Person", b =>
                 {
                     b.Property<int>("Id")
@@ -190,7 +214,6 @@ namespace HR_Management.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Avatar")
-                        .IsRequired()
                         .HasColumnType("varchar(250)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -201,11 +224,9 @@ namespace HR_Management.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("FirstName")
@@ -227,7 +248,6 @@ namespace HR_Management.Migrations
                         .HasColumnType("varchar(250)");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasColumnType("varchar(25)");
 
                     b.Property<string>("StaffId")
@@ -238,12 +258,6 @@ namespace HR_Management.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("YearOfBirth")
                         .HasColumnType("date");
@@ -402,6 +416,15 @@ namespace HR_Management.Migrations
                 {
                     b.HasOne("HR_Management.Domain.Models.Person", "Person")
                         .WithMany("Educations")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HR_Management.Domain.Models.Log", b =>
+                {
+                    b.HasOne("HR_Management.Domain.Models.Person", "Person")
+                        .WithMany("Logs")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

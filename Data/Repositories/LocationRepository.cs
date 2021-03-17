@@ -14,13 +14,13 @@ namespace HR_Management.Data.Repositories
         public LocationRepository(AppDbContext context) : base(context) { }
 
         public async Task AddAsync(Location location)
-        {
-            await _context.Locations.AddAsync(location);
-        }
+            => await _context.Locations.AddAsync(location);
 
         public async Task<Location> FindByIdAsync(int id)
         {
-            var temp = await _context.Locations.Where(x => x.Id == id && x.Status).FirstOrDefaultAsync();
+            var temp = await _context.Locations
+                .Where(x => x.Id == id && x.Status)
+                .FirstOrDefaultAsync();
 
             return temp;
         }
@@ -28,8 +28,7 @@ namespace HR_Management.Data.Repositories
         public async Task<IEnumerable<Location>> ListAsync()
         {
             var temp = await _context.Locations.Where(x => x.Status)
-                .OrderBy(x => x.Country)
-                .ThenBy(x => x.City)
+                .OrderBy(x => x.Name)
                 .ThenBy(x => x.Address)
                 .ToListAsync();
 
@@ -37,13 +36,9 @@ namespace HR_Management.Data.Repositories
         }
 
         public void Remove(Location education)
-        {
-            _context.Locations.Remove(education);
-        }
+            => _context.Locations.Remove(education);
 
         public void Update(Location location)
-        {
-            _context.Locations.Update(location);
-        }
+             => _context.Locations.Update(location);
     }
 }

@@ -7,6 +7,7 @@ using HR_Management.Domain.Services;
 using HR_Management.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,16 @@ namespace HR_Management
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddNewtonsoftJson();
+            // Get the base URL of the application (http(s)://www.api.com) from the HTTP Request and Context.
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IUriService>(o =>
+            {
+                var accessor = o.GetRequiredService<IHttpContextAccessor>();
+                var request = accessor.HttpContext.Request;
+                var uri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
+                return new UriService(uri);
+            });
+
             //services.AddCustomSwagger();
             services.AddSwaggerGen();
             services.AddControllers().ConfigureApiBehaviorOptions(options =>
@@ -33,15 +44,16 @@ namespace HR_Management
                 // Adds a custom error response factory when ModelState is invalid
                 options.InvalidModelStateResponseFactory = InvalidModelStateResponseFactory.ProduceErrorResponse;
             });
+
             // Use SQL Server
             services.AddDbContext<AppDbContext>(opts =>
             {
-                opts.UseSqlServer(
-                Configuration["ConnectionStrings:AppConnection"]);
+                opts.UseSqlServer(Configuration["ConnectionStrings:AppConnection"]);
             });
 
             // Use DI
             services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IPersonService, PersonService>();
 
             services.AddScoped<IEducationRepository, EducationRepository>();
             services.AddScoped<IEducationService, EducationService>();
@@ -66,6 +78,8 @@ namespace HR_Management
 
             services.AddScoped<ITechnologyRepository, TechnologyRepository>();
             services.AddScoped<ITechnologyService, TechnologyService>();
+            
+            services.AddScoped<IInformationService, InformationService>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             // Use AutoMapper
@@ -88,7 +102,7 @@ namespace HR_Management
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "HR_Management");
             });
-
+            
             app.UseRouting();
 
             //app.UseAuthorization();

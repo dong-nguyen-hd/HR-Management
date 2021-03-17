@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace HR_Management.Extensions
 {
-    public class RelateValidate
+    public static class RelateValidate
     {
         /// <summary>
         /// Validate Start/End Date

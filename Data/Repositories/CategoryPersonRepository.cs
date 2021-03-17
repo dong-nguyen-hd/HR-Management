@@ -17,20 +17,17 @@ namespace HR_Management.Data.Repositories
         {
             var temp = await _context.CategoryPersons.Where(x => x.PersonId == personId && x.Status)
                 .OrderBy(x => x.OrderIndex)
+                .AsNoTracking()
                 .ToListAsync();
 
             return temp;
         }
 
         public async Task AddAsync(CategoryPerson categoryPerson)
-        {
-            await _context.CategoryPersons.AddAsync(categoryPerson);
-        }
+            => await _context.CategoryPersons.AddAsync(categoryPerson);
 
         public void Update(CategoryPerson categoryPerson)
-        {
-            _context.CategoryPersons.Update(categoryPerson);
-        }
+            => _context.CategoryPersons.Update(categoryPerson);
 
         public async Task<CategoryPerson> FindByIdAsync(int id)
         {
@@ -40,14 +37,16 @@ namespace HR_Management.Data.Repositories
         }
 
         public void Remove(CategoryPerson categoryPerson)
-        {
-            _context.CategoryPersons.Remove(categoryPerson);
-        }
+            => _context.CategoryPersons.Remove(categoryPerson);
 
-        public async Task<int> MaximumOrderIndexAsync(int personId)
+        public int MaximumOrderIndex(int personId)
         {
-            var tempList = await _context.CategoryPersons.Where(x => x.PersonId == personId && x.Status).ToListAsync();
-            int maximum = (tempList.Count == 0) ? 0 : tempList.Max(x => x.OrderIndex);
+            var tempList = _context.CategoryPersons
+                .Where(x => x.PersonId == personId && x.Status)
+                .Select(x => new {x.OrderIndex})
+                .AsNoTracking();
+
+            int maximum = (tempList.Count() == 0) ? 0 : tempList.Max(x => x.OrderIndex);
 
             return maximum;
         }

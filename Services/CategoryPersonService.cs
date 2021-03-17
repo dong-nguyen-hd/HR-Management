@@ -16,22 +16,25 @@ namespace HR_Management.Services
     public class CategoryPersonService : ICategoryPersonService
     {
         private readonly ICategoryPersonRepository _categoryPersonRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly ITechnologyRepository _technologyRepository;
         private readonly IPersonRepository _personRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
         public CategoryPersonService(ICategoryPersonRepository categoryPersonRepository,
+            ICategoryRepository categoryRepository,
             ITechnologyRepository technologyRepository,
             IPersonRepository personRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork)
         {
             this._categoryPersonRepository = categoryPersonRepository;
+            this._categoryRepository = categoryRepository;
             this._technologyRepository = technologyRepository;
             this._personRepository = personRepository;
             this._mapper = mapper;
-            _unitOfWork = unitOfWork;
+            this._unitOfWork = unitOfWork;
         }
 
         public async Task<CategoryPersonResponse<IEnumerable<CategoryPersonResource>>> ListAsync(int personId)
@@ -43,29 +46,10 @@ namespace HR_Management.Services
             // Get list record from DB
             var tempCategoryPerson = await _categoryPersonRepository.ListAsync(personId);
 
-            // Mapping
-            List<CategoryPersonResource> tempResource = new List<CategoryPersonResource>();
-            foreach (var item in tempCategoryPerson)
-            {
-                var temp = _mapper.Map<CategoryPerson, CategoryPersonResource>(item);
+            // Mapping Project to Resource
+            var resource = _mapper.Map<IEnumerable<CategoryPerson>, IEnumerable<CategoryPersonResource>>(tempCategoryPerson);
 
-                // Mapping technology into Dictionary type
-                string[] listTechnology = item.Technology.Split(',');
-                foreach (var technology in listTechnology)
-                {
-                    var specific = await this._technologyRepository.FindByIdAsync(Convert.ToInt32(technology.Trim()));
-                    if (specific is null) continue;
-
-                    temp.Technology.Add(new Dictionary<int, string>()
-                    {
-                        { specific.Id, specific.Name}
-                    });
-                }
-
-                tempResource.Add(temp);
-            }
-
-            return new CategoryPersonResponse<IEnumerable<CategoryPersonResource>>(tempResource);
+            return new CategoryPersonResponse<IEnumerable<CategoryPersonResource>>(resource);
         }
 
         public async Task<CategoryPersonResponse<CategoryPersonResource>> CreateAsync(CreateCategoryPersonResource createCategoryPersonResource)
@@ -74,48 +58,29 @@ namespace HR_Management.Services
             var tempPerson = await _personRepository.FindByIdAsync(createCategoryPersonResource.PersonId);
             if (tempPerson is null)
                 return new CategoryPersonResponse<CategoryPersonResource>($"Person Id '{createCategoryPersonResource.PersonId}' is not existent.");
-
-            var listTechnologyBelongToCategoryId = await this._technologyRepository.ListAsync(createCategoryPersonResource.CategoryId);
             // Validate CategoryId is existent?
-            if (!listTechnologyBelongToCategoryId.GetEnumerator().MoveNext())
-                return new CategoryPersonResponse<CategoryPersonResource>($"Category Id '{createCategoryPersonResource.CategoryId}' is not existent.");
+            var tempCategory = await _categoryRepository.FindByIdAsync(createCategoryPersonResource.CategoryId);
+            if (tempCategory is null || tempCategory.Id == createCategoryPersonResource.CategoryId)
+                return new CategoryPersonResponse<CategoryPersonResource>($"Category Id '{createCategoryPersonResource.CategoryId}' is invalid.");
             // Validate TechnologyId is existent?
+            var listTechnologyBelongToCategoryId = await _technologyRepository.ListAsync(createCategoryPersonResource.CategoryId);
             foreach (var item in listTechnologyBelongToCategoryId)
-            {
                 if (!createCategoryPersonResource.Technology.Contains(item.Id))
-                    return new CategoryPersonResponse<CategoryPersonResource>($"Technology Id is not existent.");
-            }
-            // Find maximum value of OrderIndex
-            int maximumOrderIndex = await _categoryPersonRepository.MaximumOrderIndexAsync(createCategoryPersonResource.PersonId);
-            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
+                    return new CategoryPersonResponse<CategoryPersonResource>($"Technology Id '{item.Id}' is not existent.");
+            // Remove duplicate element
+            createCategoryPersonResource.Technology = createCategoryPersonResource.Technology.RemoveDuplicate();
 
             // Mapping Resource to CategoryPerson
             var categoryPerson = _mapper.Map<CreateCategoryPersonResource, CategoryPerson>(createCategoryPersonResource);
-            // Assign value
-            categoryPerson.Technology = createCategoryPersonResource.Technology.ConcatenateWithComma();
-            categoryPerson.OrderIndex = maximumOrderIndex;
-            // Mapping CategoryPerson to Resource
-            var resource = _mapper.Map<CategoryPerson, CategoryPersonResource>(categoryPerson);
-
-            // Mapping
-            // Mapping technology into Dictionary type
-            foreach (var technology in createCategoryPersonResource.Technology)
-            {
-                var specific = await this._technologyRepository.FindByIdAsync(technology);
-                if (specific is null) continue;
-
-                resource.Technology.Add(new Dictionary<int, string>()
-                {
-                    { specific.Id, specific.Name}
-                });
-            }
+            categoryPerson.OrderIndex = FindMaximumAsync(createCategoryPersonResource.CategoryId);
 
             try
             {
                 await _categoryPersonRepository.AddAsync(categoryPerson);
                 await _unitOfWork.CompleteAsync();
-                /// Assign Id value while added
-                resource.Id = categoryPerson.Id;
+
+                // Mapping Project to Resource
+                var resource = _mapper.Map<CategoryPerson, CategoryPersonResource>(categoryPerson);
 
                 return new CategoryPersonResponse<CategoryPersonResource>(resource);
             }
@@ -125,45 +90,45 @@ namespace HR_Management.Services
             }
         }
 
+        /// <summary>
+        /// Find maximum value of OrderIndex
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private int FindMaximumAsync(int id)
+        {
+            int maximumOrderIndex =  _categoryPersonRepository.MaximumOrderIndex(id);
+            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
+
+            return maximumOrderIndex;
+        }
+
         public async Task<CategoryPersonResponse<CategoryPersonResource>> UpdateAsync(int id, UpdateCategoryPersonResource updateCategoryPersonResource)
         {
             // Validate Id is existent?
             var tempCategoryPerson = await _categoryPersonRepository.FindByIdAsync(id);
             if (tempCategoryPerson is null)
                 return new CategoryPersonResponse<CategoryPersonResource>("CategoryPerson not exist.");
-
-            var listTechnologyBelongToCategoryId = await this._technologyRepository.ListAsync(updateCategoryPersonResource.CategoryId);
             // Validate CategoryId is existent?
-            if (!listTechnologyBelongToCategoryId.GetEnumerator().MoveNext())
-                return new CategoryPersonResponse<CategoryPersonResource>($"Category Id '{updateCategoryPersonResource.CategoryId}' is not existent.");
+            var tempCategory = await _categoryRepository.FindByIdAsync(updateCategoryPersonResource.CategoryId);
+            if (tempCategory is null || tempCategory.Id == updateCategoryPersonResource.CategoryId)
+                return new CategoryPersonResponse<CategoryPersonResource>($"Category Id '{updateCategoryPersonResource.CategoryId}' is invalid.");
             // Validate TechnologyId is existent?
+            var listTechnologyBelongToCategoryId = await _technologyRepository.ListAsync(updateCategoryPersonResource.CategoryId);
             foreach (var item in listTechnologyBelongToCategoryId)
-            {
                 if (!updateCategoryPersonResource.Technology.Contains(item.Id))
-                    return new CategoryPersonResponse<CategoryPersonResource>($"Technology Id is not existent.");
-            }
-            // Update infomation
-            tempCategoryPerson.Technology = updateCategoryPersonResource.Technology.ConcatenateWithComma();
-            tempCategoryPerson.CategoryId = updateCategoryPersonResource.CategoryId;
-
-            // Mapping
-            // Mapping CategoryPerson to Resource
-            var resource = _mapper.Map<CategoryPerson, CategoryPersonResource>(tempCategoryPerson);
-            // Mapping technology into Dictionary type
-            foreach (var technology in updateCategoryPersonResource.Technology)
-            {
-                var specific = await this._technologyRepository.FindByIdAsync(technology);
-                if (specific is null) continue;
-
-                resource.Technology.Add(new Dictionary<int, string>()
-                {
-                    { specific.Id, specific.Name}
-                });
-            }
+                    return new CategoryPersonResponse<CategoryPersonResource>($"Technology Id '{item.Id}' is not existent.");
+            // Remove duplicate element
+            updateCategoryPersonResource.Technology = updateCategoryPersonResource.Technology.RemoveDuplicate();
+            // Updating
+            _mapper.Map(updateCategoryPersonResource, tempCategoryPerson);
 
             try
             {
                 await _unitOfWork.CompleteAsync();
+
+                // Mapping Project to Resource
+                var resource = _mapper.Map<CategoryPerson, CategoryPersonResource>(tempCategoryPerson);
 
                 return new CategoryPersonResponse<CategoryPersonResource>(resource);
             }
@@ -181,25 +146,13 @@ namespace HR_Management.Services
                 return new CategoryPersonResponse<CategoryPersonResource>("CategoryPerson is not existent.");
             // Change property Status: true -> false
             tempCategoryPerson.Status = false;
-            // Mapping
-            // Mapping CategoryPerson to Resource
-            var resource = _mapper.Map<CategoryPerson, CategoryPersonResource>(tempCategoryPerson);
-            // Mapping technology into Dictionary type
-            string[] listTechnology = tempCategoryPerson.Technology.Split(',');
-            foreach (var technology in listTechnology)
-            {
-                var specific = await this._technologyRepository.FindByIdAsync(Convert.ToInt32(technology.Trim()));
-                if (specific is null) continue;
-
-                resource.Technology.Add(new Dictionary<int, string>()
-                {
-                    { specific.Id, specific.Name }
-                });
-            }
-
+            
             try
             {
                 await _unitOfWork.CompleteAsync();
+
+                // Mapping Project to Resource
+                var resource = _mapper.Map<CategoryPerson, CategoryPersonResource>(tempCategoryPerson);
 
                 return new CategoryPersonResponse<CategoryPersonResource>(resource);
             }

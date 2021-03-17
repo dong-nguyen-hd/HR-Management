@@ -1,4 +1,5 @@
 ﻿using HR_Management.Extensions;
+using HR_Management.Resources.Technology;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,6 @@ namespace HR_Management.Resources.Project
         public int OrderIndex { get; set; }
 
         [Required]
-        public List<Dictionary<int, string>> Technology { get; set; } = new List<Dictionary<int, string>>();
+        public List<TechnologyResource> Technology { get; set; } = new List<TechnologyResource>();
     }
 }

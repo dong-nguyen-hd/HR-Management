@@ -17,6 +17,7 @@ namespace HR_Management.Data.Repositories
         {
             var temp = await _context.Technologies.Where(x => x.Status)
                 .OrderBy(x => x.Name)
+                .AsNoTracking()
                 .ToListAsync();
 
             return temp;
@@ -26,20 +27,17 @@ namespace HR_Management.Data.Repositories
         {
             var temp = await _context.Technologies.Where(x => x.CategoryId == categoryId && x.Status)
                 .OrderBy(x => x.Name)
+                .AsNoTracking()
                 .ToListAsync();
 
             return temp;
         }
 
         public async Task AddAsync(Technology technology)
-        {
-            await _context.Technologies.AddAsync(technology);
-        }
+            => await _context.Technologies.AddAsync(technology);
 
         public void Update(Technology technology)
-        {
-            _context.Technologies.Update(technology);
-        }
+            => _context.Technologies.Update(technology);
 
         public async Task<Technology> FindByIdAsync(int id)
         {
@@ -49,8 +47,6 @@ namespace HR_Management.Data.Repositories
         }
 
         public void Remove(Technology technology)
-        {
-            _context.Technologies.Remove(technology);
-        }
+            => _context.Technologies.Remove(technology);
     }
 }

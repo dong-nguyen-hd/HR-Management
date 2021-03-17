@@ -123,5 +123,20 @@ namespace HR_Management.Services
                 return new TechnologyResponse<TechnologyResource>($"An error occurred when deleting the Technology: {ex.Message}");
             }
         }
+
+        public async Task<List<TechnologyResource>> ConvertListAsync(string technology)
+        {
+            List<TechnologyResource> listResource = new List<TechnologyResource>();
+
+            string[] listTechnology = technology.Split(',');
+            foreach (var item in listTechnology)
+            {
+                var temp = await _technologyRepository.FindByIdAsync(Convert.ToInt32(item.Trim()));
+                if (temp is null) continue;
+                listResource.Add(_mapper.Map<Technology, TechnologyResource>(temp));
+            }
+
+            return listResource;
+        }
     }
 }

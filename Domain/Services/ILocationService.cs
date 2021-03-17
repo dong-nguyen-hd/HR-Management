@@ -9,7 +9,8 @@ namespace HR_Management.Domain.Services
     {
         Task<LocationResponse<IEnumerable<LocationResource>>> ListAsync();
         Task<LocationResponse<LocationResource>> CreateAsync(CreateLocationResource resource);
-        Task<LocationResponse<LocationResource>> UpdateAsync(int id, CreateLocationResource resource);
+        Task<LocationResponse<LocationResource>> UpdateAsync(int id, UpdateLocationResource resource);
+        Task<LocationResponse<LocationResource>> FindAsync(int id);
         Task<LocationResponse<LocationResource>> DeleteAsync(int id);
     }
 }

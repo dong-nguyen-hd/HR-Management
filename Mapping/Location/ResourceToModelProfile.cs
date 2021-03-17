@@ -10,13 +10,11 @@ namespace HR_Management.Mapping.Location
         {
             CreateMap<CreateLocationResource, Domain.Models.Location>()
                 .ForMember(x => x.Address, opt => opt.MapFrom(src => src.Address.RemoveSpaceCharacter()))
-                .ForMember(x => x.Country, opt => opt.MapFrom(src => src.Country.RemoveSpaceCharacter()))
-                .ForMember(x => x.City, opt => opt.MapFrom(src => src.City.RemoveSpaceCharacter()));
+                .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
 
             CreateMap<LocationResource, Domain.Models.Location>()
                 .ForMember(x => x.Address, opt => opt.MapFrom(src => src.Address.RemoveSpaceCharacter()))
-                .ForMember(x => x.Country, opt => opt.MapFrom(src => src.Country.RemoveSpaceCharacter()))
-                .ForMember(x => x.City, opt => opt.MapFrom(src => src.City.RemoveSpaceCharacter()));
+                .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
         }
     }
 }

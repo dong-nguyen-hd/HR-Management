@@ -16,9 +16,7 @@ namespace HR_Management.Domain.Models
         public DateTime YearOfBirth { get; set; }
         public byte Gender { get; set; }
         public string CreatedBy { get; set; }
-        public string UpdatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
         public bool Status { get; set; }
         public string OrderIndex { get; set; }
         public int? LocationId { get; set; }
@@ -28,6 +26,7 @@ namespace HR_Management.Domain.Models
         public ICollection<Education> Educations { get; set; }
         public ICollection<Project> Projects { get; set; }
         public ICollection<WorkHistory> WorkHistories { get; set; }
+        public ICollection<Log> Logs { get; set; }
 
     }
 }

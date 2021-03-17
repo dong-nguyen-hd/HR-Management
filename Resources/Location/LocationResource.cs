@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
 
 namespace HR_Management.Resources.Location
 {
@@ -14,10 +13,6 @@ namespace HR_Management.Resources.Location
 
         [Required]
         [MaxLength(250)]
-        public string City { get; set; }
-
-        [Required]
-        [MaxLength(250)]
-        public string Country { get; set; }
+        public string Name { get; set; }
     }
 }

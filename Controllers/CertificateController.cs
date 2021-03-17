@@ -64,7 +64,7 @@ namespace HR_Management.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(CertificateResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> UpdateCertificateAsync(int id, [FromBody] UpdateCertificateResource resource)
+        public async Task<IActionResult> UpdateCertificateAsync([FromBody] UpdateCertificateResource resource, int id)
         {
             var result = await _certificateService.UpdateAsync(id, resource);
 

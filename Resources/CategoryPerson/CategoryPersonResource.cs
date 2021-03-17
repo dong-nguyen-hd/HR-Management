@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using HR_Management.Resources.Technology;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -14,9 +14,12 @@ namespace HR_Management.Resources.CategoryPerson
         public int OrderIndex { get; set; }
 
         [Required]
-        public List<Dictionary<int, string>> Technology { get; set; } = new List<Dictionary<int, string>>();
+        [Display(Name = "Category Id")]
+        public int CategoryId { get; set; }
 
         [Required]
-        public string Category { get; set; }
+        public List<TechnologyResource> Technology { get; set; } = new List<TechnologyResource>();
+
+        
     }
 }

@@ -44,29 +44,10 @@ namespace HR_Management.Services
             // Get list record from DB
             var tempProject = await _projectRepository.ListAsync(personId);
 
-            // Mapping
-            List<ProjectResource> tempResource = new List<ProjectResource>();
-            foreach (var item in tempProject)
-            {
-                var temp = _mapper.Map<Project, ProjectResource>(item);
+            // Mapping Project to Resource
+            var resource = _mapper.Map<IEnumerable<Project>, IEnumerable<ProjectResource>>(tempProject);
 
-                // Mapping technology into Dictionary type
-                string[] listTechnology = item.Technology.Split(',');
-                foreach (var technology in listTechnology)
-                {
-                    var specific = await this._technologyRepository.FindByIdAsync(Convert.ToInt32(technology.Trim()));
-                    if (specific is null) continue;
-
-                    temp.Technology.Add(new Dictionary<int, string>()
-                    {
-                        { specific.Id, specific.Name}
-                    });
-                }
-
-                tempResource.Add(temp);
-            }
-
-            return new ProjectResponse<IEnumerable<ProjectResource>>(tempResource);
+            return new ProjectResponse<IEnumerable<ProjectResource>>(resource);
         }
 
         public async Task<ProjectResponse<ProjectResource>> CreateAsync(CreateProjectResource createProjectResource)
@@ -92,31 +73,15 @@ namespace HR_Management.Services
 
             // Mapping Resource to Project
             var project = _mapper.Map<CreateProjectResource, Project>(createProjectResource);
-            // Assign value
-            project.Technology = createProjectResource.Technology.ConcatenateWithComma();
             project.OrderIndex = maximumOrderIndex;
-            // Mapping Project to Resource
-            var resource = _mapper.Map<Project, ProjectResource>(project);
-
-            // Mapping
-            // Mapping technology into Dictionary type
-            foreach (var technology in createProjectResource.Technology)
-            {
-                var specific = await this._technologyRepository.FindByIdAsync(technology);
-                if (specific is null) continue;
-
-                resource.Technology.Add(new Dictionary<int, string>()
-                {
-                    { specific.Id, specific.Name}
-                });
-            }
-
+            
             try
             {
                 await _projectRepository.AddAsync(project);
                 await _unitOfWork.CompleteAsync();
-                /// Assign Id value while added
-                resource.Id = project.Id;
+                
+                // Mapping Project to Resource
+                var resource = _mapper.Map<Project, ProjectResource>(project);
 
                 return new ProjectResponse<ProjectResource>(resource);
             }
@@ -143,34 +108,15 @@ namespace HR_Management.Services
                 if (temp is null)
                     return new ProjectResponse<ProjectResource>($"Technology Id is not existent.");
             }
-            // Update infomation
-            tempProject.Name = updateProjectResource.Name.RemoveSpaceCharacter();
-            tempProject.Description = updateProjectResource.Description.RemoveSpaceCharacter();
-            tempProject.Position = updateProjectResource.Position.RemoveSpaceCharacter();
-            tempProject.Responsibilities = updateProjectResource.Responsibilities.RemoveSpaceCharacter();
-            tempProject.TeamSize = updateProjectResource.TeamSize;
-            tempProject.Technology = updateProjectResource.Technology.ConcatenateWithComma();
-            tempProject.StartDate = updateProjectResource.StartDate;
-            tempProject.EndDate = updateProjectResource.EndDate;
-
-            // Mapping
-            // Mapping Project to Resource
-            var resource = _mapper.Map<Project, ProjectResource>(tempProject);
-            // Mapping technology into Dictionary type
-            foreach (var technology in updateProjectResource.Technology)
-            {
-                var specific = await this._technologyRepository.FindByIdAsync(technology);
-                if (specific is null) continue;
-
-                resource.Technology.Add(new Dictionary<int, string>()
-                {
-                    { specific.Id, specific.Name}
-                });
-            }
+            // Updating
+            _mapper.Map(updateProjectResource, tempProject);
 
             try
             {
                 await _unitOfWork.CompleteAsync();
+
+                // Mapping Project to Resource
+                var resource = _mapper.Map<Project, ProjectResource>(tempProject);
 
                 return new ProjectResponse<ProjectResource>(resource);
             }
@@ -188,25 +134,13 @@ namespace HR_Management.Services
                 return new ProjectResponse<ProjectResource>("Project is not existent.");
             // Change property Status: true -> false
             tempProject.Status = false;
-            // Mapping
-            // Mapping Project to Resource
-            var resource = _mapper.Map<Project, ProjectResource>(tempProject);
-            // Mapping technology into Dictionary type
-            string[] listTechnology = tempProject.Technology.Split(',');
-            foreach (var technology in listTechnology)
-            {
-                var specific = await this._technologyRepository.FindByIdAsync(Convert.ToInt32(technology.Trim()));
-                if (specific is null) continue;
-
-                resource.Technology.Add(new Dictionary<int, string>()
-                {
-                    { specific.Id, specific.Name }
-                });
-            }
 
             try
             {
                 await _unitOfWork.CompleteAsync();
+
+                // Mapping Project to Resource
+                var resource = _mapper.Map<Project, ProjectResource>(tempProject);
 
                 return new ProjectResponse<ProjectResource>(resource);
             }
