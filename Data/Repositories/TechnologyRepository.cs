@@ -15,7 +15,8 @@ namespace HR_Management.Data.Repositories
 
         public async Task<IEnumerable<Technology>> ListAsync()
         {
-            var temp = await _context.Technologies.Where(x => x.Status)
+            var temp = await _context.Technologies
+                .Where(x => x.Status)
                 .OrderBy(x => x.Name)
                 .AsNoTracking()
                 .ToListAsync();
@@ -25,7 +26,8 @@ namespace HR_Management.Data.Repositories
 
         public async Task<IEnumerable<Technology>> ListAsync(int categoryId)
         {
-            var temp = await _context.Technologies.Where(x => x.CategoryId == categoryId && x.Status)
+            var temp = await _context.Technologies
+                .Where(x => x.CategoryId == categoryId && x.Status)
                 .OrderBy(x => x.Name)
                 .AsNoTracking()
                 .ToListAsync();
@@ -41,7 +43,9 @@ namespace HR_Management.Data.Repositories
 
         public async Task<Technology> FindByIdAsync(int id)
         {
-            var temp = await _context.Technologies.Where(x => x.Id == id && x.Status).FirstOrDefaultAsync();
+            var temp = await _context.Technologies
+                .Where(x => x.Id == id && x.Status)
+                .FirstOrDefaultAsync();
 
             return temp;
         }

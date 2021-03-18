@@ -1,7 +1,7 @@
 ﻿
 namespace HR_Management.Resources.Queries
 {
-    public class QueryResource
+    public sealed class QueryResource
     {
         public int Page { get; set; }
 

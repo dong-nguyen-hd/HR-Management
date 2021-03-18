@@ -11,7 +11,7 @@ namespace HR_Management.Extensions.Validation
         {
             try
             {
-                List<eOrder> tempList = new List<eOrder>((List<eOrder>)value);
+                List<int> tempList = new List<int>((List<int>)value);
                 
                 foreach (var item in tempList)
                     if (!ValidateElement(item))
@@ -24,7 +24,7 @@ namespace HR_Management.Extensions.Validation
                 return new ValidationResult("Invalid Component field.");
             }
 
-            bool ValidateElement(eOrder temp)
+            bool ValidateElement(int temp)
                 => Enum.IsDefined(typeof(eOrder), temp);
         }
     }

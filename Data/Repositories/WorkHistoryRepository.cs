@@ -18,20 +18,17 @@ namespace HR_Management.Data.Repositories
             var temp = await _context.WorkHistories.Where(x => x.PersonId == personId && x.Status)
                 .OrderBy(x => x.OrderIndex)
                 .ThenBy(x => x.EndDate)
+                .AsNoTracking()
                 .ToListAsync();
 
             return temp;
         }
 
         public async Task AddAsync(WorkHistory workHistory)
-        {
-            await _context.WorkHistories.AddAsync(workHistory);
-        }
+            => await _context.WorkHistories.AddAsync(workHistory);
 
         public void Update(WorkHistory workHistory)
-        {
-            _context.WorkHistories.Update(workHistory);
-        }
+            => _context.WorkHistories.Update(workHistory);
 
         public async Task<WorkHistory> FindByIdAsync(int id)
         {
@@ -41,14 +38,16 @@ namespace HR_Management.Data.Repositories
         }
 
         public void Remove(WorkHistory workHistory)
-        {
-            _context.WorkHistories.Remove(workHistory);
-        }
+            => _context.WorkHistories.Remove(workHistory);
 
-        public async Task<int> MaximumOrderIndexAsync(int personId)
+        public int MaximumOrderIndex(int personId)
         {
-            var tempList = await _context.WorkHistories.Where(x => x.PersonId == personId && x.Status).ToListAsync();
-            int maximum = (tempList.Count == 0) ? 0 : tempList.Max(x => x.OrderIndex);
+            var tempList = _context.WorkHistories
+                .Where(x => x.PersonId == personId && x.Status)
+                .Select(x => new { x.OrderIndex })
+                .AsNoTracking();
+
+            int maximum = (tempList.Count() == 0) ? 0 : tempList.Max(x => x.OrderIndex);
 
             return maximum;
         }

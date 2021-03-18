@@ -4,7 +4,6 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
-using HR_Management.Extensions;
 using HR_Management.Resources;
 using HR_Management.Resources.WorkHistory;
 using System;
@@ -47,22 +46,14 @@ namespace HR_Management.Services
 
         public async Task<WorkHistoryResponse<WorkHistoryResource>> CreateAsync(CreateWorkHistoryResource createWorkHistoryResource)
         {
-            // Validate DateTime is valid
-            var isSuccess = RelateValidate.ValidateTimeInput(createWorkHistoryResource.StartDate, createWorkHistoryResource.EndDate);
-            if (!isSuccess)
-                return new WorkHistoryResponse<WorkHistoryResource>($"Start Date/End Date is not valid.");
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(createWorkHistoryResource.PersonId);
             if (tempPerson is null)
                 return new WorkHistoryResponse<WorkHistoryResource>($"PersonId '{createWorkHistoryResource.PersonId}' is not existent.");
-            // Find maximum value of OrderIndex
-            int maximumOrderIndex = await _workHistoryRepository.MaximumOrderIndexAsync(createWorkHistoryResource.PersonId);
-            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
-
-            // Mapping Resource to Project
+            
+            // Mapping Resource to WorkHistory
             var workHistory = _mapper.Map<CreateWorkHistoryResource, WorkHistory>(createWorkHistoryResource);
-            // Assign value
-            workHistory.OrderIndex = maximumOrderIndex;
+            workHistory.OrderIndex = FindMaximum(workHistory.PersonId);
 
             try
             {
@@ -79,21 +70,29 @@ namespace HR_Management.Services
             }
         }
 
+        /// <summary>
+        /// Find maximum value of OrderIndex
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private int FindMaximum(int id)
+        {
+            int maximumOrderIndex = _workHistoryRepository.MaximumOrderIndex(id);
+            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
+
+            return maximumOrderIndex;
+        }
+
+
         public async Task<WorkHistoryResponse<WorkHistoryResource>> UpdateAsync(int id, UpdateWorkHistoryResource updateWorkHistoryResource)
         {
-            // Validate dateTime is valid
-            var isSuccess = RelateValidate.ValidateTimeInput(updateWorkHistoryResource.StartDate, updateWorkHistoryResource.EndDate);
-            if (!isSuccess)
-                return new WorkHistoryResponse<WorkHistoryResource>($"Start Date/End Date is not valid.");
             // Validate Id is existent?
             var tempWorkHistory = await _workHistoryRepository.FindByIdAsync(id);
             if (tempWorkHistory is null)
                 return new WorkHistoryResponse<WorkHistoryResource>("Work History is not existent.");
-            // Update infomation
-            tempWorkHistory.Position = updateWorkHistoryResource.Position.RemoveSpaceCharacter();
-            tempWorkHistory.CompanyName = updateWorkHistoryResource.CompanyName.RemoveSpaceCharacter();
-            tempWorkHistory.StartDate = updateWorkHistoryResource.StartDate;
-            tempWorkHistory.EndDate = updateWorkHistoryResource.EndDate;
+            // Updating
+            _mapper.Map(updateWorkHistoryResource, tempWorkHistory);
+
             try
             {
                 await _unitOfWork.CompleteAsync();

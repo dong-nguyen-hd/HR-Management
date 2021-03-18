@@ -4,7 +4,6 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
-using HR_Management.Extensions;
 using HR_Management.Resources;
 using HR_Management.Resources.Project;
 using System;
@@ -52,10 +51,6 @@ namespace HR_Management.Services
 
         public async Task<ProjectResponse<ProjectResource>> CreateAsync(CreateProjectResource createProjectResource)
         {
-            // Validate dateTime is valid
-            var isSuccess = RelateValidate.ValidateTimeInput(createProjectResource.StartDate, createProjectResource.EndDate);
-            if (!isSuccess)
-                return new ProjectResponse<ProjectResource>($"Start Date/End Date is not valid.");
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(createProjectResource.PersonId);
             if (tempPerson is null)
@@ -67,13 +62,10 @@ namespace HR_Management.Services
                 if (temp is null)
                     return new ProjectResponse<ProjectResource>($"Technology Id is not existent.");
             }
-            // Find maximum value of OrderIndex
-            int maximumOrderIndex = await _projectRepository.MaximumOrderIndexAsync(createProjectResource.PersonId);
-            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
 
             // Mapping Resource to Project
             var project = _mapper.Map<CreateProjectResource, Project>(createProjectResource);
-            project.OrderIndex = maximumOrderIndex;
+            project.OrderIndex = FindMaximum(project.PersonId);
             
             try
             {
@@ -91,12 +83,21 @@ namespace HR_Management.Services
             }
         }
 
+        /// <summary>
+        /// Find maximum value of OrderIndex
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private int FindMaximum(int id)
+        {
+            int maximumOrderIndex = _projectRepository.MaximumOrderIndex(id);
+            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
+
+            return maximumOrderIndex;
+        }
+
         public async Task<ProjectResponse<ProjectResource>> UpdateAsync(int id, UpdateProjectResource updateProjectResource)
         {
-            // Validate dateTime is valid
-            var isSuccess = RelateValidate.ValidateTimeInput(updateProjectResource.StartDate, updateProjectResource.EndDate);
-            if (!isSuccess)
-                return new ProjectResponse<ProjectResource>($"Start Date/End Date is not valid.");
             // Validate Id is existent?
             var tempProject = await _projectRepository.FindByIdAsync(id);
             if (tempProject is null)

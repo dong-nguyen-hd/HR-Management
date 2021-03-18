@@ -9,7 +9,7 @@ namespace HR_Management.Domain.Services
     {
         Task<CategoryResponse<IEnumerable<CategoryResource>>> ListAsync();
         Task<CategoryResponse<CategoryResource>> CreateAsync(CreateCategoryResource resource);
-        Task<CategoryResponse<CategoryResource>> UpdateAsync(int id, CreateCategoryResource resource);
+        Task<CategoryResponse<CategoryResource>> UpdateAsync(int id, UpdateCategoryResource resource);
         Task<CategoryResponse<CategoryResource>> DeleteAsync(int id);
     }
 }

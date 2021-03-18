@@ -64,7 +64,7 @@ namespace HR_Management.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(CategoryResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> UpdateCategoryAsync(int id, [FromBody] CreateCategoryResource resource)
+        public async Task<IActionResult> UpdateCategoryAsync(int id, [FromBody] UpdateCategoryResource resource)
         {
             var result = await _categoryService.UpdateAsync(id, resource);
 

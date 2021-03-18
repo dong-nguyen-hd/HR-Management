@@ -11,6 +11,6 @@ namespace HR_Management.Domain.Repositories
         void Update(Education education);
         Task<Education> FindByIdAsync(int id);
         void Remove(Education education);
-        Task<int> MaximumOrderIndexAsync(int personId);
+        int MaximumOrderIndex(int personId);
     }
 }

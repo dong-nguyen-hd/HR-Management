@@ -1,4 +1,5 @@
 ﻿using HR_Management.Extensions;
+using HR_Management.Extensions.Validation;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -19,6 +20,7 @@ namespace HR_Management.Resources.Certificate
         public string Provider { get; set; }
 
         [Required]
+        [StartDate("EndDate")]
         [JsonConverter(typeof(DateTimeConverter))]
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }

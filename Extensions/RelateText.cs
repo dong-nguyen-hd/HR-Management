@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -7,11 +8,7 @@ namespace HR_Management.Extensions
     public static class RelateText
     {
         public static string RemoveSpaceCharacter(this string source)
-        {
-            source = Regex.Replace(source.Trim(), @"\s{2,}", " ");
-
-            return source;
-        }
+            => Regex.Replace(source.Trim(), @"\s{2,}", " ");
 
         public static string ConcatenateWithComma(this List<int> source)
         {

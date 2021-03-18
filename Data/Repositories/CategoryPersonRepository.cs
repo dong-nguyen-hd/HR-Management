@@ -15,7 +15,8 @@ namespace HR_Management.Data.Repositories
 
         public async Task<IEnumerable<CategoryPerson>> ListAsync(int personId)
         {
-            var temp = await _context.CategoryPersons.Where(x => x.PersonId == personId && x.Status)
+            var temp = await _context.CategoryPersons
+                .Where(x => x.PersonId == personId && x.Status)
                 .OrderBy(x => x.OrderIndex)
                 .AsNoTracking()
                 .ToListAsync();

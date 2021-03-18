@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HR_Management.Extensions.Validation;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace HR_Management.Resources.Education
@@ -15,6 +16,7 @@ namespace HR_Management.Resources.Education
         public string Major { get; set; }
 
         [Required]
+        [StartDate("EndDate")]
         [DataType(DataType.Date)]
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }

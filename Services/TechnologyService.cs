@@ -4,7 +4,6 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
-using HR_Management.Extensions;
 using HR_Management.Resources.Technology;
 using System;
 using System.Collections.Generic;
@@ -56,7 +55,7 @@ namespace HR_Management.Services
 
         public async Task<TechnologyResponse<TechnologyResource>> CreateAsync(CreateTechnologyResource createTechnologyResource)
         {
-            // Validate category is existent?
+            // Validate CategoryId is existent?
             var tempPerson = await _categoryRepository.FindByIdAsync(createTechnologyResource.CategoryId);
             if (tempPerson is null)
                 return new TechnologyResponse<TechnologyResource>($"CategoryId '{createTechnologyResource.CategoryId}' is not existent.");
@@ -84,8 +83,8 @@ namespace HR_Management.Services
             var tempTechnology = await _technologyRepository.FindByIdAsync(id);
             if (tempTechnology is null)
                 return new TechnologyResponse<TechnologyResource>("Technology is not existent.");
-            // Update infomation
-            tempTechnology.Name = updateTechnologyResource.Name.RemoveSpaceCharacter();
+            // Updating
+            _mapper.Map(updateTechnologyResource, tempTechnology);
             
             try
             {

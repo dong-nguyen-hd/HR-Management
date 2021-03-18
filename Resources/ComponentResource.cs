@@ -1,5 +1,4 @@
 ﻿using HR_Management.Extensions.Validation;
-using HR_Management.Infrastructure;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -10,6 +9,6 @@ namespace HR_Management.Resources
         [MaxLength(50)]
         [ComponentOrder]
         [Display(Name = "Order Index")]
-        public List<eOrder> OrderIndex { get; set; }
+        public List<int> OrderIndex { get; set; }
     }
 }

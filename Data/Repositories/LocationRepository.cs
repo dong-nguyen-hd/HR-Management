@@ -30,6 +30,7 @@ namespace HR_Management.Data.Repositories
             var temp = await _context.Locations.Where(x => x.Status)
                 .OrderBy(x => x.Name)
                 .ThenBy(x => x.Address)
+                .AsNoTracking()
                 .ToListAsync();
 
             return temp;

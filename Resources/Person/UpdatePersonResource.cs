@@ -1,7 +1,5 @@
-﻿using HR_Management.Extensions;
-using HR_Management.Extensions.Validation;
+﻿using HR_Management.Extensions.Validation;
 using HR_Management.Infrastructure;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 

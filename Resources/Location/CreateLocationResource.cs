@@ -6,10 +6,10 @@ namespace HR_Management.Resources.Location
     {
         [Required]
         [MaxLength(250)]
-        public string Address { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [MaxLength(250)]
-        public string Name { get; set; }
+        public string Address { get; set; }
     }
 }

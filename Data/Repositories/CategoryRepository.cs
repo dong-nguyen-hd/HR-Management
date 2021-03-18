@@ -17,31 +17,28 @@ namespace HR_Management.Data.Repositories
         {
             var temp = await _context.Categories.Where(x => x.Status)
                 .OrderBy(x => x.Name)
+                .AsNoTracking()
                 .ToListAsync();
 
             return temp;
         }
 
         public async Task AddAsync(Category category)
-        {
-            await _context.Categories.AddAsync(category);
-        }
+            => await _context.Categories.AddAsync(category);
 
         public void Update(Category category)
-        {
-            _context.Categories.Update(category);
-        }
+            => _context.Categories.Update(category);
 
         public async Task<Category> FindByIdAsync(int id)
         {
-            var temp = await _context.Categories.Where(x => x.Id == id && x.Status).FirstOrDefaultAsync();
+            var temp = await _context.Categories
+                .Where(x => x.Id == id && x.Status)
+                .FirstOrDefaultAsync();
 
             return temp;
         }
 
         public void Remove(Category category)
-        {
-            _context.Categories.Remove(category);
-        }
+            => _context.Categories.Remove(category);
     }
 }

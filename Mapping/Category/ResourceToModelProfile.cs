@@ -13,6 +13,9 @@ namespace HR_Management.Mapping.Category
 
             CreateMap<CategoryResource, Domain.Models.Category>()
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
+
+            CreateMap<UpdateCategoryResource, Domain.Models.Category>()
+                .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
         }
     }
 }

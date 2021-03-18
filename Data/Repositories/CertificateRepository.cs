@@ -15,23 +15,21 @@ namespace HR_Management.Data.Repositories
 
         public async Task<IEnumerable<Certificate>> ListAsync(int personId)
         {
-            var temp = await _context.Certificates.Where(x => x.PersonId == personId && x.Status)
+            var temp = await _context.Certificates
+                .Where(x => x.PersonId == personId && x.Status)
                 .OrderBy(x => x.OrderIndex)
                 .ThenBy(x => x.EndDate)
+                .AsNoTracking()
                 .ToListAsync();
 
             return temp;
         }
 
         public async Task AddAsync(Certificate certificate)
-        {
-            await _context.Certificates.AddAsync(certificate);
-        }
+            => await _context.Certificates.AddAsync(certificate);
 
         public void Update(Certificate certificate)
-        {
-            _context.Certificates.Update(certificate);
-        }
+            => _context.Certificates.Update(certificate);
 
         public async Task<Certificate> FindByIdAsync(int id)
         {
@@ -41,15 +39,17 @@ namespace HR_Management.Data.Repositories
         }
 
         public void Remove(Certificate certificate)
-        {
-            _context.Certificates.Remove(certificate);
-        }
+            => _context.Certificates.Remove(certificate);
 
-        public async Task<int> MaximumOrderIndexAsync(int personId)
+        public int MaximumOrderIndex(int personId)
         {
-            var tempList = await _context.Certificates.Where(x => x.PersonId == personId && x.Status).ToListAsync();
-            int maximum = (tempList.Count == 0) ? 0 : tempList.Max(x => x.OrderIndex);
-            
+            var tempList = _context.Certificates
+                .Where(x => x.PersonId == personId && x.Status)
+                .Select(x => new { x.OrderIndex })
+                .AsNoTracking();
+
+            int maximum = (tempList.Count() == 0) ? 0 : tempList.Max(x => x.OrderIndex);
+
             return maximum;
         }
     }

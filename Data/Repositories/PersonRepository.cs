@@ -43,7 +43,8 @@ namespace HR_Management.Data.Repositories
 
         public async Task<IEnumerable<Person>> ListByLocationAsync(QueryResource pagination, int locationId)
         {
-            var temp = await _context.People.Where(x => x.LocationId == locationId && x.Status)
+            var temp = await _context.People
+                .Where(x => x.LocationId == locationId && x.Status)
                 .OrderBy(x => x.FirstName)
                 .ThenBy(x => x.StaffId)
                 .Skip((pagination.Page - 1) * pagination.PageSize)

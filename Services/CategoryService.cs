@@ -4,7 +4,6 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
-using HR_Management.Extensions;
 using HR_Management.Resources.Category;
 using System;
 using System.Collections.Generic;
@@ -41,7 +40,6 @@ namespace HR_Management.Services
         {
             // Mapping
             var category = _mapper.Map<CreateCategoryResource, Category>(createResource);
-            
 
             try
             {
@@ -58,14 +56,14 @@ namespace HR_Management.Services
             }
         }
 
-        public async Task<CategoryResponse<CategoryResource>> UpdateAsync(int id, CreateCategoryResource updateResource)
+        public async Task<CategoryResponse<CategoryResource>> UpdateAsync(int id, UpdateCategoryResource updateResource)
         {
             // Validate Id is existent?
             var tempCategory = await _categoryRepository.FindByIdAsync(id);
             if (tempCategory is null)
                 return new CategoryResponse<CategoryResource>("Category is not existent.");
             // Update infomation
-            tempCategory.Name = updateResource.Name.RemoveSpaceCharacter();
+            _mapper.Map(updateResource, tempCategory);
 
             try
             {
@@ -77,7 +75,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CategoryResponse<CategoryResource>($"An error occurred when updating the category: {ex.Message}");
+                return new CategoryResponse<CategoryResource>($"An error occurred when updating the Category: {ex.Message}");
             }
         }
 
@@ -100,7 +98,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CategoryResponse<CategoryResource>($"An error occurred when deleting the category: {ex.Message}");
+                return new CategoryResponse<CategoryResource>($"An error occurred when deleting the Category: {ex.Message}");
             }
         }
     }

@@ -47,22 +47,14 @@ namespace HR_Management.Services
 
         public async Task<CertificateResponse<CertificateResource>> CreateAsync(CreateCertificateResource createCertificateResource)
         {
-            // Validate dateTime is valid
-            var isSuccess = RelateValidate.ValidateTimeInput(createCertificateResource.StartDate, createCertificateResource.EndDate);
-            if (!isSuccess)
-                return new CertificateResponse<CertificateResource>($"Start Date/End Date is not valid.");
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(createCertificateResource.PersonId);
             if (tempPerson is null)
                 return new CertificateResponse<CertificateResource>($"Person Id '{createCertificateResource.PersonId}' is not existent.");
-            // Find maximum value of OrderIndex
-            int maximumOrderIndex = await _certificateRepository.MaximumOrderIndexAsync(createCertificateResource.PersonId);
-            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
-
+            
             // Mapping Resource to Project
             var certificate = _mapper.Map<CreateCertificateResource, Certificate>(createCertificateResource);
-            // Assign value
-            certificate.OrderIndex = maximumOrderIndex;
+            certificate.OrderIndex = FindMaximum(certificate.PersonId);
 
             try
             {
@@ -79,21 +71,27 @@ namespace HR_Management.Services
             }
         }
 
+        /// <summary>
+        /// Find maximum value of OrderIndex
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private int FindMaximum(int id)
+        {
+            int maximumOrderIndex = _certificateRepository.MaximumOrderIndex(id);
+            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
+
+            return maximumOrderIndex;
+        }
+
         public async Task<CertificateResponse<CertificateResource>> UpdateAsync(int id, UpdateCertificateResource updateCertificateResource)
         {
-            // Validate dateTime is valid
-            var isSuccess = RelateValidate.ValidateTimeInput(updateCertificateResource.StartDate, updateCertificateResource.EndDate);
-            if (!isSuccess)
-                return new CertificateResponse<CertificateResource>($"StartDate/EndDate is not valid.");
             // Validate Id is existent?
             var tempCertificate = await _certificateRepository.FindByIdAsync(id);
             if (tempCertificate is null)
                 return new CertificateResponse<CertificateResource>("Certificate is not existent.");
-            // Update infomation
-            tempCertificate.Name = updateCertificateResource.Name.RemoveSpaceCharacter();
-            tempCertificate.Provider = updateCertificateResource.Provider.RemoveSpaceCharacter();
-            tempCertificate.StartDate = updateCertificateResource.StartDate;
-            tempCertificate.EndDate = updateCertificateResource.EndDate;
+            // Mapping Resource to Certificate
+            _mapper.Map(updateCertificateResource, tempCertificate);
 
             try
             {

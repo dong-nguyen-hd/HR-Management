@@ -12,12 +12,12 @@ namespace HR_Management.Resources.WorkHistory
 
         [Required]
         [MaxLength(250)]
-        public string Position { get; set; }
+        [Display(Name = "Company Name")]
+        public string CompanyName { get; set; }
 
         [Required]
         [MaxLength(250)]
-        [Display(Name = "Company Name")]
-        public string CompanyName { get; set; }
+        public string Position { get; set; }
 
         [Required]
         [JsonConverter(typeof(DateTimeConverter))]

@@ -4,7 +4,6 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
-using HR_Management.Extensions;
 using HR_Management.Resources;
 using HR_Management.Resources.Education;
 using System;
@@ -47,22 +46,14 @@ namespace HR_Management.Services
 
         public async Task<EducationResponse<EducationResource>> CreateAsync(CreateEducationResource createEducationResource)
         {
-            // Validate dateTime is valid
-            var isSuccess = RelateValidate.ValidateTimeInput(createEducationResource.StartDate, createEducationResource.EndDate);
-            if (!isSuccess)
-                return new EducationResponse<EducationResource>($"Start Date/End Date is not valid.");
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(createEducationResource.PersonId);
             if (tempPerson is null)
                 return new EducationResponse<EducationResource>($"Person Id '{createEducationResource.PersonId}' is not existent.");
-            // Find maximum value of OrderIndex
-            int maximumOrderIndex = await _educationRepository.MaximumOrderIndexAsync(createEducationResource.PersonId);
-            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
 
             // Mapping Resource to Project
             var education = _mapper.Map<CreateEducationResource, Education>(createEducationResource);
-            // Assign value
-            education.OrderIndex = maximumOrderIndex;
+            education.OrderIndex = FindMaximum(education.PersonId);
 
             try
             {
@@ -79,21 +70,27 @@ namespace HR_Management.Services
             }
         }
 
+        /// <summary>
+        /// Find maximum value of OrderIndex
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private int FindMaximum(int id)
+        {
+            int maximumOrderIndex = _educationRepository.MaximumOrderIndex(id);
+            maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;
+
+            return maximumOrderIndex;
+        }
+
         public async Task<EducationResponse<EducationResource>> UpdateAsync(int id, UpdateEducationResource updateEducationResource)
         {
-            // Validate dateTime is valid
-            var isSuccess = RelateValidate.ValidateTimeInput(updateEducationResource.StartDate, updateEducationResource.EndDate);
-            if (!isSuccess)
-                return new EducationResponse<EducationResource>($"StartDate/EndDate is not valid.");
             // Validate Id is existent?
             var tempEducation = await _educationRepository.FindByIdAsync(id);
             if (tempEducation is null)
                 return new EducationResponse<EducationResource>("Education is not existent.");
             // Update infomation
-            tempEducation.CollegeName = updateEducationResource.CollegeName.RemoveSpaceCharacter();
-            tempEducation.Major = updateEducationResource.Major.RemoveSpaceCharacter();
-            tempEducation.StartDate = updateEducationResource.StartDate;
-            tempEducation.EndDate = updateEducationResource.EndDate;
+            _mapper.Map(updateEducationResource, tempEducation);
 
             try
             {

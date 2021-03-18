@@ -11,6 +11,6 @@ namespace HR_Management.Domain.Repositories
         void Update(Project project);
         Task<Project> FindByIdAsync(int id);
         void Remove(Project project);
-        Task<int> MaximumOrderIndexAsync(int personId);
+        int MaximumOrderIndex(int personId);
     }
 }

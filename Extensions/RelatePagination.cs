@@ -1,4 +1,5 @@
-﻿using HR_Management.Domain.Services;
+﻿#nullable enable
+using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
 using HR_Management.Resources.Queries;
 using System;

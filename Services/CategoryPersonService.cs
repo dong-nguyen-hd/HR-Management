@@ -72,7 +72,7 @@ namespace HR_Management.Services
 
             // Mapping Resource to CategoryPerson
             var categoryPerson = _mapper.Map<CreateCategoryPersonResource, CategoryPerson>(createCategoryPersonResource);
-            categoryPerson.OrderIndex = FindMaximumAsync(createCategoryPersonResource.CategoryId);
+            categoryPerson.OrderIndex = FindMaximum(createCategoryPersonResource.PersonId);
 
             try
             {
@@ -95,7 +95,7 @@ namespace HR_Management.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private int FindMaximumAsync(int id)
+        private int FindMaximum(int id)
         {
             int maximumOrderIndex =  _categoryPersonRepository.MaximumOrderIndex(id);
             maximumOrderIndex = (maximumOrderIndex <= 0) ? 1 : maximumOrderIndex + 1;

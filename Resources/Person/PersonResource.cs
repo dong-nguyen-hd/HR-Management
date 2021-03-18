@@ -45,6 +45,7 @@ namespace HR_Management.Resources.Person
 
         [Required]
         [DoB]
+        [DataType(DataType.Date)]
         [JsonConverter(typeof(DateTimeConverter))]
         [Display(Name = "Year Of Birth")]
         public DateTime YearOfBirth { get; set; }

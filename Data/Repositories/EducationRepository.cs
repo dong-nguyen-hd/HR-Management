@@ -18,20 +18,17 @@ namespace HR_Management.Data.Repositories
             var temp =  await _context.Educations.Where(x => x.PersonId == personId && x.Status)
                 .OrderBy(x => x.OrderIndex)
                 .ThenBy(x => x.EndDate)
+                .AsNoTracking()
                 .ToListAsync();
             
             return temp;
         }
 
         public async Task AddAsync(Education education)
-        {
-            await _context.Educations.AddAsync(education);
-        }
+            => await _context.Educations.AddAsync(education);
 
         public void Update(Education education)
-        {
-            _context.Educations.Update(education);
-        }
+            => _context.Educations.Update(education);
 
         public async Task<Education> FindByIdAsync(int id)
         {
@@ -41,14 +38,16 @@ namespace HR_Management.Data.Repositories
         }
 
         public void Remove(Education education)
-        {
-            _context.Educations.Remove(education);
-        }
+            => _context.Educations.Remove(education);
 
-        public async Task<int> MaximumOrderIndexAsync(int personId)
+        public int MaximumOrderIndex(int personId)
         {
-            var tempList = await _context.Educations.Where(x => x.PersonId == personId && x.Status).ToListAsync();
-            int maximum = (tempList.Count == 0) ? 0 : tempList.Max(x => x.OrderIndex);
+            var tempList = _context.Educations
+                .Where(x => x.PersonId == personId && x.Status)
+                .Select(x => new { x.OrderIndex })
+                .AsNoTracking();
+
+            int maximum = (tempList.Count() == 0) ? 0 : tempList.Max(x => x.OrderIndex);
 
             return maximum;
         }

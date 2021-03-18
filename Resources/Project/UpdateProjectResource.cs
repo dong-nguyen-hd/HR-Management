@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HR_Management.Extensions.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -27,6 +28,7 @@ namespace HR_Management.Resources.Project
         public int TeamSize { get; set; }
 
         [Required]
+        [StartDate("EndDate")]
         [DataType(DataType.Date)]
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
@@ -36,6 +38,7 @@ namespace HR_Management.Resources.Project
         public DateTime? EndDate { get; set; }
 
         [Required]
+        [MaxLength(50)]
         public List<int> Technology { get; set; }
     }
 }

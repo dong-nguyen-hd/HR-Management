@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HR_Management.Extensions.Validation;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace HR_Management.Resources.Certificate
@@ -14,6 +15,7 @@ namespace HR_Management.Resources.Certificate
         public string Provider { get; set; }
 
         [Required]
+        [StartDate("EndDate")]
         [DataType(DataType.Date)]
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }

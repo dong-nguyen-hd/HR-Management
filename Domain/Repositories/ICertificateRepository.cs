@@ -11,6 +11,6 @@ namespace HR_Management.Domain.Repositories
         void Update(Certificate certificate);
         Task<Certificate> FindByIdAsync(int id);
         void Remove(Certificate certificate);
-        Task<int> MaximumOrderIndexAsync(int personId);
+        int MaximumOrderIndex(int personId);
     }
 }

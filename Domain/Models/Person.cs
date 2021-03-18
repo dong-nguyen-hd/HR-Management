@@ -27,6 +27,5 @@ namespace HR_Management.Domain.Models
         public ICollection<Project> Projects { get; set; }
         public ICollection<WorkHistory> WorkHistories { get; set; }
         public ICollection<Log> Logs { get; set; }
-
     }
 }

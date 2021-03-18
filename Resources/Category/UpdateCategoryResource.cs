@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HR_Management.Resources.Technology
+namespace HR_Management.Resources.Category
 {
-    public class TechnologyResource
+    public class UpdateCategoryResource
     {
-        [Required]
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(250)]
         public string Name { get; set; }

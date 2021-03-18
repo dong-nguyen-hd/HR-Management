@@ -4,7 +4,6 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
-using HR_Management.Extensions;
 using HR_Management.Resources.Location;
 using System;
 using System.Collections.Generic;
@@ -97,8 +96,7 @@ namespace HR_Management.Services
             if (tempLocation is null)
                 return new LocationResponse<LocationResource>("Location is not existent.");
             // Update infomation
-            tempLocation.Address = updateLocationResource.Address.RemoveSpaceCharacter();
-            tempLocation.Name = updateLocationResource.Name.RemoveSpaceCharacter();
+            _mapper.Map(updateLocationResource, tempLocation);
 
             try
             {
