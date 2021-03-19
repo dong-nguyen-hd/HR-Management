@@ -22,5 +22,8 @@ namespace HR_Management.Services
 
             return new Uri(modifiedUri);
         }
+
+        public Uri GetRouteUri(string route)
+            => new Uri(string.Concat(_baseUri, route));
     }
 }

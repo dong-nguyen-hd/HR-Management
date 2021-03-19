@@ -8,6 +8,7 @@ using HR_Management.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,13 @@ namespace HR_Management
                 return new UriService(uri);
             });
 
-            //services.AddCustomSwagger();
+            // Multipart body length limit
+            services.Configure<FormOptions>(options =>
+            {
+                // Set the limit to 10 MB
+                options.MultipartBodyLengthLimit = 10485760; // Bytes
+            });
+
             services.AddSwaggerGen();
             services.AddControllers().ConfigureApiBehaviorOptions(options =>
             {
@@ -81,6 +88,8 @@ namespace HR_Management
             
             services.AddScoped<IInformationService, InformationService>();
 
+            services.AddScoped<IImageService, ImageService>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             // Use AutoMapper
             services.AddAutoMapper(typeof(Startup));
@@ -105,7 +114,7 @@ namespace HR_Management
             app.UseRouting();
 
             //app.UseAuthorization();
-
+            app.UseStaticFiles();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
