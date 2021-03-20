@@ -7,10 +7,10 @@ namespace HR_Management.Domain.Services
 {
     public interface IPersonService
     {
-        Task<PersonResponse<PersonResource>> FindByIdAsync(int id);
-        Task<PersonResponse<PersonResource>> CreateAsync(CreatePersonResource createPersonResource);
-        Task<PersonResponse<PersonResource>> UpdateAsync(int id, UpdatePersonResource updatePersonResource);
-        Task<PersonResponse<PersonResource>> DeleteAsync(int id);
+        Task<PersonResponse<PersonResource>> FindByIdAsync(int id, bool isMobile = false);
+        Task<PersonResponse<PersonResource>> CreateAsync(CreatePersonResource createPersonResource, bool isMobile = false);
+        Task<PersonResponse<PersonResource>> UpdateAsync(int id, UpdatePersonResource updatePersonResource, bool isMobile = false);
+        Task<PersonResponse<PersonResource>> DeleteAsync(int id, bool isMobile = false);
         Task<PersonResponse<PersonResource>> AssignComponentAsync(int id, ComponentResource component);
     }
 }

@@ -13,12 +13,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace HR_Management
 {
     public class Startup
     {
         private IConfiguration Configuration { get; set; }
+
+        public static string ImagePathWeb { get; private set; }
+        public static string ImagePathMobile { get; private set; }
+        public static string RootPath { get; private set; }
 
         public Startup(IConfiguration config)
         {
@@ -101,6 +106,11 @@ namespace HR_Management
             {
                 app.UseDeveloperExceptionPage();
             }
+            // Get path of images-directory
+            ImagePathWeb = Configuration["ImagePathWeb"];
+            ImagePathMobile = Configuration["ImagePathMobile"];
+            RootPath = env.WebRootPath;
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 

@@ -32,22 +32,21 @@ namespace HR_Management.Controllers
         public async Task<IActionResult> SaveImage(int personId, [FromForm] IFormFile image)
         {
             var filePath = Path.GetTempFileName();
-            
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await image.CopyToAsync(stream);
 
-                bool isMobile = HttpContext.Request.Headers["User-Agent"].ToString().IsMobile();
-                var response = await _imageService.SaveImage(personId, stream, isMobile);
+            var stream = new FileStream(filePath, FileMode.Create);
+            await image.CopyToAsync(stream);
+            bool isMobile = HttpContext.Request.Headers["User-Agent"].ToString().IsMobile();
+            var response = await _imageService.SaveImage(personId, stream, isMobile);
+            stream.Dispose();
 
-                if (!response.Success)
-                    return BadRequest(new ResultResource(response.Message));
+            // Clean temp-file
+            if (System.IO.File.Exists(filePath))
+                System.IO.File.Delete(filePath);
 
-                return Ok(response.Resource);
-            }
+            if (!response.Success)
+                return BadRequest(new ResultResource(response.Message));
 
-            //if (System.IO.File.Exists(filePath))
-            //    System.IO.File.Delete(filePath);
+            return Ok(response.Resource);
         }
     }
 }

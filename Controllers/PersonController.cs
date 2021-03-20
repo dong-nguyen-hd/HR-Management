@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using HR_Management.Domain.Services;
+using HR_Management.Extensions;
 using HR_Management.Resources;
 using HR_Management.Resources.Person;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,8 @@ namespace HR_Management.Controllers
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetWithIdAsync(int personId)
         {
-            var result = await _personService.FindByIdAsync(personId);
+            bool isMobile = HttpContext.Request.Headers["User-Agent"].ToString().IsMobile();
+            var result = await _personService.FindByIdAsync(personId, isMobile);
 
             if (!result.Success)
                 return BadRequest(new ResultResource(result.Message));
@@ -46,7 +48,8 @@ namespace HR_Management.Controllers
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreatePersonAsync([FromBody] CreatePersonResource resource)
         {
-            var result = await _personService.CreateAsync(resource);
+            bool isMobile = HttpContext.Request.Headers["User-Agent"].ToString().IsMobile();
+            var result = await _personService.CreateAsync(resource, isMobile);
 
             if (!result.Success)
                 return BadRequest(new ResultResource(result.Message));
@@ -65,7 +68,8 @@ namespace HR_Management.Controllers
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdatePersonAsync([FromBody] UpdatePersonResource resource, int id)
         {
-            var result = await _personService.UpdateAsync(id, resource);
+            bool isMobile = HttpContext.Request.Headers["User-Agent"].ToString().IsMobile();
+            var result = await _personService.UpdateAsync(id, resource, isMobile);
 
             if (!result.Success)
                 return BadRequest(new ResultResource(result.Message));
@@ -101,7 +105,8 @@ namespace HR_Management.Controllers
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeletePersonAsync(int id)
         {
-            var result = await _personService.DeleteAsync(id);
+            bool isMobile = HttpContext.Request.Headers["User-Agent"].ToString().IsMobile();
+            var result = await _personService.DeleteAsync(id, isMobile);
 
             if (!result.Success)
                 return BadRequest(new ResultResource(result.Message));

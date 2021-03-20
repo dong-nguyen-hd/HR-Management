@@ -33,8 +33,7 @@ namespace HR_Management.Resources.Person
         [MaxLength(500)]
         public string Email { get; set; }
 
-        [MaxLength(250)]
-        public string Avatar { get; set; }
+        public Uri Avatar { get; set; }
 
         [MaxLength(500)]
         public string Description { get; set; }

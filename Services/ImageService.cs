@@ -2,7 +2,6 @@
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
-using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -15,17 +14,15 @@ namespace HR_Management.Services
     public class ImageService : IImageService
     {
         private readonly IUriService _uriService;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IPersonRepository _personRepository;
         private readonly IUnitOfWork _unitOfWork;
 
+
         public ImageService(IUriService uriService,
-            IWebHostEnvironment webHostEnvironment,
             IPersonRepository personRepository,
             IUnitOfWork unitOfWork)
         {
             this._uriService = uriService;
-            this._webHostEnvironment = webHostEnvironment;
             this._personRepository = personRepository;
             this._unitOfWork = unitOfWork;
         }
@@ -41,16 +38,20 @@ namespace HR_Management.Services
             if (tempPerson is null)
                 return new ImageResponse<Uri>($"Id '{personId}' is not existent.");
             // Path of image
-            string webPath = string.Format($"/Images/Web/{tempPerson.StaffId}.jpg");
-            string rootWebPath = string.Concat(_webHostEnvironment.WebRootPath, webPath);
+            string webPath = string.Format($"{Startup.ImagePathWeb}{tempPerson.StaffId}.jpg");
+            string rootWebPath = string.Concat(Startup.RootPath, webPath);
 
-            string mobilePath = string.Format($"/Images/Mobile/{tempPerson.StaffId}.jpg");
-            string rootMobilePath = string.Concat(_webHostEnvironment.WebRootPath, mobilePath);
+            string mobilePath = string.Format($"{Startup.ImagePathMobile}{tempPerson.StaffId}.jpg");
+            string rootMobilePath = string.Concat(Startup.RootPath, mobilePath);
             try
             {
                 bool isSuccess = Initialize(hasValue: tempPerson.Avatar, imageStream: imageStream, webPath: rootWebPath, mobilePath: rootMobilePath);
                 if (!isSuccess)
+                {
+                    tempPerson.Avatar = $"default.jpg";
                     return new ImageResponse<Uri>("Saving fault image.");
+                }
+                    
                 tempPerson.Avatar = $"{tempPerson.StaffId}.jpg";
                 await _unitOfWork.CompleteAsync();
 
@@ -61,8 +62,6 @@ namespace HR_Management.Services
             {
                 return new ImageResponse<Uri>($"An error occurred when saving the Image: {ex.Message}");
             }
-
-            return new ImageResponse<Uri>("test");
         }
 
         #region Initialize
