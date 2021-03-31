@@ -1,10 +1,11 @@
 using AutoMapper;
 using HR_Management.Controllers.Config;
 using HR_Management.Data.Contexts;
-using HR_Management.Data.Repositories;
-using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
+using HR_Management.Extensions.Middleware;
+using HR_Management.Resources;
 using HR_Management.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +14,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Text;
 
 namespace HR_Management
 {
@@ -33,6 +36,12 @@ namespace HR_Management
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddNewtonsoftJson();
+            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                // Adds a custom error response factory when ModelState is invalid
+                options.InvalidModelStateResponseFactory = InvalidModelStateResponseFactory.ProduceErrorResponse;
+            });
+
             // Get the base URL of the application (http(s)://www.api.com) from the HTTP Request and Context.
             services.AddHttpContextAccessor();
             services.AddSingleton<IUriService>(o =>
@@ -50,54 +59,48 @@ namespace HR_Management
                 options.MultipartBodyLengthLimit = 10485760; // Bytes
             });
 
-            services.AddSwaggerGen();
-            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            // Configure JWT Bearer
+            var jwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+            services.AddSingleton(jwtConfig);
+            services.AddAuthentication(x =>
             {
-                // Adds a custom error response factory when ModelState is invalid
-                options.InvalidModelStateResponseFactory = InvalidModelStateResponseFactory.ProduceErrorResponse;
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = true;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false, // default True
+                    ValidIssuer = jwtConfig.Issuer,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.Secret)),
+                    ValidAudience = jwtConfig.Audience,
+                    ValidateAudience = false, // default True
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromMinutes(1)
+                };
             });
 
-            // Use SQL Server
+            services.AddSwaggerGen();
+
+            // Using SQL Server
             services.AddDbContext<AppDbContext>(opts =>
             {
                 opts.UseSqlServer(Configuration["ConnectionStrings:AppConnection"]);
             });
 
-            // Use DI
-            services.AddScoped<IPersonRepository, PersonRepository>();
-            services.AddScoped<IPersonService, PersonService>();
+            // Using DI
+            services.AddDependencyInjection();
 
-            services.AddScoped<IEducationRepository, EducationRepository>();
-            services.AddScoped<IEducationService, EducationService>();
-
-            services.AddScoped<ICertificateRepository, CertificateRepository>();
-            services.AddScoped<ICertificateService, CertificateService>();
-
-            services.AddScoped<IWorkHistoryRepository, WorkHistoryRepository>();
-            services.AddScoped<IWorkHistoryService, WorkHistoryService>();
-
-            services.AddScoped<ILocationRepository, LocationRepository>();
-            services.AddScoped<ILocationService, LocationService>();
-
-            services.AddScoped<IProjectRepository, ProjectRepository>();
-            services.AddScoped<IProjectService, ProjectService>();
-
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<ICategoryService, CategoryService>();
-
-            services.AddScoped<ICategoryPersonRepository, CategoryPersonRepository>();
-            services.AddScoped<ICategoryPersonService, CategoryPersonService>();
-
-            services.AddScoped<ITechnologyRepository, TechnologyRepository>();
-            services.AddScoped<ITechnologyService, TechnologyService>();
-            
-            services.AddScoped<IInformationService, InformationService>();
-
-            services.AddScoped<IImageService, ImageService>();
-
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            // Use AutoMapper
+            // Using AutoMapper
             services.AddAutoMapper(typeof(Startup));
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -107,8 +110,8 @@ namespace HR_Management
                 app.UseDeveloperExceptionPage();
             }
             // Get path of images-directory
-            ImagePathWeb = Configuration["ImagePathWeb"];
-            ImagePathMobile = Configuration["ImagePathMobile"];
+            ImagePathWeb = Configuration["PathConfig:ImagePathWeb"];
+            ImagePathMobile = Configuration["PathConfig:ImagePathMobile"];
             RootPath = env.WebRootPath;
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
@@ -122,7 +125,8 @@ namespace HR_Management
             });
             
             app.UseRouting();
-
+            app.UseCors("AllowAll");
+            //app.UseAuthentication();
             //app.UseAuthorization();
             app.UseStaticFiles();
             app.UseEndpoints(endpoints =>

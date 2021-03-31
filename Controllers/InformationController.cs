@@ -23,7 +23,8 @@ namespace HR_Management.Controllers
         /// <summary>
         /// Get all record with pagination
         /// </summary>
-        /// <param name="personId"></param>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<InformationResource>), 200)]

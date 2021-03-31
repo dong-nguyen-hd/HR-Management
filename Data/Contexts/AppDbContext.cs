@@ -17,6 +17,7 @@ namespace HR_Management.Data.Contexts
         public DbSet<Technology> Technologies { get; set; }
         public DbSet<Person> People { get; set; }
         public DbSet<Log> Logs { get; set; }
+        public DbSet<Account> Accounts { get; set; }
 
         // Use Fluent API
         protected override void OnModelCreating(ModelBuilder builder)
@@ -90,6 +91,17 @@ namespace HR_Management.Data.Contexts
             builder.Entity<Log>().Property(x => x.UpdatedAt).HasColumnType("datetime2");
             builder.Entity<Log>().Property(x => x.UpdatedBy).IsRequired().HasColumnType("nvarchar(500)");
             builder.Entity<Log>().Property(x => x.Perpose).IsRequired().HasColumnType("nvarchar(500)");
+            // Information
+            builder.Entity<Account>().ToTable("Account");
+            builder.Entity<Account>().Property(x => x.UserName).IsRequired().HasColumnType("varchar(125)");
+            builder.Entity<Account>().Property(x => x.Password).IsRequired().HasColumnType("varchar(125)");
+            builder.Entity<Account>().Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
+            builder.Entity<Account>().Property(x => x.Email).IsRequired().HasColumnType("nvarchar(500)");
+            builder.Entity<Account>().Property(x => x.Role).IsRequired().HasColumnType("varchar(50)");
+            builder.Entity<Account>().Property(x => x.RefreshToken).HasColumnType("varchar(500)");
+            builder.Entity<Account>().Property(x => x.CreatedAt).IsRequired().HasColumnType("datetime2");
+            builder.Entity<Account>().Property(x => x.LastActivity).IsRequired().HasColumnType("datetime2");
+            builder.Entity<Account>().Property(x => x.Status).HasDefaultValue(true);
         }
     }
 }

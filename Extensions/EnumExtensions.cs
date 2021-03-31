@@ -6,7 +6,7 @@ namespace HR_Management.Extensions
     public static class EnumExtensions
     {
         /// <summary>
-        /// Get string in display-name dataanotation
+        /// Get string in display-name data-anotation
         /// </summary>
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="enum"></param>
@@ -16,7 +16,7 @@ namespace HR_Management.Extensions
             FieldInfo info = @enum.GetType().GetField(@enum.ToString());
             var attributes = (DescriptionAttribute[])info.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
-            return attributes?[0].Description ?? @enum.ToString();
+            return attributes?[0].Description ?? @enum.ToString().ToLower();
         }
     }
 }

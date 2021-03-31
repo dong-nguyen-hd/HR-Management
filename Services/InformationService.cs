@@ -35,7 +35,7 @@ namespace HR_Management.Services
             var totalRecords = await _personRepository.TotalRecordAsync();
             // Mapping
             var tempResource = _mapper.Map<IEnumerable<Person>, IEnumerable<InformationResource>>(tempPerson);
-
+            
             var resource = new InformationResponse<IEnumerable<InformationResource>>(tempResource);
             // Using extension-method for pagination
             resource.CreatePaginationResponse<InformationResponse<IEnumerable<InformationResource>>, IEnumerable<InformationResource>>(pagintation, totalRecords, _uriService, route);

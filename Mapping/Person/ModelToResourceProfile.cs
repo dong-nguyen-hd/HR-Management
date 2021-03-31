@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HR_Management.Domain.Services;
 using HR_Management.Resources.Information;
 using HR_Management.Resources.Person;
 using System;
@@ -11,8 +12,8 @@ namespace HR_Management.Mapping.Person
         public ModelToResourceProfile()
         {
             CreateMap<Domain.Models.Person, PersonResource>()
-                .ForMember(x => x.Avatar, opt => opt.Ignore())
-                .ForMember(x => x.Location, opt => opt.MapFrom(src =>  src.Location))
+                .ForMember(x => x.Avatar, opt => opt.MapFrom<CustomResolver>())
+                .ForMember(x => x.Location, opt => opt.MapFrom(src => src.Location))
                 .ForMember(x => x.OrderIndex, opt => opt.MapFrom(src => ConvertList(src.OrderIndex)));
 
             CreateMap<Domain.Models.Person, InformationResource>()
@@ -47,5 +48,21 @@ namespace HR_Management.Mapping.Person
 
             return tempList;
         }
+    }
+
+    /// <summary>
+    /// Custom Value Resolvers
+    /// </summary>
+    class CustomResolver : IValueResolver<Domain.Models.Person, PersonResource, Uri>
+    {
+        private readonly IUriService _uriService;
+
+        public CustomResolver(IUriService uriService)
+        {
+            this._uriService = uriService;
+        }
+
+        public Uri Resolve(Domain.Models.Person source, PersonResource destination, Uri destMember, ResolutionContext context)
+            => string.IsNullOrEmpty(source.Avatar) ? null : _uriService.GetRouteUri($"{Startup.ImagePathMobile}{source.Avatar}");
     }
 }
