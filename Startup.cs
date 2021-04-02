@@ -5,7 +5,6 @@ using HR_Management.Domain.Services;
 using HR_Management.Extensions.Middleware;
 using HR_Management.Resources;
 using HR_Management.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,9 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Text;
 
 namespace HR_Management
 {
@@ -27,6 +23,7 @@ namespace HR_Management
         public static string ImagePathWeb { get; private set; }
         public static string ImagePathMobile { get; private set; }
         public static string RootPath { get; private set; }
+        public static JwtConfig JwtConfig { get; private set; }
 
         public Startup(IConfiguration config)
         {
@@ -60,41 +57,15 @@ namespace HR_Management
             });
 
             // Configure JWT Bearer
-            var jwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
-            services.AddSingleton(jwtConfig);
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = true;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = false, // default True
-                    ValidIssuer = jwtConfig.Issuer,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.Secret)),
-                    ValidAudience = jwtConfig.Audience,
-                    ValidateAudience = false, // default True
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.FromMinutes(1)
-                };
-            });
+            JwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
-            services.AddSwaggerGen();
-
-            // Using SQL Server
+            services.AddJwtBearerAuthentication();
+            services.AddCustomizeSwagger();
             services.AddDbContext<AppDbContext>(opts =>
             {
                 opts.UseSqlServer(Configuration["ConnectionStrings:AppConnection"]);
             });
-
-            // Using DI
             services.AddDependencyInjection();
-
-            // Using AutoMapper
             services.AddAutoMapper(typeof(Startup));
             services.AddCors(options =>
             {
@@ -114,20 +85,12 @@ namespace HR_Management
             ImagePathMobile = Configuration["PathConfig:ImagePathMobile"];
             RootPath = env.WebRootPath;
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
+            app.UseCustomizeSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "HR_Management");
-            });
-            
             app.UseRouting();
             app.UseCors("AllowAll");
-            //app.UseAuthentication();
-            //app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseStaticFiles();
             app.UseEndpoints(endpoints =>
             {

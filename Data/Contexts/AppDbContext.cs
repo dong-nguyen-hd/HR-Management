@@ -1,5 +1,6 @@
 ﻿using HR_Management.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace HR_Management.Data.Contexts
 {
@@ -91,17 +92,32 @@ namespace HR_Management.Data.Contexts
             builder.Entity<Log>().Property(x => x.UpdatedAt).HasColumnType("datetime2");
             builder.Entity<Log>().Property(x => x.UpdatedBy).IsRequired().HasColumnType("nvarchar(500)");
             builder.Entity<Log>().Property(x => x.Perpose).IsRequired().HasColumnType("nvarchar(500)");
-            // Information
+            // Account
             builder.Entity<Account>().ToTable("Account");
             builder.Entity<Account>().Property(x => x.UserName).IsRequired().HasColumnType("varchar(125)");
             builder.Entity<Account>().Property(x => x.Password).IsRequired().HasColumnType("varchar(125)");
             builder.Entity<Account>().Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
             builder.Entity<Account>().Property(x => x.Email).IsRequired().HasColumnType("nvarchar(500)");
             builder.Entity<Account>().Property(x => x.Role).IsRequired().HasColumnType("varchar(50)");
-            builder.Entity<Account>().Property(x => x.RefreshToken).HasColumnType("varchar(500)");
             builder.Entity<Account>().Property(x => x.CreatedAt).IsRequired().HasColumnType("datetime2");
             builder.Entity<Account>().Property(x => x.LastActivity).IsRequired().HasColumnType("datetime2");
             builder.Entity<Account>().Property(x => x.Status).HasDefaultValue(true);
+
+            // Seeding Data for Account table
+            builder.Entity<Account>().HasData(
+                new Account
+                {
+                    Id = -1,
+                    UserName = "admin",
+                    Password = "10000.ej6YMBO1QrLxWx7AuxN8IA==.0CNmt0k0xfvshCGdRy8wTiapSrEWFedeozzNTakWkQw=", // Input: d7f32454b44d22182618d56e683f419a
+                    Email = "dong.nguyen.hdkt@gmail.com",
+                    Role = "admin",
+                    CreatedAt = DateTime.Now,
+                    Name = "Dong Nguyen",
+                    LastActivity = DateTime.Now,
+                    Status = true
+                }
+                );
         }
     }
 }

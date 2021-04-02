@@ -2,6 +2,7 @@
 using HR_Management.Infrastructure;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace HR_Management.Resources.Person
 {
@@ -40,5 +41,9 @@ namespace HR_Management.Resources.Person
 
         [Display(Name = "Location Id")]
         public int? LocationId { get; set; }
+
+        [JsonIgnore]
+        [Display(Name = "Created By")]
+        public string CreatedBy { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Information;
 using HR_Management.Resources.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace HR_Management.Controllers
         /// <param name="pageSize"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(IEnumerable<InformationResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)

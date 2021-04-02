@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Security.Authentication;
 
 namespace HR_Management
 {
@@ -14,11 +17,21 @@ namespace HR_Management
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    // Kestrel maximum request body size
+                    
                     webBuilder.ConfigureKestrel((context, options) =>
                     {
+                        // Kestrel maximum request body size
                         // Handle requests up to 10 MB
                         options.Limits.MaxRequestBodySize = 10485760; // Bytes
+
+                        options.Limits.MinRequestBodyDataRate = new MinDataRate(100, TimeSpan.FromSeconds(10));
+                        options.Limits.MinResponseDataRate = new MinDataRate(100, TimeSpan.FromSeconds(10));
+                        options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
+                        options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
+                        options.ConfigureHttpsDefaults(listenOptions =>
+                        {
+                            listenOptions.SslProtocols = SslProtocols.Tls12;
+                        });
                     });
                     webBuilder.UseStartup<Startup>();
                 });

@@ -2,6 +2,7 @@
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Project;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace HR_Management.Controllers
         /// <param name="personId"></param>
         /// <returns></returns>
         [HttpGet("{personId}")]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(IEnumerable<ProjectResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync(int personId)
@@ -43,6 +45,7 @@ namespace HR_Management.Controllers
         /// <param name="resource">Project data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPost]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(ProjectResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateProjectAsync([FromBody] CreateProjectResource resource)
@@ -62,6 +65,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(ProjectResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateProjectAsync(int id, [FromBody] UpdateProjectResource resource)
@@ -80,6 +84,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(ProjectResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> SwapProjectAsync([FromBody] SwapResource resource)
@@ -98,6 +103,7 @@ namespace HR_Management.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(ProjectResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteProjectAsync(int id)

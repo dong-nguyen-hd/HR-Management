@@ -10,23 +10,30 @@ namespace HR_Management.Extensions
         /// <summary>
         /// Checking login-password with storage-password
         /// </summary>
-        /// <param name="password">Storage-password</param>
-        /// <param name="validatePwd">Login-password: Default password input is MD5 format</param>
+        /// <param name="storagePassword">Storage-password</param>
+        /// <param name="loginPassword">Login-password: Default password input is MD5 format</param>
         /// <returns></returns>
-        public static bool CheckingPassword(this string password, string validatePwd)
+        public static bool CheckingPassword(this string storagePassword, string loginPassword)
         {
-            string[] arrPassword = password.Split('.');
-            if (arrPassword.Length != 3)
-                return false;
+            try
+            {
+                string[] arrPassword = storagePassword.Split('.');
+                if (arrPassword.Length != 3)
+                    return false;
 
-            string hashingPwd = GetHashPBKDF2(validatePwd.ToLower(),
-                Convert.FromBase64String(arrPassword[1]),
-                Convert.ToInt32(arrPassword[0]));
+                string hashingPwd = GetHashPBKDF2(loginPassword.ToLower(),
+                    Convert.FromBase64String(arrPassword[1]),
+                    Convert.ToInt32(arrPassword[0]));
 
-            if (string.Equals(hashingPwd, arrPassword[2]))
-                return true;
-            else
+                if (string.Equals(hashingPwd, arrPassword[2]))
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
                 return false;
+            }
         }
 
         /// <summary>
@@ -51,7 +58,7 @@ namespace HR_Management.Extensions
         /// <summary>
         /// Hashing password with PBKDF2
         /// </summary>
-        /// <param name="password">Default password input is MD5 format</param>
+        /// <param name="passwordMD5">Default password input is MD5 format</param>
         /// <param name="iterationCount"></param>
         /// <returns></returns>
         public static string HashingPassword(this string passwordMD5, int iterationCount = 10000)

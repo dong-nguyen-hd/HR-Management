@@ -2,6 +2,7 @@
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.CategoryPerson;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace HR_Management.Controllers
         /// <param name="personId"></param>
         /// <returns></returns>
         [HttpGet("{personId}")]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(IEnumerable<CategoryPersonResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync(int personId)
@@ -44,6 +46,7 @@ namespace HR_Management.Controllers
         /// <param name="resource">CategoryPerson data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPost]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(CategoryPersonResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateCategoryPersonAsync([FromBody] CreateCategoryPersonResource resource)
@@ -65,6 +68,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(CategoryPersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateCategoryPersonAsync(int id, [FromBody] UpdateCategoryPersonResource resource)
@@ -85,6 +89,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(CategoryPersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> SwapCategoryPersonAsync([FromBody] SwapResource resource)
@@ -105,6 +110,7 @@ namespace HR_Management.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(CategoryPersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteCategoryPersonAsync(int id)

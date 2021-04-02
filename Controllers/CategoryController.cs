@@ -2,6 +2,7 @@
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Category;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,9 +23,9 @@ namespace HR_Management.Controllers
         /// <summary>
         /// Get all record in table Category
         /// </summary>
-        /// <param name="personId"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(IEnumerable<CategoryResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync()
@@ -43,6 +44,7 @@ namespace HR_Management.Controllers
         /// <param name="resource">Category data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPost]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(CategoryResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateCategoryAsync([FromBody] CreateCategoryResource resource)
@@ -62,6 +64,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(CategoryResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateCategoryAsync(int id, [FromBody] UpdateCategoryResource resource)
@@ -80,6 +83,7 @@ namespace HR_Management.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(CategoryResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteCategoryAsync(int id)

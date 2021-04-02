@@ -2,6 +2,7 @@
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Location;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,9 +23,9 @@ namespace HR_Management.Controllers
         /// <summary>
         /// Get all record in table Location
         /// </summary>
-        /// <param name="personId"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(IEnumerable<LocationResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllAsync()
@@ -43,6 +44,7 @@ namespace HR_Management.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(LocationResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetWithIdAsync(int id)
@@ -61,6 +63,7 @@ namespace HR_Management.Controllers
         /// <param name="resource">Location data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPost]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(LocationResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateAsync([FromBody] CreateLocationResource resource)
@@ -80,6 +83,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(LocationResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateLocationResource resource)
@@ -98,6 +102,7 @@ namespace HR_Management.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(LocationResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteAsync(int id)

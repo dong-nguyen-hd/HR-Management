@@ -6,12 +6,6 @@ namespace HR_Management.Resources.Account
     public class UpdateAccountResource
     {
         [Required]
-        [MaxLength(125)]
-        [UserName]
-        [Display(Name = "User Name")]
-        public string UserName { get; set; }
-
-        [Required]
         [Password]
         public string Password { get; set; }
 

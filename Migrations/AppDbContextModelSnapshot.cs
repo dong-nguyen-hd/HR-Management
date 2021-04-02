@@ -44,9 +44,6 @@ namespace HR_Management.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(125)");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("varchar(500)");
-
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("varchar(50)");

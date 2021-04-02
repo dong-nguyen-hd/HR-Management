@@ -63,8 +63,6 @@ namespace HR_Management.Services
                 createPersonResource.LocationId = null;
             // Mapping Resource to Person
             var person = _mapper.Map<CreatePersonResource, Person>(createPersonResource);
-            // Testing
-            person.CreatedBy = "KimYoungKen";
 
             try
             {

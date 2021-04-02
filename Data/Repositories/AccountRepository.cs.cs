@@ -2,6 +2,8 @@
 using HR_Management.Data.Contexts;
 using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
+using HR_Management.Extensions;
+using HR_Management.Resources.Authentication;
 using HR_Management.Resources.Queries;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -47,7 +49,26 @@ namespace HR_Management.Data.Repositories
         public void Update(Account account)
             => _context.Accounts.Update(account);
 
-        public async Task<bool> ValidateUserName(string userName)
+        public async Task<Account> ValidateCredentialsAsync(LoginResource loginResource)
+        {
+            var temp = await _context.Accounts
+                .Where(x => x.UserName == loginResource.UserName.ToLower())
+                .FirstOrDefaultAsync();
+
+            if (temp is null)
+                return null;
+            else
+            {
+                // Validate credential
+                bool isValid = temp.Password.CheckingPassword(loginResource.Password);
+                if (isValid)
+                    return temp;
+                else
+                    return null;
+            }
+        }
+
+        public async Task<bool> ValidateUserNameAsync(string userName)
            => !await _context.Accounts.Where(x => x.UserName == userName).AnyAsync();
     }
 }

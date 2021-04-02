@@ -2,6 +2,7 @@
 using HR_Management.Domain.Services;
 using HR_Management.Resources;
 using HR_Management.Resources.Technology;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,12 +23,12 @@ namespace HR_Management.Controllers
         /// <summary>
         /// Get all record in table Technology
         /// </summary>
-        /// <param name="personId"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(IEnumerable<TechnologyResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> GetAllWithPersonIdAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             var result = await _technologyService.ListAsync();
 
@@ -40,12 +41,13 @@ namespace HR_Management.Controllers
         /// <summary>
         /// Get all record with categoryId in table Technology
         /// </summary>
-        /// <param name="personId"></param>
+        /// <param name="categoryId"></param>
         /// <returns></returns>
         [HttpGet("{categoryId}")]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(IEnumerable<TechnologyResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> GetAllWithPersonIdAsync(int categoryId)
+        public async Task<IActionResult> GetAllWithCategoryIdAsync(int categoryId)
         {
             var result = await _technologyService.ListAsync(categoryId);
 
@@ -61,6 +63,7 @@ namespace HR_Management.Controllers
         /// <param name="resource">Technology data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPost]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(TechnologyResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateTechnologyAsync([FromBody] CreateTechnologyResource resource)
@@ -80,6 +83,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(TechnologyResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateTechnologyAsync(int id, [FromBody] UpdateTechnologyResource resource)
@@ -98,6 +102,7 @@ namespace HR_Management.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(TechnologyResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteTechnologyAsync(int id)

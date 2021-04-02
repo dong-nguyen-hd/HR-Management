@@ -3,6 +3,7 @@ using HR_Management.Domain.Services;
 using HR_Management.Extensions;
 using HR_Management.Resources;
 using HR_Management.Resources.Person;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ namespace HR_Management.Controllers
         /// <param name="personId"></param>
         /// <returns></returns>
         [HttpGet("{personId:int}")]
+        [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(PersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetWithIdAsync(int personId)
@@ -44,10 +46,13 @@ namespace HR_Management.Controllers
         /// <param name="resource">Person data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPost]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(PersonResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreatePersonAsync([FromBody] CreatePersonResource resource)
         {
+            resource.CreatedBy = User.Identity?.Name;
+
             bool isMobile = HttpContext.Request.Headers["User-Agent"].ToString().IsMobile();
             var result = await _personService.CreateAsync(resource, isMobile);
 
@@ -64,6 +69,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(PersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdatePersonAsync([FromBody] UpdatePersonResource resource, int id)
@@ -83,6 +89,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("swap/{personId:int}")]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(PersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> AssignComponentAsync(int personId, [FromBody] ComponentResource resource)
@@ -101,6 +108,7 @@ namespace HR_Management.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(PersonResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeletePersonAsync(int id)

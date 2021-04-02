@@ -2,6 +2,7 @@
 using HR_Management.Domain.Services;
 using HR_Management.Extensions;
 using HR_Management.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
@@ -27,6 +28,7 @@ namespace HR_Management.Controllers
         /// <param name="image"></param>
         /// <returns></returns>
         [HttpPut("{personId:int}")]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(ResultResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> SaveImage(int personId, [FromForm] IFormFile image)

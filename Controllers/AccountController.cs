@@ -1,8 +1,11 @@
 ﻿#nullable enable
 using HR_Management.Domain.Services;
+using HR_Management.Extensions;
+using HR_Management.Infrastructure;
 using HR_Management.Resources;
 using HR_Management.Resources.Account;
 using HR_Management.Resources.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,9 +26,10 @@ namespace HR_Management.Controllers
         /// <summary>
         /// Get a record with Id in table Person
         /// </summary>
-        /// <param name="personId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(AccountResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetWithIdAsync(int id)
@@ -45,6 +49,7 @@ namespace HR_Management.Controllers
         /// <param name="pageSize"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<AccountResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> GetAllWithPersonIdAsync([FromQuery] int page, [FromQuery] int pageSize)
@@ -67,10 +72,17 @@ namespace HR_Management.Controllers
         /// <param name="resource">Account data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPost]
+        [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(AccountResource), 201)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> CreateAccountAsync([FromBody] CreateAccountResource resource)
         {
+            if (resource.Role == (int)eRole.Admin)
+            {
+                if (!User.IsInRole(eRole.Admin.ToDescriptionString()))
+                    return BadRequest(new ResultResource("Account not permitted."));
+            }
+            
             var result = await _accountService.CreateAsync(resource);
 
             if (!result.Success)
@@ -86,6 +98,7 @@ namespace HR_Management.Controllers
         /// <param name="resource"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(AccountResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> UpdateAccountAsync(int id, [FromBody] UpdateAccountResource resource)
@@ -104,6 +117,7 @@ namespace HR_Management.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(AccountResource), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
         public async Task<IActionResult> DeleteAccountAsync(int id)

@@ -34,7 +34,7 @@ namespace HR_Management.Services
         public async Task<AccountResponse<AccountResource>> CreateAsync(CreateAccountResource createAccountResource)
         {
             // Validate User Name is existent?
-            var isValid = await _accountRepository.ValidateUserName(createAccountResource.UserName);
+            var isValid = await _accountRepository.ValidateUserNameAsync(createAccountResource.UserName);
             if (!isValid)
                 return new AccountResponse<AccountResource>("User name is existent.");
             // Mapping Resource to Account
@@ -106,10 +106,6 @@ namespace HR_Management.Services
 
         public async Task<AccountResponse<AccountResource>> UpdateAsync(int id, UpdateAccountResource updateAccountResource)
         {
-            // Validate User Name is existent?
-            var isValid = await _accountRepository.ValidateUserName(updateAccountResource.UserName);
-            if (!isValid)
-                return new AccountResponse<AccountResource>("User name is existent.");
             // Validate Id is existent?
             var tempAccount = await _accountRepository.FindByIdAsync(id);
             if (tempAccount is null)
