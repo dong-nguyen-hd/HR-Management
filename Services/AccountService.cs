@@ -113,7 +113,7 @@ namespace HR_Management.Services
 
             // Mapping Resource to Person
             _mapper.Map(updateAccountResource, tempAccount);
-
+            
             try
             {
                 await _unitOfWork.CompleteAsync();

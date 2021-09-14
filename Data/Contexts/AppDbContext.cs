@@ -1,6 +1,6 @@
 ﻿using HR_Management.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
+using System.Reflection;
 
 namespace HR_Management.Data.Contexts
 {
@@ -25,99 +25,8 @@ namespace HR_Management.Data.Contexts
         {
             base.OnModelCreating(builder);
 
-            // Education
-            builder.Entity<Education>().ToTable("Education");
-            builder.Entity<Education>().Property(x => x.CollegeName).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Education>().Property(x => x.Major).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Education>().Property(x => x.StartDate).IsRequired().HasColumnType("date");
-            builder.Entity<Education>().Property(x => x.EndDate).HasColumnType("date");
-            builder.Entity<Education>().Property(x => x.Status).HasDefaultValue(true);
-            // WorkHistory
-            builder.Entity<WorkHistory>().ToTable("WorkHistory");
-            builder.Entity<WorkHistory>().Property(x => x.Position).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<WorkHistory>().Property(x => x.CompanyName).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<WorkHistory>().Property(x => x.StartDate).IsRequired().HasColumnType("date");
-            builder.Entity<WorkHistory>().Property(x => x.EndDate).HasColumnType("date");
-            builder.Entity<WorkHistory>().Property(x => x.Status).HasDefaultValue(true);
-            // Certificate
-            builder.Entity<Certificate>().ToTable("Certificate");
-            builder.Entity<Certificate>().Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Certificate>().Property(x => x.Provider).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Certificate>().Property(x => x.StartDate).IsRequired().HasColumnType("date");
-            builder.Entity<Certificate>().Property(x => x.EndDate).HasColumnType("date");
-            builder.Entity<Certificate>().Property(x => x.Status).HasDefaultValue(true);
-            // Location
-            builder.Entity<Location>().ToTable("Location");
-            builder.Entity<Location>().Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Location>().Property(x => x.Address).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Location>().Property(x => x.Status).HasDefaultValue(true);
-            // Project
-            builder.Entity<Project>().ToTable("Project");
-            builder.Entity<Project>().Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Project>().Property(x => x.Description).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Project>().Property(x => x.Position).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Project>().Property(x => x.Responsibilities).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Project>().Property(x => x.Technology).IsRequired().HasColumnType("varchar(max)");
-            builder.Entity<Project>().Property(x => x.StartDate).IsRequired().HasColumnType("date");
-            builder.Entity<Project>().Property(x => x.EndDate).HasColumnType("date");
-            builder.Entity<Project>().Property(x => x.Status).HasDefaultValue(true);
-            // CategoryPerson
-            builder.Entity<CategoryPerson>().ToTable("CategoryPerson");
-            builder.Entity<CategoryPerson>().Property(x => x.Technology).IsRequired().HasColumnType("varchar(max)");
-            builder.Entity<CategoryPerson>().Property(x => x.Status).HasDefaultValue(true);
-            // Category
-            builder.Entity<Category>().ToTable("Category");
-            builder.Entity<Category>().Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Category>().Property(x => x.Status).HasDefaultValue(true);
-            // Technology
-            builder.Entity<Technology>().ToTable("Technology");
-            builder.Entity<Technology>().Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Technology>().Property(x => x.Status).HasDefaultValue(true);
-            // Person
-            builder.Entity<Person>().ToTable("Person");
-            builder.Entity<Person>().Property(x => x.FirstName).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Person>().Property(x => x.LastName).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Person>().Property(x => x.Email).HasColumnType("nvarchar(500)");
-            builder.Entity<Person>().Property(x => x.Avatar).HasColumnType("varchar(250)");
-            builder.Entity<Person>().Property(x => x.Description).HasColumnType("nvarchar(500)");
-            builder.Entity<Person>().Property(x => x.Phone).HasColumnType("varchar(25)");
-            builder.Entity<Person>().Property(x => x.CreatedBy).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Person>().Property(x => x.CreatedAt).IsRequired().HasColumnType("datetime2");
-            builder.Entity<Person>().Property(x => x.YearOfBirth).IsRequired().HasColumnType("date");
-            builder.Entity<Person>().Property(x => x.OrderIndex).IsRequired().HasColumnType("varchar(250)");
-            builder.Entity<Person>().Property(x => x.StaffId).IsRequired().HasColumnType("varchar(25)");
-            builder.Entity<Person>().Property(x => x.Status).HasDefaultValue(true);
-            // Log
-            builder.Entity<Log>().ToTable("Log");
-            builder.Entity<Log>().Property(x => x.UpdatedAt).HasColumnType("datetime2");
-            builder.Entity<Log>().Property(x => x.UpdatedBy).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Log>().Property(x => x.Perpose).IsRequired().HasColumnType("nvarchar(500)");
-            // Account
-            builder.Entity<Account>().ToTable("Account");
-            builder.Entity<Account>().Property(x => x.UserName).IsRequired().HasColumnType("varchar(125)");
-            builder.Entity<Account>().Property(x => x.Password).IsRequired().HasColumnType("varchar(125)");
-            builder.Entity<Account>().Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Account>().Property(x => x.Email).IsRequired().HasColumnType("nvarchar(500)");
-            builder.Entity<Account>().Property(x => x.Role).IsRequired().HasColumnType("varchar(50)");
-            builder.Entity<Account>().Property(x => x.CreatedAt).IsRequired().HasColumnType("datetime2");
-            builder.Entity<Account>().Property(x => x.LastActivity).IsRequired().HasColumnType("datetime2");
-            builder.Entity<Account>().Property(x => x.Status).HasDefaultValue(true);
-
-            // Seeding Data for Account table
-            builder.Entity<Account>().HasData(
-                new Account
-                {
-                    Id = -1,
-                    UserName = "admin",
-                    Password = "10000.ej6YMBO1QrLxWx7AuxN8IA==.0CNmt0k0xfvshCGdRy8wTiapSrEWFedeozzNTakWkQw=", // Input: d7f32454b44d22182618d56e683f419a
-                    Email = "dong.nguyen.hdkt@gmail.com",
-                    Role = "admin",
-                    CreatedAt = DateTime.Now,
-                    Name = "Dong Nguyen",
-                    LastActivity = DateTime.Now,
-                    Status = true
-                }
-                );
+            // Finds and runs all your configuration classes in the same assembly as the DbContext
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }

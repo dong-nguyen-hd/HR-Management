@@ -52,7 +52,7 @@ namespace HR_Management.Controllers
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<AccountResource>), 200)]
         [ProducesResponseType(typeof(ResultResource), 400)]
-        public async Task<IActionResult> GetAllWithPersonIdAsync([FromQuery] int page, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
             QueryResource pagintation = new QueryResource(page, pageSize);
 

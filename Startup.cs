@@ -1,4 +1,3 @@
-using AutoMapper;
 using HR_Management.Controllers.Config;
 using HR_Management.Data.Contexts;
 using HR_Management.Domain.Services;

@@ -32,8 +32,6 @@ namespace HR_Management.Services
             _secret = Encoding.ASCII.GetBytes(Startup.JwtConfig.Secret);
         }
 
-
-
         public async Task<TokenManagementResponse<TokenResource>> GenerateTokensAsync(LoginResource loginResource, DateTime now)
         {
             // Validate Login-Resource

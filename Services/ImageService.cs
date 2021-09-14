@@ -17,7 +17,6 @@ namespace HR_Management.Services
         private readonly IPersonRepository _personRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-
         public ImageService(IUriService uriService,
             IPersonRepository personRepository,
             IUnitOfWork unitOfWork)
