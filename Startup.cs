@@ -17,16 +17,25 @@ namespace HR_Management
 {
     public class Startup
     {
-        private IConfiguration Configuration { get; set; }
+        public IConfiguration Configuration { get; private set; }
 
         public static string ImagePathWeb { get; private set; }
         public static string ImagePathMobile { get; private set; }
         public static string RootPath { get; private set; }
         public static JwtConfig JwtConfig { get; private set; }
 
-        public Startup(IConfiguration config)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
-            Configuration = config;
+            // Calling response-message.json
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"responsemessage.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables();
+
+            configuration = builder.Build();
+
+            Configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -57,6 +66,13 @@ namespace HR_Management
 
             // Configure JWT Bearer
             JwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+
+            // Mapping data from response-message.json
+            services.AddSingleton(Configuration.GetSection("ResponseMessage").Get<ResponseMessage>());
+            services.Configure<ResponseMessage>((setting) =>
+            {
+                Configuration.GetSection("ResponseMessage").Bind(setting);
+            });
 
             services.AddJwtBearerAuthentication();
             services.AddCustomizeSwagger();

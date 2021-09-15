@@ -4,14 +4,16 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
+using HR_Management.Resources;
 using HR_Management.Resources.Category;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class CategoryService : ICategoryService
+    public class CategoryService : ResponseMessageService, ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
@@ -19,7 +21,8 @@ namespace HR_Management.Services
 
         public CategoryService(ICategoryRepository categoryRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._categoryRepository = categoryRepository;
             this._mapper = mapper;
@@ -32,7 +35,7 @@ namespace HR_Management.Services
             var tempCategory = await _categoryRepository.ListAsync();
             // Mapping
             var tempResource = _mapper.Map<IEnumerable<Category>, IEnumerable<CategoryResource>>(tempCategory);
-            
+
             return new CategoryResponse<IEnumerable<CategoryResource>>(tempResource);
         }
 
@@ -52,7 +55,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CategoryResponse<CategoryResource>($"An error occurred when saving the Category: {ex.Message}");
+                return new CategoryResponse<CategoryResource>($"{ResponseMessage.Values["Category_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -61,7 +64,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempCategory = await _categoryRepository.FindByIdAsync(id);
             if (tempCategory is null)
-                return new CategoryResponse<CategoryResource>("Category is not existent.");
+                return new CategoryResponse<CategoryResource>(ResponseMessage.Values["Category_NoData"]);
             // Update infomation
             _mapper.Map(updateResource, tempCategory);
 
@@ -75,7 +78,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CategoryResponse<CategoryResource>($"An error occurred when updating the Category: {ex.Message}");
+                return new CategoryResponse<CategoryResource>($"{ResponseMessage.Values["Category_Updating_Error"]}: {ex.Message}");
             }
         }
 
@@ -84,7 +87,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempCategory = await _categoryRepository.FindByIdAsync(id);
             if (tempCategory is null)
-                return new CategoryResponse<CategoryResource>("Category is not existent.");
+                return new CategoryResponse<CategoryResource>(ResponseMessage.Values["Category_NoData"]);
             // Change property Status: true -> false
             tempCategory.Status = false;
 
@@ -98,7 +101,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CategoryResponse<CategoryResource>($"An error occurred when deleting the Category: {ex.Message}");
+                return new CategoryResponse<CategoryResource>($"{ResponseMessage.Values["Category_Deleting_Error"]}: {ex.Message}");
             }
         }
     }

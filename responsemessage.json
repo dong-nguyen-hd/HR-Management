@@ -1,0 +1,76 @@
+﻿{
+  "ResponseMessage": {
+    "Values": {
+      "Success": "Successful!",
+      "NoData": "Object is not existent.",
+
+      "Swap_Id_Invalid": "Current-Id/Turned-Id is invalid.",
+
+      "Token_Invalid": "User name or Password invalid.",
+      "Token_Saving_Error": "An error occurred when saving the Token",
+
+      "Image_NoData": "There is no image.",
+      "Image_Bigger_Error": "Image cannot be bigger than 5 MB.",
+      "Image_Saving_Error": "An error occurred when saving the Image",
+
+      "Account_UserName_DuplicateError": "User name is existent.",
+      "Account_Id_NoData": "Id is not existent.",
+      "Account_NoData": "Account is not existent.",
+      "Account_Saving_Error": "An error occurred when saving the Account",
+      "Account_Updating_Error": "An error occurred when updating the Account",
+      "Account_Deleting_Error": "An error occurred when deleting the Account",
+
+      "Person_Id_NoData": "Person-Id is not existent.",
+      "Person_Updating_Error": "An error occurred when updating the Person",
+      "Person_Saving_Error": "An error occurred when saving the Person",
+      "Person_Deleting_Error": "An error occurred when deleting the Person",
+
+      "Category_Id_Invalid": "Category-Id is invalid.",
+      "Category_NoData": "Category is not existent.",
+      "Category_Saving_Error": "An error occurred when saving the Category",
+      "Category_Updating_Error": "An error occurred when updating the Category",
+      "Category_Deleting_Error": "An error occurred when deleting the Category",
+
+      "Technology_Id_NoData": "Technology-Id is not existent.",
+      "Technology_Saving_Error": "An error occurred when saving the Technology",
+      "Technology_Updating_Error": "An error occurred when updating the Technology",
+      "Technology_Deleting_Error": "An error occurred when deleting the Technology",
+
+      "Project_Saving_Error": "An error occurred when saving the Project",
+      "Project_Deleting_Error": "An error occurred when deleting the Project",
+      "Project_Updating_Error": "An error occurred when updating the Project",
+      "Project_Swapping_Error": "An error occurred when swapping the Project",
+      "Project_NoData": "Project is not existent.",
+
+      "CategoryPerson_Saving_Error": "An error occurred when saving the CategoryPerson",
+      "CategoryPerson_Updating_Error": "An error occurred when updating the CategoryPerson",
+      "CategoryPerson_Swapping_Error": "An error occurred when swapping the CategoryPerson",
+      "CategoryPerson_Deleting_Error": "An error occurred when deleting the CategoryPerson",
+      "CategoryPerson_NoData": "CategoryPerson is not existent.",
+      "CategoryPerson_Id_Invalid": "Category-Id is invalid.",
+
+      "Certificate_Saving_Error": "An error occurred when saving the Certificate",
+      "Certificate_Updating_Error": "An error occurred when updating the Certificate",
+      "Certificate_Swapping_Error": "An error occurred when swapping the Certificate",
+      "Certificate_Deleting_Error": "An error occurred when deleting the Certificate",
+      "Certificate_NoData": "Certificate is not existent.",
+
+      "Education_Saving_Error": "An error occurred when saving the Education",
+      "Education_Updating_Error": "An error occurred when updating the Education",
+      "Education_Swapping_Error": "An error occurred when swapping the Education",
+      "Education_Deleting_Error": "An error occurred when deleting the Education",
+      "Education_NoData": "Education is not existent.",
+
+      "Location_Saving_Error": "An error occurred when saving the Location",
+      "Location_Deleting_Error": "An error occurred when deleting the Location",
+      "Location_Updating_Error": "An error occurred when updating the Location",
+      "Location_NoData": "Location is not existent.",
+
+      "WorkHistory_Saving_Error": "An error occurred when saving the Work-History",
+      "WorkHistory_Deleting_Error": "An error occurred when deleting the Work-History",
+      "WorkHistory_Swapping_Error": "An error occurred when swapping the Work-History",
+      "WorkHistory_Updating_Error": "An error occurred when updating the Work-History",
+      "WorkHistory_NoData": "Work-History is not existent."
+    }
+  }
+}

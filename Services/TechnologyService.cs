@@ -4,14 +4,16 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
+using HR_Management.Resources;
 using HR_Management.Resources.Technology;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class TechnologyService : ITechnologyService
+    public class TechnologyService : ResponseMessageService, ITechnologyService
     {
         private readonly ITechnologyRepository _technologyRepository;
         private readonly ICategoryRepository _categoryRepository;
@@ -21,7 +23,8 @@ namespace HR_Management.Services
         public TechnologyService(ITechnologyRepository technologyRepository,
             ICategoryRepository categoryRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._technologyRepository = technologyRepository;
             this._categoryRepository = categoryRepository;
@@ -44,7 +47,7 @@ namespace HR_Management.Services
             // Validate category is existent?
             var tempPerson = await _categoryRepository.FindByIdAsync(categoryId);
             if (tempPerson is null)
-                return new TechnologyResponse<IEnumerable<TechnologyResource>>($"CategoryId '{categoryId}' is not existent.");
+                return new TechnologyResponse<IEnumerable<TechnologyResource>>(ResponseMessage.Values["Category_NoData"]);
             // Get list record from DB
             var tempTechnology = await _technologyRepository.ListAsync(categoryId);
             // Mapping Technology to Resource
@@ -58,7 +61,7 @@ namespace HR_Management.Services
             // Validate CategoryId is existent?
             var tempPerson = await _categoryRepository.FindByIdAsync(createTechnologyResource.CategoryId);
             if (tempPerson is null)
-                return new TechnologyResponse<TechnologyResource>($"CategoryId '{createTechnologyResource.CategoryId}' is not existent.");
+                return new TechnologyResponse<TechnologyResource>(ResponseMessage.Values["Category_NoData"]);
             // Mapping Resource to Technology
             var technology = _mapper.Map<CreateTechnologyResource, Technology>(createTechnologyResource);
 
@@ -73,7 +76,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new TechnologyResponse<TechnologyResource>($"An error occurred when saving the Technology: {ex.Message}");
+                return new TechnologyResponse<TechnologyResource>($"{ResponseMessage.Values["Technology_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -82,10 +85,10 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempTechnology = await _technologyRepository.FindByIdAsync(id);
             if (tempTechnology is null)
-                return new TechnologyResponse<TechnologyResource>("Technology is not existent.");
+                return new TechnologyResponse<TechnologyResource>(ResponseMessage.Values["Technology_Id_NoData"]);
             // Updating
             _mapper.Map(updateTechnologyResource, tempTechnology);
-            
+
             try
             {
                 await _unitOfWork.CompleteAsync();
@@ -96,7 +99,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new TechnologyResponse<TechnologyResource>($"An error occurred when updating the Technology: {ex.Message}");
+                return new TechnologyResponse<TechnologyResource>($"{ResponseMessage.Values["Technology_Updating_Error"]}: {ex.Message}");
             }
         }
 
@@ -105,7 +108,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempTechnology = await _technologyRepository.FindByIdAsync(id);
             if (tempTechnology is null)
-                return new TechnologyResponse<TechnologyResource>("Technology is not existent.");
+                return new TechnologyResponse<TechnologyResource>(ResponseMessage.Values["Technology_Id_NoData"]);
             // Change property Status: true -> false
             tempTechnology.Status = false;
 
@@ -119,7 +122,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new TechnologyResponse<TechnologyResource>($"An error occurred when deleting the Technology: {ex.Message}");
+                return new TechnologyResponse<TechnologyResource>($"{ResponseMessage.Values["Technology_Deleting_Error"]}: {ex.Message}");
             }
         }
 

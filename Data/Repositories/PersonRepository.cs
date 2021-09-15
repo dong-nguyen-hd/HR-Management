@@ -27,6 +27,7 @@ namespace HR_Management.Data.Repositories
         {
             var temp = await _context.People
                 .Where(x => x.Status)
+                .OrderBy(x => x.Id)
                 .Skip((pagination.Page - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .Include(y => y.Location)

@@ -7,12 +7,13 @@ using HR_Management.Domain.Services.Communication;
 using HR_Management.Extensions;
 using HR_Management.Resources;
 using HR_Management.Resources.Person;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class PersonService : IPersonService
+    public class PersonService : ResponseMessageService, IPersonService
     {
         private readonly IPersonRepository _personRepository;
         private readonly ILocationRepository _locationRepository;
@@ -24,7 +25,8 @@ namespace HR_Management.Services
             ILocationRepository locationRepository,
             IUriService uriService,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._personRepository = personRepository;
             this._locationRepository = locationRepository;
@@ -38,7 +40,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempPerson = await _personRepository.FindByIdAsync(id);
             if (tempPerson is null)
-                return new PersonResponse<PersonResource>("Person is not existent.");
+                return new PersonResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
             try
             {
                 tempPerson.OrderIndex = component.OrderIndex.RemoveDuplicate().ConcatenateWithComma();
@@ -51,7 +53,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new PersonResponse<PersonResource>($"An error occurred when updating the Person: {ex.Message}");
+                return new PersonResponse<PersonResource>($"{ResponseMessage.Values["Person_Updating_Error"]}: {ex.Message}");
             }
         }
 
@@ -79,16 +81,16 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new PersonResponse<PersonResource>($"An error occurred when saving the Person: {ex.Message}");
+                return new PersonResponse<PersonResource>($"{ResponseMessage.Values["Person_Saving_Error"]}: {ex.Message}");
             }
         }
-            
+
         public async Task<PersonResponse<PersonResource>> DeleteAsync(int id, bool isMobile = false)
         {
             // Validate Id is existent?
             var tempPerson = await _personRepository.FindByIdAsync(id);
             if (tempPerson is null)
-                return new PersonResponse<PersonResource>("Person is not existent.");
+                return new PersonResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
             // Change property Status: true -> false
             tempPerson.Status = false;
 
@@ -105,7 +107,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new PersonResponse<PersonResource>($"An error occurred when deleting the Person: {ex.Message}");
+                return new PersonResponse<PersonResource>($"{ResponseMessage.Values["Person_Deleting_Error"]}: {ex.Message}");
             }
         }
 
@@ -113,7 +115,7 @@ namespace HR_Management.Services
         {
             var tempPerson = await _personRepository.FindByIdAsync(id);
             if (tempPerson is null)
-                return new PersonResponse<PersonResource>($"Id '{id}' is not existent.");
+                return new PersonResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
             // Mapping Person to Resource
             var resource = _mapper.Map<Person, PersonResource>(tempPerson);
             resource.Avatar = isMobile ?
@@ -128,7 +130,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempPerson = await _personRepository.FindByIdAsync(id);
             if (tempPerson is null)
-                return new PersonResponse<PersonResource>("Person is not existent.");
+                return new PersonResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
             // Validate location is existent?
             var tempLocation = !updatePersonResource.LocationId.HasValue ? null : await _locationRepository.FindByIdAsync((int)updatePersonResource.LocationId);
             if (tempLocation is null)
@@ -149,7 +151,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new PersonResponse<PersonResource>($"An error occurred when updating the Person: {ex.Message}");
+                return new PersonResponse<PersonResource>($"{ResponseMessage.Values["Person_Updating_Error"]}: {ex.Message}");
             }
         }
     }

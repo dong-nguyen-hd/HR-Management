@@ -6,13 +6,14 @@ using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
 using HR_Management.Resources;
 using HR_Management.Resources.WorkHistory;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class WorkHistoryService : IWorkHistoryService
+    public class WorkHistoryService : ResponseMessageService, IWorkHistoryService
     {
         private readonly IWorkHistoryRepository _workHistoryRepository;
         private readonly IPersonRepository _personRepository;
@@ -22,7 +23,8 @@ namespace HR_Management.Services
         public WorkHistoryService(IWorkHistoryRepository workHistoryRepository,
             IPersonRepository personRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._workHistoryRepository = workHistoryRepository;
             this._personRepository = personRepository;
@@ -35,7 +37,7 @@ namespace HR_Management.Services
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(personId);
             if (tempPerson is null)
-                return new WorkHistoryResponse<IEnumerable<WorkHistoryResource>>($"Person Id '{personId}' is not existent.");
+                return new WorkHistoryResponse<IEnumerable<WorkHistoryResource>>(ResponseMessage.Values["Person_Id_NoData"]);
             // Get list record from DB
             var tempWorkHistory = await _workHistoryRepository.ListAsync(personId);
             // Mapping Project to Resource
@@ -49,8 +51,8 @@ namespace HR_Management.Services
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(createWorkHistoryResource.PersonId);
             if (tempPerson is null)
-                return new WorkHistoryResponse<WorkHistoryResource>($"PersonId '{createWorkHistoryResource.PersonId}' is not existent.");
-            
+                return new WorkHistoryResponse<WorkHistoryResource>(ResponseMessage.Values["Person_Id_NoData"]);
+
             // Mapping Resource to WorkHistory
             var workHistory = _mapper.Map<CreateWorkHistoryResource, WorkHistory>(createWorkHistoryResource);
             workHistory.OrderIndex = FindMaximum(workHistory.PersonId);
@@ -66,7 +68,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new WorkHistoryResponse<WorkHistoryResource>($"An error occurred when saving the Work History: {ex.Message}");
+                return new WorkHistoryResponse<WorkHistoryResource>($"{ResponseMessage.Values["WorkHistory_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -89,7 +91,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempWorkHistory = await _workHistoryRepository.FindByIdAsync(id);
             if (tempWorkHistory is null)
-                return new WorkHistoryResponse<WorkHistoryResource>("Work History is not existent.");
+                return new WorkHistoryResponse<WorkHistoryResource>(ResponseMessage.Values["WorkHistory_NoData"]);
             // Updating
             _mapper.Map(updateWorkHistoryResource, tempWorkHistory);
 
@@ -103,7 +105,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new WorkHistoryResponse<WorkHistoryResource>($"An error occurred when updating the Work History: {ex.Message}");
+                return new WorkHistoryResponse<WorkHistoryResource>($"{ResponseMessage.Values["WorkHistory_Updating_Error"]}: {ex.Message}");
             }
         }
 
@@ -112,7 +114,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempWorkHistory = await _workHistoryRepository.FindByIdAsync(id);
             if (tempWorkHistory is null)
-                return new WorkHistoryResponse<WorkHistoryResource>("Work History is not existent.");
+                return new WorkHistoryResponse<WorkHistoryResource>(ResponseMessage.Values["WorkHistory_NoData"]);
             // Change property Status: true -> false
             tempWorkHistory.Status = false;
 
@@ -126,7 +128,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new WorkHistoryResponse<WorkHistoryResource>($"An error occurred when deleting the Work History: {ex.Message}");
+                return new WorkHistoryResponse<WorkHistoryResource>($"{ResponseMessage.Values["WorkHistory_Deleting_Error"]}: {ex.Message}");
             }
         }
 
@@ -134,14 +136,14 @@ namespace HR_Management.Services
         {
             // Validate Id duplicate
             if (obj.CurrentId == obj.TurnedId)
-                return new WorkHistoryResponse<WorkHistoryResource>("Current Id/Turned Id is not valid.");
+                return new WorkHistoryResponse<WorkHistoryResource>(ResponseMessage.Values["Swap_Id_Invalid"]);
             // Validate Id is existent?
             var currentWorkHistory = await _workHistoryRepository.FindByIdAsync(obj.CurrentId);
             var turnedWorkHistory = await _workHistoryRepository.FindByIdAsync(obj.TurnedId);
             if (currentWorkHistory is null || turnedWorkHistory is null)
-                return new WorkHistoryResponse<WorkHistoryResource>("Work History is not existent.");
+                return new WorkHistoryResponse<WorkHistoryResource>(ResponseMessage.Values["WorkHistory_NoData"]);
             if (currentWorkHistory.PersonId != turnedWorkHistory.PersonId)
-                return new WorkHistoryResponse<WorkHistoryResource>("Current Id/Turned Id is not valid.");
+                return new WorkHistoryResponse<WorkHistoryResource>(ResponseMessage.Values["Swap_Id_Invalid"]);
             // Swap property OrderIndex
             int tempOrderIndex = -1;
             tempOrderIndex = currentWorkHistory.OrderIndex;
@@ -156,7 +158,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new WorkHistoryResponse<WorkHistoryResource>($"An error occurred when swapping the Work History: {ex.Message}");
+                return new WorkHistoryResponse<WorkHistoryResource>($"{ResponseMessage.Values["WorkHistory_Swapping_Error"]}: {ex.Message}");
             }
         }
     }

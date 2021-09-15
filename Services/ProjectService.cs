@@ -6,13 +6,14 @@ using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
 using HR_Management.Resources;
 using HR_Management.Resources.Project;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class ProjectService : IProjectService
+    public class ProjectService : ResponseMessageService, IProjectService
     {
         private readonly IProjectRepository _projectRepository;
         private readonly ITechnologyRepository _technologyRepository;
@@ -24,7 +25,8 @@ namespace HR_Management.Services
             ITechnologyRepository technologyRepository,
             IPersonRepository personRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._projectRepository = projectRepository;
             this._technologyRepository = technologyRepository;
@@ -38,7 +40,7 @@ namespace HR_Management.Services
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(personId);
             if (tempPerson is null)
-                return new ProjectResponse<IEnumerable<ProjectResource>>($"Person Id '{personId}' is not existent.");
+                return new ProjectResponse<IEnumerable<ProjectResource>>(ResponseMessage.Values["Person_Id_NoData"]);
 
             // Get list record from DB
             var tempProject = await _projectRepository.ListAsync(personId);
@@ -54,24 +56,24 @@ namespace HR_Management.Services
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(createProjectResource.PersonId);
             if (tempPerson is null)
-                return new ProjectResponse<ProjectResource>($"Person Id '{createProjectResource.PersonId}' is not existent.");
+                return new ProjectResponse<ProjectResource>(ResponseMessage.Values["Person_Id_NoData"]);
             // Validate TechnologyId is existent?
             foreach (var item in createProjectResource.Technology)
             {
                 var temp = await this._technologyRepository.FindByIdAsync(item);
                 if (temp is null)
-                    return new ProjectResponse<ProjectResource>($"Technology Id is not existent.");
+                    return new ProjectResponse<ProjectResource>(ResponseMessage.Values["Technology_Id_NoData"]);
             }
 
             // Mapping Resource to Project
             var project = _mapper.Map<CreateProjectResource, Project>(createProjectResource);
             project.OrderIndex = FindMaximum(project.PersonId);
-            
+
             try
             {
                 await _projectRepository.AddAsync(project);
                 await _unitOfWork.CompleteAsync();
-                
+
                 // Mapping Project to Resource
                 var resource = _mapper.Map<Project, ProjectResource>(project);
 
@@ -79,7 +81,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new ProjectResponse<ProjectResource>($"An error occurred when saving the Project: {ex.Message}");
+                return new ProjectResponse<ProjectResource>($"{ResponseMessage.Values["Project_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -101,13 +103,13 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempProject = await _projectRepository.FindByIdAsync(id);
             if (tempProject is null)
-                return new ProjectResponse<ProjectResource>("Project is not existent.");
+                return new ProjectResponse<ProjectResource>(ResponseMessage.Values["Project_NoData"]);
             // Validate TechnologyId is existent?
             foreach (var item in updateProjectResource.Technology)
             {
                 var temp = await this._technologyRepository.FindByIdAsync(item);
                 if (temp is null)
-                    return new ProjectResponse<ProjectResource>($"Technology Id is not existent.");
+                    return new ProjectResponse<ProjectResource>(ResponseMessage.Values["Technology_Id_NoData"]);
             }
             // Updating
             _mapper.Map(updateProjectResource, tempProject);
@@ -123,7 +125,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new ProjectResponse<ProjectResource>($"An error occurred when updating the Project: {ex.Message}");
+                return new ProjectResponse<ProjectResource>($"{ResponseMessage.Values["Project_Updating_Error"]}: {ex.Message}");
             }
         }
 
@@ -132,7 +134,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempProject = await _projectRepository.FindByIdAsync(id);
             if (tempProject is null)
-                return new ProjectResponse<ProjectResource>("Project is not existent.");
+                return new ProjectResponse<ProjectResource>(ResponseMessage.Values["Project_NoData"]);
             // Change property Status: true -> false
             tempProject.Status = false;
 
@@ -147,7 +149,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new ProjectResponse<ProjectResource>($"An error occurred when deleting the Project: {ex.Message}");
+                return new ProjectResponse<ProjectResource>($"{ResponseMessage.Values["Project_Deleting_Error"]}: {ex.Message}");
             }
         }
 
@@ -155,14 +157,14 @@ namespace HR_Management.Services
         {
             // Validate Id duplicate
             if (obj.CurrentId == obj.TurnedId)
-                return new ProjectResponse<ProjectResource>("Current Id/Turned Id is not valid.");
+                return new ProjectResponse<ProjectResource>(ResponseMessage.Values["Swap_Id_Invalid"]);
             // Validate Id is existent?
             var currentProject = await _projectRepository.FindByIdAsync(obj.CurrentId);
             var turnedProject = await _projectRepository.FindByIdAsync(obj.TurnedId);
             if (currentProject is null || turnedProject is null)
-                return new ProjectResponse<ProjectResource>("Project is not existent.");
+                return new ProjectResponse<ProjectResource>(ResponseMessage.Values["Project_NoData"]);
             if (currentProject.PersonId != turnedProject.PersonId)
-                return new ProjectResponse<ProjectResource>("Current Id/Turned Id is not valid.");
+                return new ProjectResponse<ProjectResource>(ResponseMessage.Values["Swap_Id_Invalid"]);
             // Swap property OrderIndex
             int tempOrderIndex = -1;
             tempOrderIndex = currentProject.OrderIndex;
@@ -177,7 +179,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new ProjectResponse<ProjectResource>($"An error occurred when swapping the Project: {ex.Message}");
+                return new ProjectResponse<ProjectResource>($"{ResponseMessage.Values["Project_Swapping_Error"]}: {ex.Message}");
             }
         }
     }

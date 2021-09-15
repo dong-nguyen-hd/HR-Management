@@ -4,7 +4,9 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
+using HR_Management.Resources;
 using HR_Management.Resources.Authentication;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class TokenManagementService : ITokenManagementService
+    public class TokenManagementService : ResponseMessageService, ITokenManagementService
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IMapper _mapper;
@@ -24,7 +26,8 @@ namespace HR_Management.Services
 
         public TokenManagementService(IAccountRepository accountRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._accountRepository = accountRepository;
             this._mapper = mapper;
@@ -37,7 +40,7 @@ namespace HR_Management.Services
             // Validate Login-Resource
             var tempAccount = await _accountRepository.ValidateCredentialsAsync(loginResource);
             if (tempAccount is null)
-                return new TokenManagementResponse<TokenResource>("User name or Password invalid.");
+                return new TokenManagementResponse<TokenResource>(ResponseMessage.Values["Token_Invalid"]);
             // Get claim value
             Claim[] claims = GetClaim(tempAccount);
 
@@ -67,7 +70,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new TokenManagementResponse<TokenResource>($"An error occurred when saving the Token: {ex.Message}");
+                return new TokenManagementResponse<TokenResource>($"{ResponseMessage.Values["Token_Saving_Error"]}: {ex.Message}");
             }
         }
 

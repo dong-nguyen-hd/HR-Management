@@ -5,15 +5,17 @@ using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
 using HR_Management.Extensions;
+using HR_Management.Resources;
 using HR_Management.Resources.Account;
 using HR_Management.Resources.Queries;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class AccountService : IAccountService
+    public class AccountService : ResponseMessageService, IAccountService
     {
         private readonly IAccountRepository _accountRepository;
         private readonly IUriService _uriService;
@@ -23,7 +25,8 @@ namespace HR_Management.Services
         public AccountService(IAccountRepository accountRepository,
             IUriService uriService,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._accountRepository = accountRepository;
             this._uriService = uriService;
@@ -36,7 +39,7 @@ namespace HR_Management.Services
             // Validate User Name is existent?
             var isValid = await _accountRepository.ValidateUserNameAsync(createAccountResource.UserName);
             if (!isValid)
-                return new AccountResponse<AccountResource>("User name is existent.");
+                return new AccountResponse<AccountResource>(ResponseMessage.Values["Account_UserName_DuplicateError"]);
             // Mapping Resource to Account
             var account = _mapper.Map<CreateAccountResource, Account>(createAccountResource);
 
@@ -52,7 +55,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new AccountResponse<AccountResource>($"An error occurred when saving the Account: {ex.Message}");
+                return new AccountResponse<AccountResource>($"{ResponseMessage.Values["Account_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -61,7 +64,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempAccount = await _accountRepository.FindByIdAsync(id);
             if (tempAccount is null)
-                return new AccountResponse<AccountResource>("Account is not existent.");
+                return new AccountResponse<AccountResource>(ResponseMessage.Values["Account_NoData"]);
             // Change property Status: true -> false
             tempAccount.Status = false;
 
@@ -75,7 +78,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new AccountResponse<AccountResource>($"An error occurred when deleting the Account: {ex.Message}");
+                return new AccountResponse<AccountResource>($"{ResponseMessage.Values["Account_Deleting_Error"]}: {ex.Message}");
             }
         }
 
@@ -83,7 +86,7 @@ namespace HR_Management.Services
         {
             var tempAccount = await _accountRepository.FindByIdAsync(id);
             if (tempAccount is null)
-                return new AccountResponse<AccountResource>($"Id '{id}' is not existent.");
+                return new AccountResponse<AccountResource>(ResponseMessage.Values["Account_Id_NoData"]);
             // Mapping Person to Resource
             var resource = _mapper.Map<Account, AccountResource>(tempAccount);
 
@@ -109,7 +112,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempAccount = await _accountRepository.FindByIdAsync(id);
             if (tempAccount is null)
-                return new AccountResponse<AccountResource>("Account is not existent.");
+                return new AccountResponse<AccountResource>(ResponseMessage.Values["Account_NoData"]);
 
             // Mapping Resource to Person
             _mapper.Map(updateAccountResource, tempAccount);
@@ -124,7 +127,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new AccountResponse<AccountResource>($"An error occurred when updating the Account: {ex.Message}");
+                return new AccountResponse<AccountResource>($"{ResponseMessage.Values["Account_Updating_Error"]}: {ex.Message}");
             }
         }
     }

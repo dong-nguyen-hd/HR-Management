@@ -4,22 +4,25 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
+using HR_Management.Resources;
 using HR_Management.Resources.Location;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class LocationService : ILocationService
+    public class LocationService : ResponseMessageService, ILocationService
     {
         private readonly ILocationRepository _locationRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public LocationService(ILocationRepository locationRepository, 
+        public LocationService(ILocationRepository locationRepository,
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._locationRepository = locationRepository;
             this._unitOfWork = unitOfWork;
@@ -43,7 +46,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new LocationResponse<LocationResource>($"An error occurred when saving the Location: {ex.Message}");
+                return new LocationResponse<LocationResource>($"{ResponseMessage.Values["Location_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -52,7 +55,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempLocation = await _locationRepository.FindByIdAsync(id);
             if (tempLocation is null)
-                return new LocationResponse<LocationResource>("Location is not existent.");
+                return new LocationResponse<LocationResource>(ResponseMessage.Values["Location_NoData"]);
             // Change property Status: true -> false
             tempLocation.Status = false;
 
@@ -66,7 +69,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new LocationResponse<LocationResource>($"An error occurred when deleting the Location: {ex.Message}");
+                return new LocationResponse<LocationResource>($"{ResponseMessage.Values["Location_Deleting_Error"]}: {ex.Message}");
             }
         }
 
@@ -94,7 +97,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempLocation = await _locationRepository.FindByIdAsync(id);
             if (tempLocation is null)
-                return new LocationResponse<LocationResource>("Location is not existent.");
+                return new LocationResponse<LocationResource>(ResponseMessage.Values["Location_NoData"]);
             // Update infomation
             _mapper.Map(updateLocationResource, tempLocation);
 
@@ -108,7 +111,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new LocationResponse<LocationResource>($"An error occurred when updating the Location: {ex.Message}");
+                return new LocationResponse<LocationResource>($"{ResponseMessage.Values["Location_Updating_Error"]}: {ex.Message}");
             }
         }
     }

@@ -6,13 +6,14 @@ using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
 using HR_Management.Resources;
 using HR_Management.Resources.Education;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class EducationService : IEducationService
+    public class EducationService : ResponseMessageService, IEducationService
     {
         private readonly IEducationRepository _educationRepository;
         private readonly IPersonRepository _personRepository;
@@ -22,7 +23,8 @@ namespace HR_Management.Services
         public EducationService(IEducationRepository educationRepository,
             IPersonRepository personRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._educationRepository = educationRepository;
             this._personRepository = personRepository;
@@ -35,7 +37,7 @@ namespace HR_Management.Services
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(personId);
             if (tempPerson is null)
-                return new EducationResponse<IEnumerable<EducationResource>>($"Person Id '{personId}' is not existent.");
+                return new EducationResponse<IEnumerable<EducationResource>>(ResponseMessage.Values["Person_Id_NoData"]);
             // Get list record from DB
             var tempEducation = await _educationRepository.ListAsync(personId);
             // Mapping Project to Resource
@@ -49,7 +51,7 @@ namespace HR_Management.Services
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(createEducationResource.PersonId);
             if (tempPerson is null)
-                return new EducationResponse<EducationResource>($"Person Id '{createEducationResource.PersonId}' is not existent.");
+                return new EducationResponse<EducationResource>(ResponseMessage.Values["Person_Id_NoData"]);
 
             // Mapping Resource to Project
             var education = _mapper.Map<CreateEducationResource, Education>(createEducationResource);
@@ -66,7 +68,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new EducationResponse<EducationResource>($"An error occurred when saving the Education: {ex.Message}");
+                return new EducationResponse<EducationResource>($"{ResponseMessage.Values["Education_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -88,7 +90,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempEducation = await _educationRepository.FindByIdAsync(id);
             if (tempEducation is null)
-                return new EducationResponse<EducationResource>("Education is not existent.");
+                return new EducationResponse<EducationResource>(ResponseMessage.Values["Education_NoData"]);
             // Update infomation
             _mapper.Map(updateEducationResource, tempEducation);
 
@@ -102,7 +104,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new EducationResponse<EducationResource>($"An error occurred when updating the Education: {ex.Message}");
+                return new EducationResponse<EducationResource>($"{ResponseMessage.Values["Education_Updating_Error"]}: {ex.Message}");
             }
         }
 
@@ -111,7 +113,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempEducation = await _educationRepository.FindByIdAsync(id);
             if (tempEducation is null)
-                return new EducationResponse<EducationResource>("Education is not existent.");
+                return new EducationResponse<EducationResource>(ResponseMessage.Values["Education_NoData"]);
             // Change property Status: true -> false
             tempEducation.Status = false;
 
@@ -125,7 +127,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new EducationResponse<EducationResource>($"An error occurred when deleting the Education: {ex.Message}");
+                return new EducationResponse<EducationResource>($"{ResponseMessage.Values["Education_Deleting_Error"]}: {ex.Message}");
             }
         }
 
@@ -133,14 +135,14 @@ namespace HR_Management.Services
         {
             // Validate Id duplicate
             if (obj.CurrentId == obj.TurnedId)
-                return new EducationResponse<EducationResource>("Current Id/Turned Id is not valid.");
+                return new EducationResponse<EducationResource>(ResponseMessage.Values["Swap_Id_Invalid"]);
             // Validate Id is existent?
             var currentEducation = await _educationRepository.FindByIdAsync(obj.CurrentId);
             var turnedEducation = await _educationRepository.FindByIdAsync(obj.TurnedId);
             if (currentEducation is null || turnedEducation is null)
-                return new EducationResponse<EducationResource>("Education is not existent.");
+                return new EducationResponse<EducationResource>(ResponseMessage.Values["Education_NoData"]);
             if (currentEducation.PersonId != turnedEducation.PersonId)
-                return new EducationResponse<EducationResource>("Current Id/Turned Id is not valid.");
+                return new EducationResponse<EducationResource>(ResponseMessage.Values["Swap_Id_Invalid"]);
             // Swap property OrderIndex
             int tempOrderIndex = -1;
             tempOrderIndex = currentEducation.OrderIndex;
@@ -155,7 +157,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new EducationResponse<EducationResource>($"An error occurred when swapping the Education: {ex.Message}");
+                return new EducationResponse<EducationResource>($"{ResponseMessage.Values["Education_Swapping_Error"]}: {ex.Message}");
             }
         }
     }

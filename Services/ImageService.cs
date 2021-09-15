@@ -2,6 +2,8 @@
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
+using HR_Management.Resources;
+using Microsoft.Extensions.Options;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -11,31 +13,38 @@ using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class ImageService : IImageService
+    public class ImageService : ResponseMessageService, IImageService
     {
+        #region Property
         private readonly IUriService _uriService;
         private readonly IPersonRepository _personRepository;
         private readonly IUnitOfWork _unitOfWork;
+        #endregion
 
+        #region Constructor
         public ImageService(IUriService uriService,
             IPersonRepository personRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._uriService = uriService;
             this._personRepository = personRepository;
             this._unitOfWork = unitOfWork;
         }
+        #endregion
+
+        #region Method
         public async Task<ImageResponse<Uri>> SaveImage(int personId, Stream imageStream, bool isMobile = false)
         {
             // Validate properties of image
             if (imageStream is null || imageStream.Length == 0)
-                new ImageResponse<Uri>("There is no image.");
+                new ImageResponse<Uri>(ResponseMessage.Values["Image_NoData"]);
             if (imageStream?.Length > 5242880)
-                new ImageResponse<Uri>("Image cannot be bigger than 5 MB.");
+                new ImageResponse<Uri>(ResponseMessage.Values["Image_Bigger_Error"]);
             // Validate Id is existent?
             var tempPerson = await _personRepository.FindByIdAsync(personId);
             if (tempPerson is null)
-                return new ImageResponse<Uri>($"Id '{personId}' is not existent.");
+                return new ImageResponse<Uri>(ResponseMessage.Values["Person_Id_NoData"]);
             // Path of image
             string webPath = string.Format($"{Startup.ImagePathWeb}{tempPerson.StaffId}.jpg");
             string rootWebPath = string.Concat(Startup.RootPath, webPath);
@@ -48,9 +57,9 @@ namespace HR_Management.Services
                 if (!isSuccess)
                 {
                     tempPerson.Avatar = $"default.jpg";
-                    return new ImageResponse<Uri>("Saving fault image.");
+                    return new ImageResponse<Uri>(ResponseMessage.Values["Image_Saving_Error"]);
                 }
-                    
+
                 tempPerson.Avatar = $"{tempPerson.StaffId}.jpg";
                 await _unitOfWork.CompleteAsync();
 
@@ -59,7 +68,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new ImageResponse<Uri>($"An error occurred when saving the Image: {ex.Message}");
+                return new ImageResponse<Uri>($"{ResponseMessage.Values["Image_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -233,6 +242,8 @@ namespace HR_Management.Services
                 File.Delete(path);
             }
         }
+        #endregion
+
         #endregion
     }
 }

@@ -4,16 +4,16 @@ using HR_Management.Domain.Models;
 using HR_Management.Domain.Repositories;
 using HR_Management.Domain.Services;
 using HR_Management.Domain.Services.Communication;
-using HR_Management.Extensions;
 using HR_Management.Resources;
 using HR_Management.Resources.Certificate;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HR_Management.Services
 {
-    public class CertificateService : ICertificateService
+    public class CertificateService : ResponseMessageService, ICertificateService
     {
         private readonly ICertificateRepository _certificateRepository;
         private readonly IPersonRepository _personRepository;
@@ -23,7 +23,8 @@ namespace HR_Management.Services
         public CertificateService(ICertificateRepository certificateRepository,
             IPersonRepository personRepository,
             IMapper mapper,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptionsSnapshot<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._certificateRepository = certificateRepository;
             this._personRepository = personRepository;
@@ -36,7 +37,7 @@ namespace HR_Management.Services
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(personId);
             if (tempPerson is null)
-                return new CertificateResponse<IEnumerable<CertificateResource>>($"Person Id '{personId}' is not existent.");
+                return new CertificateResponse<IEnumerable<CertificateResource>>(ResponseMessage.Values["Person_Id_NoData"]);
             // Get list record from DB
             var tempCertificate = await _certificateRepository.ListAsync(personId);
             // Mapping Project to Resource
@@ -50,8 +51,8 @@ namespace HR_Management.Services
             // Validate person is existent?
             var tempPerson = await _personRepository.FindByIdAsync(createCertificateResource.PersonId);
             if (tempPerson is null)
-                return new CertificateResponse<CertificateResource>($"Person Id '{createCertificateResource.PersonId}' is not existent.");
-            
+                return new CertificateResponse<CertificateResource>(ResponseMessage.Values["Person_Id_NoData"]);
+
             // Mapping Resource to Project
             var certificate = _mapper.Map<CreateCertificateResource, Certificate>(createCertificateResource);
             certificate.OrderIndex = FindMaximum(certificate.PersonId);
@@ -67,7 +68,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CertificateResponse<CertificateResource>($"An error occurred when saving the Certificate: {ex.Message}");
+                return new CertificateResponse<CertificateResource>($"{ResponseMessage.Values["Certificate_Saving_Error"]}: {ex.Message}");
             }
         }
 
@@ -89,7 +90,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempCertificate = await _certificateRepository.FindByIdAsync(id);
             if (tempCertificate is null)
-                return new CertificateResponse<CertificateResource>("Certificate is not existent.");
+                return new CertificateResponse<CertificateResource>(ResponseMessage.Values["Certificate_NoData"]);
             // Mapping Resource to Certificate
             _mapper.Map(updateCertificateResource, tempCertificate);
 
@@ -103,7 +104,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CertificateResponse<CertificateResource>($"An error occurred when updating the Certificate: {ex.Message}");
+                return new CertificateResponse<CertificateResource>($"{ResponseMessage.Values["Certificate_Updating_Error"]}: {ex.Message}");
             }
         }
 
@@ -112,7 +113,7 @@ namespace HR_Management.Services
             // Validate Id is existent?
             var tempCertificate = await _certificateRepository.FindByIdAsync(id);
             if (tempCertificate is null)
-                return new CertificateResponse<CertificateResource>("Certificate is not existent.");
+                return new CertificateResponse<CertificateResource>(ResponseMessage.Values["Certificate_NoData"]);
             // Change property Status: true -> false
             tempCertificate.Status = false;
 
@@ -126,7 +127,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CertificateResponse<CertificateResource>($"An error occurred when deleting the Certificate: {ex.Message}");
+                return new CertificateResponse<CertificateResource>($"{ResponseMessage.Values["Certificate_Deleting_Error"]}: {ex.Message}");
             }
         }
 
@@ -134,14 +135,14 @@ namespace HR_Management.Services
         {
             // Validate Id duplicate
             if (obj.CurrentId == obj.TurnedId)
-                return new CertificateResponse<CertificateResource>("Current Id/Turned Id is not valid.");
+                return new CertificateResponse<CertificateResource>(ResponseMessage.Values["Swap_Id_Invalid"]);
             // Validate Id is existent?
             var currentCertificate = await _certificateRepository.FindByIdAsync(obj.CurrentId);
             var turnedCertificate = await _certificateRepository.FindByIdAsync(obj.TurnedId);
             if (currentCertificate is null || turnedCertificate is null)
-                return new CertificateResponse<CertificateResource>("Certificate is not existent.");
+                return new CertificateResponse<CertificateResource>(ResponseMessage.Values["Certificate_NoData"]);
             if (currentCertificate.PersonId != turnedCertificate.PersonId)
-                return new CertificateResponse<CertificateResource>("Current Id/Turned Id is not valid.");
+                return new CertificateResponse<CertificateResource>(ResponseMessage.Values["Swap_Id_Invalid"]);
             // Swap property OrderIndex
             int tempOrderIndex = -1;
             tempOrderIndex = currentCertificate.OrderIndex;
@@ -156,7 +157,7 @@ namespace HR_Management.Services
             }
             catch (Exception ex)
             {
-                return new CertificateResponse<CertificateResource>($"An error occurred when swapping the Certificate: {ex.Message}");
+                return new CertificateResponse<CertificateResource>($"{ResponseMessage.Values["Certificate_Swapping_Error"]}: {ex.Message}");
             }
         }
     }
