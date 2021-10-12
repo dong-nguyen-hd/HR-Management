@@ -1,0 +1,24 @@
+﻿using Business.Data;
+using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace Business.Extensions.Validation
+{
+    public class RoleAttribute : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            try
+            {
+                if (Enum.IsDefined(typeof(eRole), value))
+                    return ValidationResult.Success;
+                else
+                    return new ValidationResult("Invalid Role field.");
+            }
+            catch (Exception)
+            {
+                return new ValidationResult("Invalid Role field.");
+            }
+        }
+    }
+}

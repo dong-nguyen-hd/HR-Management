@@ -25,7 +25,7 @@ This project building on **.NET 5.0**, using for Human Resource Management for I
 ## Design Patterns
 
 * Unit Of Work
-* Repository
+* Generic Repository
 * Request-Reply
 * Inversion of Control / Dependency injection
 * ORM
