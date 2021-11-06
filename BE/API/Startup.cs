@@ -72,7 +72,7 @@ namespace API
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
 
             // Mapping data from response-message.json
-            services.Configure<ResponseMessage>(Configuration.GetSection("ResponseMessage"));
+            services.Configure<ResponseMessage>(Configuration.GetSection(nameof(ResponseMessage)));
 
             // Mapping host information
             services.Configure<HostResource>(Configuration.GetSection("PathConfig"));

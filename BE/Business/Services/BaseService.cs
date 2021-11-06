@@ -55,9 +55,13 @@ namespace Business.Services
         {
             // Mapping Resource to Entity
             var tempEntity = Mapper.Map<Insert, Entity>(insertResource);
-
+            
             try
             {
+                var personId = (int)tempEntity.GetType().GetProperty("PersonId").GetValue(tempEntity);
+                int orderIndex = await _baseRepository.MaximumOrderIndexAsync(personId);
+                tempEntity.GetType().GetProperty("OrderIndex").SetValue(tempEntity, orderIndex);
+
                 await _baseRepository.InsertAsync(tempEntity);
                 await UnitOfWork.CompleteAsync();
 

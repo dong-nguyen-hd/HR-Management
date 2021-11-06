@@ -8,6 +8,6 @@ namespace Business.Domain.Models
         public string Name { get; set; }
         public string Address { get; set; }
         public bool Status { get; set; }
-        public ICollection<Person> People { get; set; }
+        public HashSet<Person> People { get; set; }
     }
 }

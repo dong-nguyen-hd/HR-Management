@@ -34,7 +34,7 @@ namespace Infrastructure.Repositories
         }
 
         public virtual async Task InsertAsync(Entity entity)
-        => await _entities.AddAsync(entity);
+            => await _entities.AddAsync(entity);
 
         /// <summary>
         /// Removing by change value of status true -> false
@@ -52,10 +52,12 @@ namespace Infrastructure.Repositories
 
         public virtual async Task<int> MaximumOrderIndexAsync(int personId)
         {
-            var tempList = await GetListEntityAsync(personId);
+            var idName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("PersonId").Name;
+
+            var countElement = await _entities.Where(entity => EF.Property<int>(entity, idName).Equals(personId)).CountAsync();
 
             // Find maximum with OrderIndex predicate
-            return tempList.Count == 0 ? 0 : tempList.Max(entiy => (int)entiy.GetType().GetProperty("OrderIndex").GetValue(entiy));
+            return countElement == 0 ? 1 : countElement + 1;
         }
 
         public virtual async Task<IEnumerable<Entity>> GetAllAsync()
@@ -63,23 +65,6 @@ namespace Infrastructure.Repositories
             var statusName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Status").Name;
 
             return await _entities.Where(entity => EF.Property<bool>(entity, statusName).Equals(true))
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
-        /// <summary>
-        /// Get list of entity with Person-Id and Status predicate
-        /// </summary>
-        /// <param name="personId"></param>
-        /// <param name="status"></param>
-        /// <returns></returns>
-        private async Task<List<Entity>> GetListEntityAsync(int personId, bool status = true)
-        {
-            var statusName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Status").Name;
-            var idName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("PersonId").Name;
-
-            return await _entities.Where(entity => EF.Property<int>(entity, idName).Equals(personId) &&
-                EF.Property<bool>(entity, statusName).Equals(true))
                 .AsNoTracking()
                 .ToListAsync();
         }

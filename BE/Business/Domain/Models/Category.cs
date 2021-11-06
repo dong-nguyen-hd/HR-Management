@@ -8,6 +8,6 @@ namespace Business.Domain.Models
         public string Name { get; set; }
         public bool Status { get; set; }
         public CategoryPerson CategoryPerson { get; set; }
-        public ICollection<Technology> Technologies { get; set; }
+        public HashSet<Technology> Technologies { get; set; }
     }
 }

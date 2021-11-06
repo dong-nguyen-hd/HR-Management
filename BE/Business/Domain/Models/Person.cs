@@ -21,11 +21,11 @@ namespace Business.Domain.Models
         public string OrderIndex { get; set; }
         public int? LocationId { get; set; }
         public Location Location { get; set; }
-        public ICollection<Certificate> Certificates { get; set; }
-        public ICollection<CategoryPerson> CategoryPersons { get; set; }
-        public ICollection<Education> Educations { get; set; }
-        public ICollection<Project> Projects { get; set; }
-        public ICollection<WorkHistory> WorkHistories { get; set; }
-        public ICollection<Log> Logs { get; set; }
+        public HashSet<Certificate> Certificates { get; set; }
+        public HashSet<CategoryPerson> CategoryPersons { get; set; }
+        public HashSet<Education> Educations { get; set; }
+        public HashSet<Project> Projects { get; set; }
+        public HashSet<WorkHistory> WorkHistories { get; set; }
+        public HashSet<Log> Logs { get; set; }
     }
 }

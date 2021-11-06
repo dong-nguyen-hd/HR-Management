@@ -1,0 +1,13 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: $theme-bgcolor;
+  color: $text-primary-color;
+  font-size: $font-size-m;
+}
+
+.hero {
+  text-align: center;
+}
