@@ -1,7 +1,9 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>thx <a href="//balm.js.org/">BalmJS</a></p>
+    ...
+    <!-- Add a test button -->
+    <ui-button icon="add" @click="$alert('Hello BalmUI')">Click Me</ui-button>
+    <p>Testing</p>
   </div>
 </template>
 
