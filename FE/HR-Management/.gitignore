@@ -1,21 +1,33 @@
-# Logs
-logs
-*.log
+.DS_Store
+.thumbs.db
+node_modules
+
+# Quasar core related directories
+.quasar
+/dist
+
+# Cordova related directories and files
+/src-cordova/node_modules
+/src-cordova/platforms
+/src-cordova/plugins
+/src-cordova/www
+
+# Capacitor related directories and files
+/src-capacitor/www
+/src-capacitor/node_modules
+
+# BEX related directories and files
+/src-bex/www
+/src-bex/js/core
+
+# Log files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
 
-# Dependency directories
-bower_components
-node_modules/
-jspm_packages/
-web_modules/
-
-# Build build output
-.tmp/
-dist/
-/assets/
-
-# MacOS generated files
-.DS_Store
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

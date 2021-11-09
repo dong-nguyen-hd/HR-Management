@@ -1,4 +1,8 @@
-__mocks__
-__tests__
-.tmp
-dist
+/dist
+/src-bex/www
+/src-capacitor
+/src-cordova
+/.quasar
+/node_modules
+.eslintrc.js
+babel.config.js

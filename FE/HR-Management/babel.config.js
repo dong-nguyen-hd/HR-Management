@@ -1,9 +1,15 @@
-module.exports = {
-  presets: [['@babel/preset-env', { modules: false }]],
-  plugins: ['@babel/plugin-transform-runtime'],
-  env: {
-    test: {
-      presets: ['@babel/preset-env']
-    }
+
+
+module.exports = api => {
+  return {
+    presets: [
+      [
+        '@quasar/babel-preset-app',
+        api.caller(caller => caller && caller.target === 'node')
+          ? { targets: { node: 'current' } }
+          : {}
+      ]
+    ]
   }
-};
+}
+
