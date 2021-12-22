@@ -10,8 +10,7 @@ namespace Business.Extensions.Validation
         {
             try
             {
-                string source = value.ToString().ToLower();
-                if (Regex.IsMatch(source, @"\s", RegexOptions.Compiled))
+                if (Regex.IsMatch(value.ToString(), @"\s", RegexOptions.Compiled))
                     return new ValidationResult("User name is not contain any space characters.");
                 else
                     return ValidationResult.Success;

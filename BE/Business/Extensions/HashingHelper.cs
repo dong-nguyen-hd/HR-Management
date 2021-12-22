@@ -20,7 +20,7 @@ namespace Business.Extensions
                 if (arrPassword.Length != 3)
                     return false;
 
-                string hashingPwd = GetHashPBKDF2(loginPassword.ToLower(),
+                string hashingPwd = GetHashPBKDF2(loginPassword,
                     Convert.FromBase64String(arrPassword[1]),
                     Convert.ToInt32(arrPassword[0]));
 
@@ -45,7 +45,7 @@ namespace Business.Extensions
         {
             // Derive a 256-bit subkey (use HMAC-SHA512 with 10,000 iterations is default)
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
+                password: password.ToLower(),
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA512,
                 iterationCount: iterationCount,

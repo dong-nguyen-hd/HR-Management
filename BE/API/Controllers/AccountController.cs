@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -35,7 +36,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetAllAsync([FromQuery] int page, [FromQuery] int pageSize)
+        public async Task<IActionResult> ListPaginationAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
             QueryResource pagintation = new QueryResource(page, pageSize);
 
@@ -61,7 +62,7 @@ namespace API.Controllers
             if (resource.Role == (int)eRole.Admin)
             {
                 if (!User.IsInRole(eRole.Admin.ToDescriptionString()))
-                    return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not Permitted"]));
+                    return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
             }
 
             var result = await _accountService.InsertAsync(resource);
@@ -88,6 +89,47 @@ namespace API.Controllers
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateAccountResource resource)
             => await base.UpdateAsync(id, resource);
 
+        [HttpPut("selfUpdate/{id:int}")]
+        [Authorize(Roles = "admin, editor, viewer")]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SeflUpdateAsync(int id, [FromBody] SelfUpdateAccountResource resource)
+        {
+            var identifier = (User.Identity as ClaimsIdentity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+
+            if (!identifier.Equals(id.ToString()))
+                return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+
+            var result = await _accountService.SelfUpdateAsync(id, resource);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return StatusCode(201, result.Resource);
+        }
+
+        [HttpPut("updatePassword/{id:int}")]
+        [Authorize(Roles = "admin, editor, viewer")]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdatePasswordAsync(int id, [FromBody] UpdatePasswordAccountResource resource)
+        {
+            // Check if the id belongs to me
+            var identifier = (User.Identity as ClaimsIdentity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+            if (!identifier.Equals(id.ToString()))
+                return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+
+            // Checking duplicate password
+            if (resource.OldPassword.Equals(resource.NewPassword))
+                return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+
+            var result = await _accountService.UpdatePasswordAsync(id, resource);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return StatusCode(201, result.Resource);
+        }
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "admin")]

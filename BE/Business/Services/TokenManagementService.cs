@@ -89,6 +89,7 @@ namespace Business.Services
             {
                 // Optional: you can add other Claims.
                 // Note: You avoid sensitive information, because this is public.
+                new Claim(ClaimTypes.NameIdentifier, account.Id.ToString()),
                 new Claim(ClaimTypes.Name, account.UserName),
                 new Claim(ClaimTypes.Role, account.Role),
             };
