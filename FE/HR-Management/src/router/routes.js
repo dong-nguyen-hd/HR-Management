@@ -1,19 +1,27 @@
-
 const routes = [
   {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    name: "Login",
+    path: "/login",
+    component: () => import("pages/Login.vue"),
+  },
+  {
+    path: "/",
+    component: () => import("layouts/MainLayout.vue"),
+    meta: { requireLogin: true },
     children: [
-      { path: '', component: () => import('pages/Index.vue') }
-    ]
+      {
+        path: "/index",
+        component: () => import("pages/Index.vue"),
+      },
+    ],
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/Error404.vue')
-  }
-]
+    path: "/:catchAll(.*)*",
+    component: () => import("pages/Error404.vue"),
+  },
+];
 
-export default routes
+export default routes;

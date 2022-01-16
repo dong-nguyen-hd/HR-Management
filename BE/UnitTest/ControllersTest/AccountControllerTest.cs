@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using Xunit;
 
-namespace UnitTest
+namespace UnitTest.ControllersTest
 {
-    public class UnitTest1
+    public class AccountControllerTest
     {
         [Fact]
         public void Test1()
