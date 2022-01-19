@@ -1,1 +1,34 @@
 // app global css in SCSS form
+// fonts
+@font-face {
+  font-family: Poppins-Regular;
+  src: url("./fonts/poppins/Poppins-Regular.ttf");
+}
+
+@font-face {
+  font-family: Poppins-Bold;
+  src: url("./fonts/poppins/Poppins-Bold.ttf");
+}
+
+@font-face {
+  font-family: Poppins-Medium;
+  src: url("./fonts/poppins/Poppins-Medium.ttf");
+}
+
+@font-face {
+  font-family: Montserrat-Bold;
+  src: url("./fonts/montserrat/Montserrat-Bold.ttf");
+}
+
+// Restyle tag
+* {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  height: 100%;
+  font-family: Poppins-Regular, sans-serif;
+}

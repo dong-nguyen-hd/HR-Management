@@ -28,7 +28,7 @@ namespace Infrastructure.Contexts.Config
                 {
                     Id = -1,
                     UserName = "admin",
-                    Password = "10000.ej6YMBO1QrLxWx7AuxN8IA==.0CNmt0k0xfvshCGdRy8wTiapSrEWFedeozzNTakWkQw=", // Input: d7f32454b44d22182618d56e683f419a (MD5 hash)
+                    Password = "10000.YNMP1rFAoc8L+0I4UeerFg==.qVRWc4jYxx/BMt8ro9rjNyr8nxgvClamDkef+j7vLE8=", // Input: 21232f297a57a5a743894a0e4a801fc3 (plain-text: admin) (hash function: MD5)
                     Email = "dong.nguyen.hdkt@gmail.com",
                     Role = "admin",
                     CreatedAt = DateTime.UtcNow,
