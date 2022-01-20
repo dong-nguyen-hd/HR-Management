@@ -9,11 +9,13 @@ License: CC BY 3.0
     <div class="container-login display-center">
       <div class="wrap-login">
         <div class="top-login">
-          <div class="login-pic top-left-login display-center">
-            <img
-              src="../assets/images/img-01.png"
-              alt="Human Resource Management"
-            />
+          <div class="top-left-login display-center">
+            <div class="login-pic">
+              <img
+                src="../assets/images/logo-vertical.svg"
+                alt="Human Resource Management"
+              />
+            </div>
           </div>
 
           <div class="top-right-login display-center">
@@ -24,11 +26,11 @@ License: CC BY 3.0
               <div class="title-login display-center">
                 <div class="login-pic lt-md q-pr-sm">
                   <img
-                    src="../assets/images/img-01.png"
+                    src="../assets/images/logo-mono-black.svg"
                     alt="Human Resource Management"
                   />
                 </div>
-                Login
+                Welcome!
               </div>
               <q-input
                 class="q-pb-sm"
@@ -36,12 +38,12 @@ License: CC BY 3.0
                 rounded
                 hide-bottom-space
                 outlined
-                v-model="account.username"
+                v-model="account.userName"
                 placeholder="User name"
-                error-message="test"
                 lazy-rules="ondemand"
                 :rules="[
-                  (val) => (val && val.length > 0) || 'Please type something',
+                  (val) =>
+                    (val && val.length > 0) || 'User name can not be empty!',
                 ]"
               >
                 <template v-slot:prepend>
@@ -51,6 +53,7 @@ License: CC BY 3.0
 
               <q-input
                 class="q-pb-lg"
+                hide-bottom-space
                 tabindex="2"
                 rounded
                 outlined
@@ -59,7 +62,11 @@ License: CC BY 3.0
                 placeholder="Password"
                 lazy-rules="ondemand"
                 :rules="[
-                  (val) => (val && val.length > 0) || 'Please type something',
+                  (val) =>
+                    (val && val.length > 0) || 'Password can not be empty!',
+                  (val) =>
+                    (val && val.length > 5) ||
+                    'Password must be more than 5 characters',
                 ]"
               >
                 <template v-slot:prepend>
@@ -68,6 +75,7 @@ License: CC BY 3.0
               </q-input>
 
               <q-btn
+                unelevated
                 class="btn-login"
                 tabindex="3"
                 rounded
@@ -91,9 +99,9 @@ License: CC BY 3.0
 </template>
 
 <script>
-import { useQuasar } from "quasar";
 import { mapActions } from "vuex";
 import MD5 from "crypto-js/md5";
+import { useQuasar } from "quasar";
 
 let $q;
 
@@ -102,45 +110,37 @@ export default {
   data() {
     return {
       account: {
-        username: "",
-        password: "",
+        userName: "abcd",
+        password: "abcdabcd",
       },
     };
   },
   methods: {
     ...mapActions("auth", ["login"]),
     async submitForm() {
-      if (!this.account.username || !this.account.password) {
-        $q.notify({
-          type: "negative",
-          message: "Informed data are invalid.",
-        });
-      } else if (this.account.password.length < 3) {
-        $q.notify({
-          type: "negative",
-          message: "The password must have 6 or more characters.",
-        });
-      } else {
-        try {
-          // Hashing password
-          this.account.password = MD5(this.account.password).toString();
+      
+        // Hashing password
+        let tempAccount = {
+          userName: this.account.userName,
+          password: MD5(this.account.password).toString(),
+        };
 
-          await this.login(this.account);
-          const toPath = this.$route.query.to || "/admin";
-          this.$router.push(toPath);
-        } catch (err) {
-          if (err.response.data.detail) {
-            $q.notify({
-              type: "negative",
-              message: err.response.data.detail,
-            });
-          }
-        }
-      }
+        let result = await this.login(tempAccount);
+
+        console.log(result);
+
+        const toPath = this.$route.query.to || "/admin";
+        this.$router.push(toPath);
+      // } catch (err) {
+      //   this.$q.notify({
+      //     type: "negative",
+      //     message: "Test",
+      //   });
+      // }
     },
   },
   mounted() {
-    $q = useQuasar();
+    const $q = useQuasar();
   },
 };
 </script>
@@ -208,13 +208,16 @@ export default {
   padding-bottom: 20px;
 }
 
-.width-form-login {
-  width: 80%;
-}
-
 .btn-login {
   width: 100%;
   height: 56px;
+  font-family: Montserrat-Bold;
+  font-size: 15px;
+  line-height: 1.5;
+
+  .q-btn:hover {
+    background-color: $accent;
+  }
 }
 
 .display-center {
@@ -222,9 +225,6 @@ export default {
   justify-content: center;
   align-items: center;
 }
-
-/*------------------------------------------------------------------
-[ Resize picture ]*/
 
 .login-pic {
   img {
@@ -242,12 +242,16 @@ export default {
   }
 
   .login-pic {
-    width: 34%;
+    width: 60%;
   }
 
   .top-left-login,
   .top-right-login {
     width: calc(100% - 50%);
+  }
+
+  .width-form-login {
+    width: 70%;
   }
 }
 
@@ -266,7 +270,11 @@ export default {
   }
 
   .login-pic {
-    width: 20%;
+    width: 16%;
+  }
+
+  .width-form-login {
+    width: 80%;
   }
 }
 
@@ -285,7 +293,11 @@ export default {
   }
 
   .login-pic {
-    width: 20%;
+    width: 16%;
+  }
+
+  .width-form-login {
+    width: 80%;
   }
 }
 </style>

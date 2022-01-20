@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace Business.Extensions.Validation
@@ -12,10 +11,10 @@ namespace Business.Extensions.Validation
             {
                 if (Regex.IsMatch(value.ToString(), @"\s", RegexOptions.Compiled))
                     return new ValidationResult("User name is not contain any space characters.");
-                else
-                    return ValidationResult.Success;
+
+                return ValidationResult.Success;
             }
-            catch (Exception)
+            catch
             {
                 return new ValidationResult("Invalid User name field.");
             }

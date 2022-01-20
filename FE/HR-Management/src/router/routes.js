@@ -10,6 +10,7 @@ const routes = [
     meta: { requireLogin: true },
     children: [
       {
+        name: "Index",
         path: "/index",
         component: () => import("pages/Index.vue"),
       },
