@@ -1,50 +1,45 @@
 import { api } from "src/boot/axios";
 
-// export const login = async ({ commit }, payload) => {
-//   await api.post("/api/v1/token/login", payload).then((response) => {
-//     return response.data;
-//     const result = response.data.resource;
-//     commit("setToken", result.accessToken);
-//     commit("setInformation", result);
-//     api.defaults.headers.common.Authorization = "JWT " + result.accessToken;
-//   });
-// };
-
-export const login = async ({ commit }, payload) => {
-  await api
-    .post("/api/v1/token/login", payload)
-    .then((response) => {
-      let result = response.data;
-      commit("setToken", result.resource.accessToken);
-      commit("setInformation", result.resource);
-      api.defaults.headers.common.Authorization =
-        "JWT " + result.resource.accessToken;
-      return result;
-    })
-    .catch(function (error) {
-      if (error.response) {
-        return error.response.data;
-      } else {
-        let temp = { success: false, message: "Server Error!" };
-        return temp;
-      }
-    });
+export const login = async ({ commit, dispatch }, payload) => {
+  let resource = payload.resource;
+  localStorage.setItem("hrtoken", resource.accessToken);
+  localStorage.setItem("test", JSON.stringify(resource));
+  commit("setToken", resource.accessToken);
+  commit("setInformation", resource);
+  dispatch("setHeaderJWT");
 };
 
-export const logOut = ({ commit }) => {
-  api.defaults.headers.common.Authorization = "";
+export const logOut = async ({ commit, dispatch }) => {
+  localStorage.removeItem('hrtoken');
   commit("removeToken");
+  dispatch("setHeaderJWT");
 };
+
+export const getInformation = async ({ commit }, id) => {
+  await api.get(`/api/v1/account/${id}`).then(response => {
+    commit('setInformation', response.data.resource)
+  })
+}
 
 export const init = async ({ commit, dispatch }) => {
-  const localResource = localStorage.getItem("hrtoken");
-  if (localResource) {
-    let resource = JSON.parse(localResource);
+  // let tokenStorage = localStorage.getItem("hrtoken");
+  // if (tokenStorage) {
+  //   let token = localResource.toString();
+  //   commit("setToken", token);
+  //   dispatch("setHeaderJWT");
 
-    commit("setToken", resource.accessToken);
-    commit("setInformation", resource);
-    api.defaults.headers.common.Authorization = "JWT " + resource.accessToken;
-  } else {
-    commit("removeToken");
-  }
+  //   await dispatch()
+
+  //   commit("setInformation", resource);
+  // } else {
+  //   commit("removeToken");
+  // }
+};
+
+export const setHeaderJWT = async ({ getters }) => {
+  let isAuthenticated = getters.isAuthenticated;
+
+  if (isAuthenticated)
+    api.defaults.headers.common.Authorization = "JWT " + getters.getToken;
+  else api.defaults.headers.common.Authorization = "";
 };

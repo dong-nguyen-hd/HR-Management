@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
+    [ApiController]
     [Route("api/v1/token")]
     public class TokenController : ControllerBase
     {
@@ -19,7 +20,7 @@ namespace API.Controllers
         #region Constructor
         public TokenController(ITokenManagementService tokenManagementService)
         {
-            _tokenManagementService = tokenManagementService;
+            this._tokenManagementService = tokenManagementService;
         }
         #endregion
 

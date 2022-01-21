@@ -99,9 +99,10 @@ License: CC BY 3.0
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import MD5 from "crypto-js/md5";
 import { useQuasar } from "quasar";
+import { api } from "src/boot/axios";
 
 let $q;
 
@@ -110,34 +111,64 @@ export default {
   data() {
     return {
       account: {
-        userName: "abcd",
-        password: "abcdabcd",
+        // You need to remove account information!
+        userName: "admin",
+        password: "admin1234",
       },
     };
   },
   methods: {
     ...mapActions("auth", ["login"]),
     async submitForm() {
-      
+      try {
         // Hashing password
-        let tempAccount = {
+        let payload = {
           userName: this.account.userName,
           password: MD5(this.account.password).toString(),
         };
 
-        let result = await this.login(tempAccount);
+        // Request API
+        let result = await api
+          .post("/api/v1/token/login", payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
 
-        console.log(result);
-
-        const toPath = this.$route.query.to || "/admin";
-        this.$router.push(toPath);
-      // } catch (err) {
-      //   this.$q.notify({
-      //     type: "negative",
-      //     message: "Test",
-      //   });
-      // }
+        if (result.success) {
+          await this.login(result);
+          this.$router.push("/index");
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } catch (err) {
+        this.$q.notify({
+          type: "negative",
+          message: "Server Error!",
+        });
+      }
     },
+  },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated'])
+  },
+  created() {
+    if (this.isAuthenticated) {
+      this.$router.push("/index");
+    }
   },
   mounted() {
     const $q = useQuasar();

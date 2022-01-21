@@ -6,7 +6,7 @@
 
         <q-toolbar-title>
           <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+            <img src="../assets/images/logo-mono-white.svg" />
           </q-avatar>
           Title
         </q-toolbar-title>
@@ -52,7 +52,7 @@
       </div>
     </q-drawer>
 
-    <q-page-container class="bg-primary">
+    <q-page-container>
       <router-view />
     </q-page-container>
   </q-layout>
@@ -84,7 +84,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style lang="scss" scoped>
-
-</style>

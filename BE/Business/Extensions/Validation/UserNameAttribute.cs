@@ -9,6 +9,9 @@ namespace Business.Extensions.Validation
         {
             try
             {
+                if(value is null)
+                    return new ValidationResult("Invalid User name field.");
+
                 if (Regex.IsMatch(value.ToString(), @"\s", RegexOptions.Compiled))
                     return new ValidationResult("User name is not contain any space characters.");
 
