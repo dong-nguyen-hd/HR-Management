@@ -7,7 +7,11 @@ namespace Infrastructure.Contexts
     public class AppDbContext : DbContext
     {
         #region Constructor
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+            Database.EnsureDeleted();
+            Database.EnsureCreated();
+        }
         #endregion
 
         #region Property
@@ -22,6 +26,7 @@ namespace Infrastructure.Contexts
         public DbSet<Person> People { get; set; }
         public DbSet<Log> Logs { get; set; }
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Token> Tokens { get; set; }
         #endregion
 
         #region Method

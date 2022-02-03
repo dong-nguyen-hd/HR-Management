@@ -31,7 +31,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<TokenResource>), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> LoginAsync([FromBody] LoginResource resource)
         {
-            var result = await _tokenManagementService.GenerateTokensAsync(resource, DateTime.Now);
+            string userAgent = Request.Headers["User-Agent"].ToString();
+            var result = await _tokenManagementService.GenerateTokensAsync(resource, DateTime.UtcNow, userAgent);
 
             if (result.Success)
                 return Ok(result);

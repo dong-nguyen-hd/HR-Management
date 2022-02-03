@@ -45,6 +45,8 @@ namespace API.Extensions
 
             services.AddScoped<ITokenManagementService, TokenManagementService>();
 
+            services.AddScoped<ITokenRepository, TokenRepository>();
+
             services.AddScoped<IImageService, ImageService>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();

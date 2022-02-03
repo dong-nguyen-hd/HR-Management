@@ -7,6 +7,6 @@ namespace Business.Domain.Services
 {
     public interface ITokenManagementService
     {
-        Task<BaseResponse<TokenResource>> GenerateTokensAsync(LoginResource loginResource, DateTime now);
+        Task<BaseResponse<AccessTokenResource>> GenerateTokensAsync(LoginResource loginResource, DateTime now, string userAgent);
     }
 }

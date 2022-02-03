@@ -12,6 +12,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +22,7 @@ namespace Business.Services
     {
         #region Property
         private readonly IAccountRepository _accountRepository;
+        private readonly ITokenRepository _tokenRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly byte[] _secret;
@@ -29,28 +31,65 @@ namespace Business.Services
 
         #region Constructor
         public TokenManagementService(IAccountRepository accountRepository,
+            ITokenRepository tokenRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IOptionsMonitor<JwtConfig> jwtConfig,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._accountRepository = accountRepository;
+            this._tokenRepository = tokenRepository;
             this._mapper = mapper;
             this._unitOfWork = unitOfWork;
             this._jwtConfig = jwtConfig.CurrentValue;
-            _secret = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+            this._secret = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
         }
         #endregion
 
         #region Method
-        public async Task<BaseResponse<TokenResource>> GenerateTokensAsync(LoginResource loginResource, DateTime now)
+        public async Task<BaseResponse<AccessTokenResource>> GenerateTokensAsync(LoginResource loginResource, DateTime now, string userAgent)
         {
             // Validate Login-Resource
             var tempAccount = await _accountRepository.ValidateCredentialsAsync(loginResource);
             if (tempAccount is null)
-                return new BaseResponse<TokenResource>(ResponseMessage.Values["Token_Invalid"]);
+                return new BaseResponse<AccessTokenResource>(ResponseMessage.Values["Token_Invalid"]);
+
+            // Get access-token
+            var accessToken = GenerateAccessToken(tempAccount, now);
+
+            // Get refresh-token
+            var refreshToken = GenerateRefreshToken(now, userAgent);
+
+            // Set Last-Activity value
+            tempAccount.LastActivity = DateTime.UtcNow;
+
+            try
+            {
+                tempAccount.Tokens.Add(refreshToken);
+                await _unitOfWork.CompleteAsync();
+
+                return new BaseResponse<AccessTokenResource>(MappingTokenResoure(tempAccount, refreshToken, accessToken));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new BaseResponse<AccessTokenResource>(ResponseMessage.Values["Token_Saving_Error"]);
+            }
+        }
+
+        private AccessTokenResource MappingTokenResoure(Account account, Token token, string accessToken)
+        {
+            var tokenResource = _mapper.Map<Account, AccessTokenResource>(account);
+            tokenResource.TokenResource = _mapper.Map<Token, TokenResource>(token);
+            tokenResource.AccessToken = accessToken;
+
+            return tokenResource;
+        }
+
+        private string GenerateAccessToken(Account account, DateTime now)
+        {
             // Get claim value
-            Claim[] claims = GetClaim(tempAccount);
+            Claim[] claims = GetClaim(account);
 
             var shouldAddAudienceClaim = string.IsNullOrWhiteSpace(claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Aud)?.Value);
 
@@ -58,29 +97,12 @@ namespace Business.Services
                 _jwtConfig.Issuer,
                 shouldAddAudienceClaim ? _jwtConfig.Audience : string.Empty,
                 claims,
-                expires: now.AddHours(_jwtConfig.AccessTokenExpirationHours),
+                expires: now.AddMinutes(_jwtConfig.AccessTokenExpiration),
                 signingCredentials: new SigningCredentials(new SymmetricSecurityKey(_secret), SecurityAlgorithms.HmacSha256Signature));
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
-            // Set Last-Activity value
-            tempAccount.LastActivity = DateTime.Now;
-
-            try
-            {
-                await _unitOfWork.CompleteAsync();
-
-                // Mapping
-                var resource = _mapper.Map<Account, TokenResource>(tempAccount);
-                resource.AccessToken = accessToken;
-
-                return new BaseResponse<TokenResource>(resource);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return new BaseResponse<TokenResource>(ResponseMessage.Values["Token_Saving_Error"]);
-            }
+            return accessToken;
         }
 
         private static Claim[] GetClaim(Account account)
@@ -95,6 +117,25 @@ namespace Business.Services
             };
 
             return claims;
+        }
+
+        private Token GenerateRefreshToken(DateTime now, string userAgent)
+            => new()
+            {
+                RefreshToken = GenerateRefreshTokenString(),
+                ExpireTime = now.AddMinutes(_jwtConfig.RefreshTokenExpiration),
+                UserAgent = userAgent,
+                IsUse = false
+            };
+
+        private static string GenerateRefreshTokenString()
+        {
+            var randomNumber = new byte[32];
+
+            using var randomNumberGenerator = RandomNumberGenerator.Create();
+            randomNumberGenerator.GetBytes(randomNumber);
+
+            return Convert.ToBase64String(randomNumber);
         }
         #endregion
     }

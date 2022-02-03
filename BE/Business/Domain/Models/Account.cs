@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Business.Domain.Models
 {
@@ -13,5 +14,6 @@ namespace Business.Domain.Models
         public DateTime CreatedAt { get; set; }
         public DateTime LastActivity { get; set; }
         public bool Status { get; set; }
+        public HashSet<Token> Tokens { get; set; } = new();
     }
 }

@@ -10,7 +10,7 @@ namespace Business.Mapping.Account
         {
             CreateMap<Domain.Models.Account, AccountResource>();
 
-            CreateMap<Domain.Models.Account, TokenResource>();
+            CreateMap<Domain.Models.Account, AccessTokenResource>();
         }
     }
 }
