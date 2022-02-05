@@ -7,12 +7,8 @@ namespace Business.Resources.Authentication
 {
     public class AccessTokenResource : AccountResource
     {
-        [Display(Name = "Access Token")]
-        [JsonProperty(Order = 1)]
-        public string AccessToken { get; set; }
-
         [Display(Name = "Token Resource")]
-        [JsonProperty(Order = 2)]
+        [JsonProperty(Order = 1)]
         public TokenResource TokenResource { get; set; }
     }
 
@@ -25,5 +21,8 @@ namespace Business.Resources.Authentication
 
         [Display(Name = "Expire Time")]
         public DateTime ExpireTime { get; set; }
+
+        [Display(Name = "Access Token")]
+        public string AccessToken { get; set; }
     }
 }

@@ -9,8 +9,9 @@ namespace Infrastructure.Contexts
         #region Constructor
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
+            // Using for debug
+            //Database.EnsureDeleted();
+            //Database.EnsureCreated();
         }
         #endregion
 

@@ -70,7 +70,7 @@ namespace API.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            return StatusCode(201, result.Resource);
+            return StatusCode(201, result);
         }
 
         [HttpGet("{id:int}")]
@@ -105,7 +105,7 @@ namespace API.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            return StatusCode(201, result.Resource);
+            return StatusCode(201, result);
         }
 
         [HttpPut("updatePassword/{id:int}")]

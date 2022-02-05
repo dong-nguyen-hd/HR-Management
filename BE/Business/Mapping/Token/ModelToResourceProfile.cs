@@ -7,7 +7,8 @@ namespace Business.Mapping.Token
     {
         public ModelToResourceProfile()
         {
-            CreateMap<Domain.Models.Token, TokenResource>();
+            CreateMap<Domain.Models.Token, TokenResource>()
+                .ForMember(x => x.AccessToken, opt => opt.Ignore());
         }
     }
 }

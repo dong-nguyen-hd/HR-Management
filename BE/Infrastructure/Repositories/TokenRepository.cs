@@ -1,6 +1,8 @@
 ﻿using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -11,7 +13,8 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        
+        public override async Task<Token> GetByIdAsync(int id)
+        => await Context.Tokens.SingleOrDefaultAsync(x => x.Id.Equals(id));
         #endregion
     }
 }

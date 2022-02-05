@@ -11,6 +11,7 @@
       "Swap_Id_Invalid": "Current-Id/Turned-Id is invalid",
 
       "Token_Invalid": "User name or password is incorrect",
+      "Token_Not_Permitted": "Refresh Token not permitted",
       "Token_Saving_Error": "An error occurred when saving the Token",
 
       "Image_NoData": "There is no image.",

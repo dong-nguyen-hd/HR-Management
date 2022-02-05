@@ -47,6 +47,67 @@ namespace Business.Services
         #endregion
 
         #region Method
+        public async Task<BaseResponse<TokenResource>> GenerateNewTokensAsync(RefreshTokenResource refreshTokenResource, DateTime now)
+        {
+            // Validate Refresh Token
+            var tempRefreshToken = await _tokenRepository.GetByIdAsync(refreshTokenResource.Id);
+            if (tempRefreshToken is null ||
+                !tempRefreshToken.RefreshToken.Equals(refreshTokenResource.RefreshToken) ||
+                tempRefreshToken.IsUse ||
+                !(DateTime.Compare(tempRefreshToken.ExpireTime, now) > 0))
+                return new BaseResponse<TokenResource>(ResponseMessage.Values["Token_Not_Permitted"]);
+
+            // Validate Account
+            var tempAccount = await _accountRepository.GetByIdAsync(refreshTokenResource.AccountId);
+            if (tempAccount is null || !tempAccount.Id.Equals(tempRefreshToken.AccountId))
+                return new BaseResponse<TokenResource>(ResponseMessage.Values["Account_NoData"]);
+
+            // Get access-token
+            var accessToken = GenerateAccessToken(tempAccount, now);
+
+            // Get refresh-token
+            var refreshToken = GenerateRefreshToken(now, refreshTokenResource.UserAgent);
+
+            // Set Last-Activity value
+            tempAccount.LastActivity = DateTime.UtcNow;
+
+            try
+            {
+                tempRefreshToken.IsUse = true; // Disable refresh-token older
+
+                tempAccount.Tokens.Add(refreshToken);
+                await _unitOfWork.CompleteAsync();
+
+                return new BaseResponse<TokenResource>(new TokenResource() { Id = refreshToken.Id, AccessToken = accessToken, ExpireTime = refreshToken.ExpireTime, RefreshToken = refreshToken.RefreshToken });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new BaseResponse<TokenResource>(ResponseMessage.Values["Token_Saving_Error"]);
+            }
+        }
+
+        public async Task<BaseResponse<object>> LogoutAsync(LogoutResource logoutResource)
+        {
+            // Validate Refresh Token
+            var tempRefreshToken = await _tokenRepository.GetByIdAsync(logoutResource.Id);
+            if (tempRefreshToken is null || !tempRefreshToken.RefreshToken.Equals(logoutResource.RefreshToken))
+                return new BaseResponse<object>(ResponseMessage.Values["Token_Invalid"]);
+
+            try
+            {
+                tempRefreshToken.IsUse = true;
+                await _unitOfWork.CompleteAsync();
+
+                return new BaseResponse<object>(true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new BaseResponse<object>(ResponseMessage.Values["Token_Saving_Error"]);
+            }
+        }
+
         public async Task<BaseResponse<AccessTokenResource>> GenerateTokensAsync(LoginResource loginResource, DateTime now, string userAgent)
         {
             // Validate Login-Resource
@@ -81,7 +142,7 @@ namespace Business.Services
         {
             var tokenResource = _mapper.Map<Account, AccessTokenResource>(account);
             tokenResource.TokenResource = _mapper.Map<Token, TokenResource>(token);
-            tokenResource.AccessToken = accessToken;
+            tokenResource.TokenResource.AccessToken = accessToken;
 
             return tokenResource;
         }
