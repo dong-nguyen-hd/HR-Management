@@ -34,7 +34,8 @@ namespace Infrastructure.Contexts.Config
                     CreatedAt = DateTime.UtcNow,
                     Name = "Dong Nguyen",
                     LastActivity = DateTime.UtcNow,
-                    Status = true
+                    Status = true,
+                    Avatar = "default.jpg"
                 }
             );
         }

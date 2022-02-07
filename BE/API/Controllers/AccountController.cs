@@ -40,7 +40,7 @@ namespace API.Controllers
         {
             QueryResource pagintation = new QueryResource(page, pageSize);
 
-            string route = Request.Path.Value;
+            string route = Request?.Path.Value;
 
             var result = await _accountService.ListPaginationAsync(pagintation, route);
 
