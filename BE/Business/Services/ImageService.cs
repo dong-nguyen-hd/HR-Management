@@ -19,6 +19,7 @@ namespace Business.Services
         #region Property
         private readonly IUriService _uriService;
         private readonly IPersonRepository _personRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly HostResource _hostResource;
         private readonly IWebHostEnvironment _env;
@@ -27,6 +28,7 @@ namespace Business.Services
         #region Constructor
         public ImageService(IUriService uriService,
             IPersonRepository personRepository,
+            IAccountRepository accountRepository,
             IUnitOfWork unitOfWork,
             IWebHostEnvironment env,
             IOptionsMonitor<HostResource> hostResource,
@@ -34,6 +36,7 @@ namespace Business.Services
         {
             this._uriService = uriService;
             this._personRepository = personRepository;
+            this._accountRepository = accountRepository;
             this._unitOfWork = unitOfWork;
             this._hostResource = hostResource.CurrentValue;
             this._env = env;
@@ -41,7 +44,47 @@ namespace Business.Services
         #endregion
 
         #region Method
-        public async Task<BaseResponse<Uri>> SaveImageAsync(int personId, Stream imageStream)
+        public async Task<BaseResponse<Uri>> SaveImageAccountAsync(int accountId, Stream imageStream)
+        {
+            // Validate properties of image
+            if (imageStream is null || imageStream.Length == 0)
+                return new BaseResponse<Uri>(ResponseMessage.Values["Image_NoData"]);
+            if (imageStream?.Length > 5242880) // 5 MB
+                return new BaseResponse<Uri>(ResponseMessage.Values["Image_Bigger_Error"]);
+            // Validate Id is existent?
+            var tempAccount = await _accountRepository.GetByIdAsync(accountId);
+            if (tempAccount is null)
+                return new BaseResponse<Uri>(ResponseMessage.Values["Account_Id_NoData"]);
+
+            // Path of image
+            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{tempAccount.UserName}.jpg");
+            string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
+
+            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{tempAccount.UserName}.jpg");
+            string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
+
+            try
+            {
+                bool isSuccess = Initialize(hasValue: tempAccount.Avatar, imageStream, rootOriginalPath, rootThumbnailPath);
+                if (!isSuccess)
+                {
+                    tempAccount.Avatar = "default.jpg";
+                    return new BaseResponse<Uri>(ResponseMessage.Values["Image_Saving_Error"]);
+                }
+
+                tempAccount.Avatar = $"{tempAccount.UserName}.jpg";
+                await _unitOfWork.CompleteAsync();
+
+                return new BaseResponse<Uri>(_uriService.GetRouteUri(thumbnailPath));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new BaseResponse<Uri>(ResponseMessage.Values["Image_Saving_Error"]);
+            }
+        }
+
+        public async Task<BaseResponse<Uri>> SaveImagePersonAsync(int personId, Stream imageStream)
         {
             // Validate properties of image
             if (imageStream is null || imageStream.Length == 0)

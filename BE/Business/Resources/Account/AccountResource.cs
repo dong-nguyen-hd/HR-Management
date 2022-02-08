@@ -10,6 +10,7 @@ namespace Business.Resources.Account
         public string Name { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
+        public Uri Avatar { get; set; }
 
         [Display(Name = "Created At")]
         public DateTime CreatedAt { get; set; }

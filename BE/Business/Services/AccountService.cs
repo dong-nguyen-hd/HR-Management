@@ -31,10 +31,11 @@ namespace Business.Services
         #endregion
 
         #region Method
-        public async Task<PaginationResponse<IEnumerable<AccountResource>>> ListPaginationAsync(QueryResource pagintation, string route)
+        public async Task<PaginationResponse<IEnumerable<AccountResource>>> ListPaginationAsync(QueryResource pagintation)
         {
             var tempAccount = await _accountRepository.ListPaginationAsync(pagintation);
             var totalRecords = await _accountRepository.TotalRecordAsync();
+
             // Mapping
             var tempResource = Mapper.Map<IEnumerable<Account>, IEnumerable<AccountResource>>(tempAccount);
 

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -20,17 +21,43 @@ namespace API.Controllers
     {
         #region Property
         private readonly IAccountService _accountService;
+        private readonly IImageService _imageService;
         #endregion
 
         #region Constructor
         public AccountController(IAccountService accountService,
+            IImageService imageService,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(accountService, responseMessage)
         {
             this._accountService = accountService;
+            this._imageService = imageService;
         }
         #endregion
 
         #region Action
+        [HttpPut("image/{id:int}")]
+        [Authorize(Roles = "viewer, editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<>), 200)]
+        [ProducesResponseType(typeof(BaseResponse<>), 400)]
+        public async Task<IActionResult> SaveImageAsync(int id, [FromForm] IFormFile image)
+        {
+            var filePath = Path.GetTempFileName();
+
+            var stream = new FileStream(filePath, FileMode.Create);
+            await image.CopyToAsync(stream);
+            var result = await _imageService.SaveImageAccountAsync(id, stream);
+            stream.Dispose();
+
+            // Clean temp-file
+            if (System.IO.File.Exists(filePath))
+                System.IO.File.Delete(filePath);
+
+            if (result.Success)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
         [HttpGet]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]
@@ -40,9 +67,7 @@ namespace API.Controllers
         {
             QueryResource pagintation = new QueryResource(page, pageSize);
 
-            string route = Request?.Path.Value;
-
-            var result = await _accountService.ListPaginationAsync(pagintation, route);
+            var result = await _accountService.ListPaginationAsync(pagintation);
 
             if (!result.Success)
                 return BadRequest(result);

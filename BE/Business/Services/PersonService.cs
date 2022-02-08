@@ -20,21 +20,75 @@ namespace Business.Services
         #region Constructor
         public PersonService(IPersonRepository personRepository,
             ITechnologyService technologyService,
+            ILocationRepository locationRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(personRepository, mapper, unitOfWork, responseMessage)
         {
             this._personRepository = personRepository;
+            this._locationRepository = locationRepository;
             this._technologyService = technologyService;
         }
         #endregion
 
         #region Property
         private readonly IPersonRepository _personRepository;
+        private readonly ILocationRepository _locationRepository;
         private readonly ITechnologyService _technologyService;
         #endregion
 
         #region Method
+        public override async Task<BaseResponse<PersonResource>> InsertAsync(CreatePersonResource createPersonResource)
+        {
+            // Validate Location is existent?
+            var tempLocation = !createPersonResource.LocationId.HasValue ? null : await _locationRepository.GetByIdAsync((int)createPersonResource.LocationId);
+            if (tempLocation is null)
+                createPersonResource.LocationId = null;
+            // Mapping Resource to Person
+            var person = Mapper.Map<CreatePersonResource, Person>(createPersonResource);
+
+            try
+            {
+                await _personRepository.InsertAsync(person);
+                await UnitOfWork.CompleteAsync();
+
+                return new BaseResponse<PersonResource>(Mapper.Map<Person, PersonResource>(person));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Saving_Error"]);
+            }
+        }
+
+        public override async Task<BaseResponse<PersonResource>> UpdateAsync(int id, UpdatePersonResource updatePersonResource)
+        {
+            // Validate Id is existent?
+            var tempPerson = await _personRepository.GetByIdAsync(id);
+            if(tempPerson is null)
+                return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
+
+            // Validate LocationId is existent?
+            var tempLocation = !updatePersonResource.LocationId.HasValue ? null : await _locationRepository.GetByIdAsync((int)updatePersonResource.LocationId);
+            if (tempLocation is null)
+                updatePersonResource.LocationId = null;
+
+            // Mapping Resource to Person
+            Mapper.Map(updatePersonResource, tempPerson);
+
+            try
+            {
+                await UnitOfWork.CompleteAsync();
+
+                return new BaseResponse<PersonResource>(Mapper.Map<Person, PersonResource>(tempPerson));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Saving_Error"]);
+            }
+        }
+
         public async Task<BaseResponse<PersonResource>> AssignComponentAsync(int id, ComponentResource component)
         {
             // Validate Id is existent?

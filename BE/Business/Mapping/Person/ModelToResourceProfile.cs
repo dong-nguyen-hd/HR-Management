@@ -23,9 +23,9 @@ namespace Business.Mapping.Person
                 .ForMember(x => x.Project, opt => opt.MapFrom(src => src.Projects));
         }
 
-        List<int> ConvertList(string resource)
+        private static List<int> ConvertList(string resource)
         {
-            List<int> tempList = new List<int>();
+            List<int> tempList = new();
             string[] temp = resource.Split(',');
 
             foreach (var number in temp)

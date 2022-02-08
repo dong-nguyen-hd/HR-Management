@@ -82,7 +82,7 @@ namespace Business.Services
             // Validate Id is existent?
             var tempEntity = await _baseRepository.GetByIdAsync(id);
             if (tempEntity is null)
-                return new BaseResponse<Response>(ResponseMessage.Values["Location_NoData"]);
+                return new BaseResponse<Response>(ResponseMessage.Values["Id_NoData"]);
 
             try
             {

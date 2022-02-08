@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -17,17 +18,43 @@ namespace API.Controllers
     {
         #region Property
         private readonly IPersonService _personService;
+        private readonly IImageService _imageService;
         #endregion
 
         #region Constructor
         public PersonController(IPersonService personService,
+            IImageService imageService,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(personService, responseMessage)
         {
             this._personService = personService;
+            this._imageService = imageService;
         }
         #endregion
 
         #region Action
+        [HttpPut("image/{id:int}")]
+        [Authorize(Roles = "editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<>), 200)]
+        [ProducesResponseType(typeof(BaseResponse<>), 400)]
+        public async Task<IActionResult> SaveImageAsync(int id, [FromForm] IFormFile image)
+        {
+            var filePath = Path.GetTempFileName();
+
+            var stream = new FileStream(filePath, FileMode.Create);
+            await image.CopyToAsync(stream);
+            var result = await _imageService.SaveImagePersonAsync(id, stream);
+            stream.Dispose();
+
+            // Clean temp-file
+            if (System.IO.File.Exists(filePath))
+                System.IO.File.Delete(filePath);
+
+            if (result.Success)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
         [HttpGet]
         [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<PersonResource>>), StatusCodes.Status200OK)]
@@ -64,7 +91,12 @@ namespace API.Controllers
         {
             resource.CreatedBy = User.Identity?.Name;
 
-            return await base.CreateAsync(resource);
+            var result = await _personService.InsertAsync(resource);
+
+            if (result.Success)
+                return StatusCode(201, result);
+
+            return BadRequest(result);
         }
 
         [HttpPut("{id:int}")]
@@ -72,7 +104,14 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdatePersonAsync(int id, [FromBody] UpdatePersonResource resource)
-            => await base.UpdateAsync(id, resource);
+        {
+            var result = await _personService.UpdateAsync(id, resource);
+
+            if (result.Success)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
 
         [HttpPut("swap/{id:int}")]
         [Authorize(Roles = "editor, admin")]

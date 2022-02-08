@@ -7,6 +7,7 @@ namespace Business.Domain.Services
 {
     public interface IImageService
     {
-        Task<BaseResponse<Uri>> SaveImageAsync(int personId, Stream imageStream);
+        Task<BaseResponse<Uri>> SaveImagePersonAsync(int personId, Stream imageStream);
+        Task<BaseResponse<Uri>> SaveImageAccountAsync(int accountId, Stream imageStream);
     }
 }
