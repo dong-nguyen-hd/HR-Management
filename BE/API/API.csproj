@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Logs\" />
     <Folder Include="wwwroot\Images\Thumbnail\" />
     <Folder Include="wwwroot\Images\Original\" />
   </ItemGroup>

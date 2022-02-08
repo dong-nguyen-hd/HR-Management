@@ -4,6 +4,7 @@ using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.Project;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Business.Services
@@ -14,7 +15,8 @@ namespace Business.Services
         public ProjectService(IProjectRepository projectRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(projectRepository, mapper, unitOfWork, responseMessage)
+            ILogger<ProjectService> logger,
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(projectRepository, mapper, unitOfWork, logger, responseMessage)
         {
         }
         #endregion

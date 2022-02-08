@@ -7,6 +7,7 @@ using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Person;
 using Business.Resources.Technology;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,8 @@ namespace Business.Services
             ILocationRepository locationRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(personRepository, mapper, unitOfWork, responseMessage)
+            ILogger<PersonService> logger,
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(personRepository, mapper, unitOfWork, logger, responseMessage)
         {
             this._personRepository = personRepository;
             this._locationRepository = locationRepository;
@@ -56,7 +58,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.LogError(ex, ResponseMessage.Values["Person_Saving_Error"]);
                 return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Saving_Error"]);
             }
         }
@@ -84,7 +86,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.LogError(ex, ResponseMessage.Values["Person_Saving_Error"]);
                 return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Saving_Error"]);
             }
         }
@@ -108,7 +110,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.LogError(ex, ResponseMessage.Values["Person_Updating_Error"]);
                 return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Updating_Error"]);
             }
         }

@@ -7,6 +7,7 @@ using Business.Domain.Services;
 using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Account;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,8 @@ namespace Business.Services
         public AccountService(IAccountRepository accountRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(accountRepository, mapper, unitOfWork, responseMessage)
+            ILogger<AccountService> logger,
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(accountRepository, mapper, unitOfWork, logger, responseMessage)
         {
             this._accountRepository = accountRepository;
         }
@@ -63,7 +65,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.LogError(ex, ResponseMessage.Values["Account_Updating_Error"]);
                 return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Updating_Error"]);
             }
         }
@@ -89,7 +91,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.LogError(ex, ResponseMessage.Values["Account_Updating_Error"]);
                 return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Updating_Error"]);
             }
         }

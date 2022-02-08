@@ -15,7 +15,8 @@ namespace Business.Mapping.Account
             CreateMap<Domain.Models.Account, AccountResource>()
                 .ForMember(x => x.Avatar, opt => opt.MapFrom<CustomResolver>());
 
-            CreateMap<Domain.Models.Account, AccessTokenResource>();
+            CreateMap<Domain.Models.Account, AccessTokenResource>()
+                .ForMember(x => x.Avatar, opt => opt.MapFrom<CustomResolver>());
         }
     }
 
