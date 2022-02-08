@@ -25,7 +25,6 @@ namespace Infrastructure.Contexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<Technology> Technologies { get; set; }
         public DbSet<Person> People { get; set; }
-        public DbSet<Log> Logs { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Token> Tokens { get; set; }
         #endregion

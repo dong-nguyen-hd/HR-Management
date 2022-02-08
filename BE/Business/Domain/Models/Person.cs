@@ -26,6 +26,5 @@ namespace Business.Domain.Models
         public HashSet<Education> Educations { get; set; }
         public HashSet<Project> Projects { get; set; }
         public HashSet<WorkHistory> WorkHistories { get; set; }
-        public HashSet<Log> Logs { get; set; }
     }
 }

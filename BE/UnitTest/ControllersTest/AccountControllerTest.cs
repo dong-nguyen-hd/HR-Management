@@ -26,12 +26,13 @@ namespace UnitTest.ControllersTest
 
             var monitor = Mock.Of<IOptionsMonitor<ResponseMessage>>(_ => _.CurrentValue == new ResponseMessage());
 
-            var mockService = new Mock<IAccountService>();
+            var mockAccountService = new Mock<IAccountService>();
+            var mockImageService = new Mock<IImageService>();
 
             var tempResult = new BaseResponse<AccountResource>(tempResoucre);
-            mockService.Setup(service => service.GetByIdAsync(id)).ReturnsAsync(tempResult);
+            mockAccountService.Setup(service => service.GetByIdAsync(id)).ReturnsAsync(tempResult);
 
-            var controller = new AccountController(mockService.Object, monitor);
+            var controller = new AccountController(mockAccountService.Object, mockImageService.Object, monitor);
 
             // Act
             var result = await controller.GetByIdAsync(id);
@@ -53,12 +54,13 @@ namespace UnitTest.ControllersTest
 
             var monitor = Mock.Of<IOptionsMonitor<ResponseMessage>>(_ => _.CurrentValue == new ResponseMessage());
 
-            var mockService = new Mock<IAccountService>();
+            var mockAccountService = new Mock<IAccountService>();
+            var mockImageService = new Mock<IImageService>();
 
             var tempResult = new BaseResponse<AccountResource>(tempResoucre);
-            mockService.Setup(service => service.GetByIdAsync(id)).ReturnsAsync(tempResult);
+            mockAccountService.Setup(service => service.GetByIdAsync(id)).ReturnsAsync(tempResult);
 
-            var controller = new AccountController(mockService.Object, monitor);
+            var controller = new AccountController(mockAccountService.Object, mockImageService.Object, monitor);
 
             // Act
             var result = await controller.GetByIdAsync(id);
