@@ -4,7 +4,6 @@ using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.WorkHistory;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Business.Services
@@ -15,8 +14,7 @@ namespace Business.Services
         public WorkHistoryService(IWorkHistoryRepository workHistoryRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            ILogger<WorkHistoryService> logger,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(workHistoryRepository, mapper, unitOfWork, logger, responseMessage)
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(workHistoryRepository, mapper, unitOfWork, responseMessage)
         {
         }
         #endregion

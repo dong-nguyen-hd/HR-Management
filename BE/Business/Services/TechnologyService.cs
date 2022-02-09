@@ -5,7 +5,6 @@ using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.Technology;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,8 +17,7 @@ namespace Business.Services
         public TechnologyService(ITechnologyRepository technologyRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            ILogger<TechnologyService> logger,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(technologyRepository, mapper, unitOfWork, logger, responseMessage)
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(technologyRepository, mapper, unitOfWork, responseMessage)
         {
             this._technologyRepository = technologyRepository;
         }

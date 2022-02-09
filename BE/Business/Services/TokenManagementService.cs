@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Business.Communication;
+using Business.CustomException;
 using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.Authentication;
 using Business.Resources.Information;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -28,7 +28,6 @@ namespace Business.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly byte[] _secret;
         private readonly JwtConfig _jwtConfig;
-        private readonly ILogger<TokenManagementService> _logger;
         #endregion
 
         #region Constructor
@@ -37,7 +36,6 @@ namespace Business.Services
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IOptionsMonitor<JwtConfig> jwtConfig,
-            ILogger<TokenManagementService> logger,
         IOptionsMonitor<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._accountRepository = accountRepository;
@@ -46,7 +44,6 @@ namespace Business.Services
             this._unitOfWork = unitOfWork;
             this._jwtConfig = jwtConfig.CurrentValue;
             this._secret = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
-            this._logger = logger;
         }
         #endregion
 
@@ -86,8 +83,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ResponseMessage.Values["Token_Saving_Error"]);
-                return new BaseResponse<TokenResource>(ResponseMessage.Values["Token_Saving_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Token_Saving_Error"], ex);
             }
         }
 
@@ -107,8 +103,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ResponseMessage.Values["Token_Saving_Error"]);
-                return new BaseResponse<object>(ResponseMessage.Values["Token_Saving_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Token_Saving_Error"], ex);
             }
         }
 
@@ -137,8 +132,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ResponseMessage.Values["Token_Saving_Error"]);
-                return new BaseResponse<AccessTokenResource>(ResponseMessage.Values["Token_Saving_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Token_Saving_Error"], ex);
             }
         }
 

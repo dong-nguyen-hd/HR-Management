@@ -1,10 +1,10 @@
 ﻿using Business.Communication;
+using Business.CustomException;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.Information;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Drawing;
@@ -24,7 +24,6 @@ namespace Business.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly HostResource _hostResource;
         private readonly IWebHostEnvironment _env;
-        private readonly ILogger<ImageService> _logger;
         #endregion
 
         #region Constructor
@@ -33,7 +32,6 @@ namespace Business.Services
             IAccountRepository accountRepository,
             IUnitOfWork unitOfWork,
             IWebHostEnvironment env,
-            ILogger<ImageService> logger,
             IOptionsMonitor<HostResource> hostResource,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(responseMessage)
         {
@@ -82,8 +80,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ResponseMessage.Values["Image_Saving_Error"]);
-                return new BaseResponse<Uri>(ResponseMessage.Values["Image_Saving_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Image_Saving_Error"], ex);
             }
         }
 
@@ -122,8 +119,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ResponseMessage.Values["Image_Saving_Error"]);
-                return new BaseResponse<Uri>(ResponseMessage.Values["Image_Saving_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Image_Saving_Error"], ex);
             }
         }
 

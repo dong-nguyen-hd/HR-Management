@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Business.Communication;
+using Business.CustomException;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -18,20 +18,17 @@ namespace Business.Services
         private readonly IBaseRepository<Entity> _baseRepository;
         protected readonly IMapper Mapper;
         protected readonly IUnitOfWork UnitOfWork;
-        protected readonly ILogger<BaseService<Response, Insert, Update, Entity>> Logger;
         #endregion
 
         #region Constructor
         public BaseService(IBaseRepository<Entity> baseRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            ILogger<BaseService<Response, Insert, Update, Entity>> logger,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._baseRepository = baseRepository;
             this.Mapper = mapper;
             this.UnitOfWork = unitOfWork;
-            this.Logger = logger;
         }
         #endregion
 
@@ -76,8 +73,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, ResponseMessage.Values["Saving_Error"]);
-                return new BaseResponse<Response>(ResponseMessage.Values["Saving_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Saving_Error"], ex);
             }
         }
 
@@ -103,8 +99,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, ResponseMessage.Values["Deleting_Error"]);
-                return new BaseResponse<Response>(ResponseMessage.Values["Deleting_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Deleting_Error"], ex);
             }
         }
 
@@ -127,8 +122,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, ResponseMessage.Values["Updating_Error"]);
-                return new BaseResponse<Response>(ResponseMessage.Values["Updating_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Updating_Error"], ex);
             }
         }
 
@@ -164,8 +158,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, ResponseMessage.Values["Swapping_Error"]);
-                return new BaseResponse<Response>(ResponseMessage.Values["Swapping_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Swapping_Error"], ex);
             }
         }
         #endregion

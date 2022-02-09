@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Communication;
+using Business.CustomException;
 using Business.Data;
 using Business.Domain.Models;
 using Business.Domain.Repositories;
@@ -7,7 +8,6 @@ using Business.Domain.Services;
 using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Account;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -25,8 +25,7 @@ namespace Business.Services
         public AccountService(IAccountRepository accountRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            ILogger<AccountService> logger,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(accountRepository, mapper, unitOfWork, logger, responseMessage)
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(accountRepository, mapper, unitOfWork, responseMessage)
         {
             this._accountRepository = accountRepository;
         }
@@ -65,8 +64,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, ResponseMessage.Values["Account_Updating_Error"]);
-                return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Updating_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Account_Updating_Error"], ex);
             }
         }
 
@@ -91,8 +89,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, ResponseMessage.Values["Account_Updating_Error"]);
-                return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Updating_Error"]);
+                throw new MessageResultException(ResponseMessage.Values["Account_Updating_Error"], ex);
             }
         }
         #endregion

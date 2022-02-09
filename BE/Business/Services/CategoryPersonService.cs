@@ -4,7 +4,6 @@ using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.CategoryPerson;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Business.Services
@@ -15,8 +14,7 @@ namespace Business.Services
         public CategoryPersonService(ICategoryPersonRepository categoryPersonRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            ILogger<CategoryPersonService> logger,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(categoryPersonRepository, mapper, unitOfWork, logger, responseMessage)
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(categoryPersonRepository, mapper, unitOfWork, responseMessage)
         {
         }
         #endregion

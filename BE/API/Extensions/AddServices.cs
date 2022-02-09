@@ -9,7 +9,7 @@ using Business.Mapping.Account;
 
 namespace API.Extensions
 {
-    public static class CustomizeMiddleware
+    public static class AddServices
     {
         public static void AddDependencyInjection(this IServiceCollection services)
         {
