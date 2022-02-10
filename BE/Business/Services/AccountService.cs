@@ -32,6 +32,24 @@ namespace Business.Services
         #endregion
 
         #region Method
+        public override async Task<BaseResponse<AccountResource>> InsertAsync(CreateAccountResource createAccountResource)
+        {
+            // Mapping Resource to Account
+            var tempAccount = Mapper.Map<CreateAccountResource, Account>(createAccountResource);
+
+            try
+            {
+                await _accountRepository.InsertAsync(tempAccount);
+                await UnitOfWork.CompleteAsync();
+
+                return new BaseResponse<AccountResource>(Mapper.Map<Account, AccountResource>(tempAccount));
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["Account_Saving_Error"], ex);
+            }
+        }
+
         public async Task<PaginationResponse<IEnumerable<AccountResource>>> ListPaginationAsync(QueryResource pagintation)
         {
             var tempAccount = await _accountRepository.ListPaginationAsync(pagintation);
@@ -57,10 +75,8 @@ namespace Business.Services
             try
             {
                 await UnitOfWork.CompleteAsync();
-                // Mapping
-                var result = Mapper.Map<AccountResource>(tempAccount);
 
-                return new BaseResponse<AccountResource>(result);
+                return new BaseResponse<AccountResource>(Mapper.Map<AccountResource>(tempAccount));
             }
             catch (Exception ex)
             {
@@ -82,10 +98,8 @@ namespace Business.Services
             try
             {
                 await UnitOfWork.CompleteAsync();
-                // Mapping
-                var result = Mapper.Map<AccountResource>(tempAccount);
 
-                return new BaseResponse<AccountResource>(result);
+                return new BaseResponse<AccountResource>(Mapper.Map<AccountResource>(tempAccount));
             }
             catch (Exception ex)
             {

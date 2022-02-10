@@ -33,7 +33,7 @@ public class ErrorHandlerMiddleware
             response.ContentType = "application/json";
 
             var messageError = string.Empty;
-
+            
             // Using switch for custom exception
             switch (error)
             {
