@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Business.Domain.Repositories
@@ -8,8 +10,10 @@ namespace Business.Domain.Repositories
         Task<Entity> GetByIdAsync(int entityId);
         Task InsertAsync(Entity entity);
         Task RemoveAsync(int entityId);
+        Task RemoveRangeAsync(IEnumerable<Entity> entities);
         void Update(Entity entity);
         Task<int> MaximumOrderIndexAsync(int personId);
         Task<IEnumerable<Entity>> GetAllAsync();
+        Task<IEnumerable<Entity>> FindAsync(Expression<Func<Entity, bool>> expression);
     }
 }

@@ -4,6 +4,7 @@ using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.Information;
 using Business.Services;
+using Business.Services.CronJob;
 using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace API
 {
@@ -48,6 +50,12 @@ namespace API
             {
                 // Adds a custom error response factory when ModelState is invalid
                 options.InvalidModelStateResponseFactory = InvalidResponseFactory.ProduceErrorResponse;
+            });
+
+            services.AddCronJob<DeleteRefreshTokenJob>(c =>
+            {
+                c.TimeZoneInfo = TimeZoneInfo.Local;
+                c.CronExpression = @"* * * * *";
             });
 
             // Get the base URL of the application (http(s)://www.api.com) from the HTTP Request and Context.

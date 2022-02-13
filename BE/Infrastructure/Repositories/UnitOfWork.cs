@@ -1,5 +1,6 @@
 ﻿using Business.Domain.Repositories;
 using Infrastructure.Contexts;
+using System;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
@@ -8,6 +9,7 @@ namespace Infrastructure.Repositories
     {
         #region Property
         private readonly AppDbContext _context;
+        private bool _disposed;
         #endregion
 
         #region Constructor
@@ -19,10 +21,25 @@ namespace Infrastructure.Repositories
 
         #region Method
         public async Task CompleteAsync()
-        => await _context.SaveChangesAsync();
+            => await _context.SaveChangesAsync();
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    _context.Dispose();
+                }
+            }
+            this._disposed = true;
+        }
 
         public void Dispose()
-        => _context.Dispose();
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
         #endregion
     }
 }

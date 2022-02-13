@@ -22,7 +22,7 @@ namespace API
 
             try
             {
-                Log.Information("Application Starting.");
+                Log.Information("Application is starting.");
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)

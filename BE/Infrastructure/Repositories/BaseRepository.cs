@@ -3,6 +3,7 @@ using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
@@ -23,6 +24,9 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
+        public virtual async Task<IEnumerable<Entity>> FindAsync(Expression<System.Func<Entity, bool>> expression)
+            => await _entities.Where(expression).ToListAsync();
+
         public virtual async Task<Entity> GetByIdAsync(int entityId)
         {
             var statusName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Status").Name;
@@ -67,6 +71,12 @@ namespace Infrastructure.Repositories
             return await _entities.Where(entity => EF.Property<bool>(entity, statusName).Equals(true))
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public virtual async Task RemoveRangeAsync(IEnumerable<Entity> entities)
+        {
+            // TODO: remove range async status
+            throw new System.NotImplementedException();
         }
         #endregion
     }
