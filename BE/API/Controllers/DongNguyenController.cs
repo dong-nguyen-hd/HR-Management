@@ -2,6 +2,7 @@
 using Business.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -89,6 +90,17 @@ namespace API.Controllers
         public virtual async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _baseService.RemoveAsync(id);
+
+            if (result.Success)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        [NonAction]
+        public virtual async Task<IActionResult> DeleteRangeAsync(List<int> ids)
+        {
+            var result = await _baseService.RemoveRangeAsync(ids);
 
             if (result.Success)
                 return Ok(result);

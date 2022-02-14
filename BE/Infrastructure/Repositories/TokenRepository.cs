@@ -3,6 +3,7 @@ using Business.Domain.Repositories;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
@@ -17,8 +18,12 @@ namespace Infrastructure.Repositories
         public override async Task<Token> GetByIdAsync(int id)
         => await Context.Tokens.SingleOrDefaultAsync(x => x.Id.Equals(id));
 
-        public override async Task RemoveRangeAsync(IEnumerable<Token> entities)
-            => Context.Tokens.RemoveRange(entities);
+        public override async Task<int> RemoveRangeAsync(IEnumerable<Token> tokens)
+        {
+            Context.Tokens.RemoveRange(tokens);
+
+            return Enumerable.Count(tokens);
+        }
         #endregion
     }
 }

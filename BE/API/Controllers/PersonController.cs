@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -38,6 +39,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<>), 400)]
         public async Task<IActionResult> SaveImageAsync(int id, [FromForm] IFormFile image)
         {
+            Log.Information($"{User.Identity?.Name}: save image a person with Id is {id}.");
+
             var filePath = Path.GetTempFileName();
 
             var stream = new FileStream(filePath, FileMode.Create);
@@ -62,6 +65,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<PersonResource>>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetPaginationAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
+            Log.Information($"{User.Identity?.Name}: get pagination person.");
+
             QueryResource pagintation = new QueryResource(page, pageSize);
 
             var result = await _personService.GetPaginationAsync(pagintation);
@@ -81,7 +86,11 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetByIdAsync(int id)
-            => await base.GetByIdAsync(id);
+        {
+            Log.Information($"{User.Identity?.Name}: get a person with Id is {id}.");
+
+            return await base.GetByIdAsync(id);
+        }
 
         [HttpPost]
         [Authorize(Roles = "editor, admin")]
@@ -89,6 +98,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreatePersonResource resource)
         {
+            Log.Information($"{User.Identity?.Name}: create a person.");
+
             resource.CreatedBy = User.Identity?.Name;
 
             var result = await _personService.InsertAsync(resource);
@@ -105,6 +116,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdatePersonAsync(int id, [FromBody] UpdatePersonResource resource)
         {
+            Log.Information($"{User.Identity?.Name}: update a person with Id is {id}.");
+
             var result = await _personService.UpdateAsync(id, resource);
 
             if (result.Success)
@@ -119,6 +132,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AssignComponentAsync(int id, [FromBody] ComponentResource resource)
         {
+            Log.Information($"{User.Identity?.Name}: assign a person with Id is {id}.");
+
             var result = await _personService.AssignComponentAsync(id, resource);
 
             if (result.Success)
@@ -132,7 +147,11 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
-            => await base.DeleteAsync(id);
+        {
+            Log.Information($"{User.Identity?.Name}: delete a person with Id is {id}.");
+
+            return await base.DeleteAsync(id);
+        }
         #endregion
     }
 }

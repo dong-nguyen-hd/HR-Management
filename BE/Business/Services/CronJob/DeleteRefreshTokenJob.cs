@@ -57,7 +57,9 @@ namespace Business.Services.CronJob
 
         private async Task DeleteExpiredTokenAsync(ITokenRepository tokenRepository, IUnitOfWork unitOfWork)
         {
-            var tempTokens = await tokenRepository.FindAsync(x => DateTime.Compare(x.ExpireTime, DateTime.UtcNow) < 0);
+            var now = DateTime.UtcNow;
+
+            var tempTokens = await tokenRepository.FindAsync(x => DateTime.Compare(x.ExpireTime, now) < 0);
 
             await tokenRepository.RemoveRangeAsync(tempTokens);
 

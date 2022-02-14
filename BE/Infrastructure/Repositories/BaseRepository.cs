@@ -1,9 +1,11 @@
 ﻿using Business.Domain.Repositories;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
@@ -24,7 +26,7 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        public virtual async Task<IEnumerable<Entity>> FindAsync(Expression<System.Func<Entity, bool>> expression)
+        public virtual async Task<IEnumerable<Entity>> FindAsync(Expression<Func<Entity, bool>> expression)
             => await _entities.Where(expression).ToListAsync();
 
         public virtual async Task<Entity> GetByIdAsync(int entityId)
@@ -73,11 +75,67 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public virtual async Task RemoveRangeAsync(IEnumerable<Entity> entities)
+        /// <summary>
+        /// Removing by change value of status true -> false
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns>The number of entities deleted</returns>
+        public virtual async Task<int> RemoveRangeAsync(IEnumerable<Entity> entities)
         {
-            // TODO: remove range async status
-            throw new System.NotImplementedException();
+            int count = 0;
+            foreach (var entity in entities)
+            {
+                entity.GetType().GetProperty("Status").SetValue(entity, false);
+                count++;
+            }
+
+            return count;
         }
+
+        /// <summary>
+        /// Get entity from table with many primary key
+        /// </summary>
+        /// <param name="keyValues">You can use "params object[] keyValues" for generic type</param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException">Only a single primary key is supported</exception>
+        /// <exception cref="ArgumentException">Type does not contain the primary key as an accessible property</exception>
+        public virtual async Task<IEnumerable<Entity>> GetWithPrimaryKeyAsync(List<int> keyValues)
+        {
+            var entityType = Context.Model.FindEntityType(typeof(Entity));
+            var primaryKey = entityType.FindPrimaryKey();
+
+            if (primaryKey.Properties.Count != 1)
+                throw new NotSupportedException("Only a single primary key is supported");
+
+            var pkProperty = primaryKey.Properties[0];
+            var pkPropertyType = pkProperty.ClrType;
+
+            // Validate passed key values
+            foreach (var keyValue in keyValues)
+            {
+                if (!pkPropertyType.IsAssignableFrom(keyValue.GetType()))
+                    throw new ArgumentException($"Key value '{keyValue}' is not of the right type");
+            }
+
+            // Retrieve member info for primary key
+            var pkMemberInfo = typeof(Entity).GetProperty(pkProperty.Name);
+            if (pkMemberInfo is null)
+                throw new ArgumentException("Type does not contain the primary key as an accessible property");
+
+            // Build lambda expression
+            var parameter = Expression.Parameter(typeof(Entity), "e");
+            var body = Expression.Call(null, ContainsMethod,
+                Expression.Constant(keyValues),
+                Expression.Convert(Expression.MakeMemberAccess(parameter, pkMemberInfo), typeof(int)));
+
+            var predicateExpression = Expression.Lambda<Func<Entity, bool>>(body, parameter);
+
+            return await _entities.Where(predicateExpression).ToListAsync();
+        }
+
+        private static MethodInfo ContainsMethod => typeof(Enumerable).GetMethods()
+        .FirstOrDefault(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+        .MakeGenericMethod(typeof(int));
         #endregion
     }
 }

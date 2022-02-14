@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
@@ -37,10 +38,17 @@ namespace API.Controllers
         #region Action
         [HttpPut("image/{id:int}")]
         [Authorize(Roles = "viewer, editor, admin")]
-        [ProducesResponseType(typeof(BaseResponse<>), 200)]
-        [ProducesResponseType(typeof(BaseResponse<>), 400)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), 200)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), 400)]
         public async Task<IActionResult> SaveImageAsync(int id, [FromForm] IFormFile image)
         {
+            Log.Information($"{User.Identity?.Name}: save image for Id is {id}.");
+
+            var identifier = (User.Identity as ClaimsIdentity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+
+            if (!identifier.Equals(id.ToString()))
+                return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+
             var filePath = Path.GetTempFileName();
 
             var stream = new FileStream(filePath, FileMode.Create);
@@ -65,6 +73,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ListPaginationAsync([FromQuery] int page, [FromQuery] int pageSize)
         {
+            Log.Information($"{User.Identity?.Name}: get account data.");
+
             QueryResource pagintation = new QueryResource(page, pageSize);
 
             var result = await _accountService.ListPaginationAsync(pagintation);
@@ -84,6 +94,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateAccountResource resource)
         {
+            Log.Information($"{User.Identity?.Name}: create account is {resource.UserName}.");
+
             if (resource.Role == (int)eRole.Admin)
             {
                 if (!User.IsInRole(eRole.Admin.ToDescriptionString()))
@@ -104,15 +116,22 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetByIdAsync(int id)
-            => await base.GetByIdAsync(id);
+        {
+            Log.Information($"{User.Identity?.Name}: get account data with Id is {id}.");
 
+            return await base.GetByIdAsync(id);
+        }
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateAccountResource resource)
-            => await base.UpdateAsync(id, resource);
+        {
+            Log.Information($"{User.Identity?.Name}: update account with Id is {id}.");
+
+            return await base.UpdateAsync(id, resource);
+        }
 
         [HttpPut("selfUpdate/{id:int}")]
         [Authorize(Roles = "admin, editor, viewer")]
@@ -120,6 +139,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SeflUpdateAsync(int id, [FromBody] SelfUpdateAccountResource resource)
         {
+            Log.Information($"{User.Identity?.Name}: self-update account with Id is {id}.");
+
             var identifier = (User.Identity as ClaimsIdentity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
 
             if (!identifier.Equals(id.ToString()))
@@ -139,6 +160,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdatePasswordAsync(int id, [FromBody] UpdatePasswordAccountResource resource)
         {
+            Log.Information($"{User.Identity?.Name}: update account password with Id is {id}.");
+
             // Check if the id belongs to me
             var identifier = (User.Identity as ClaimsIdentity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
             if (!identifier.Equals(id.ToString()))
@@ -161,7 +184,25 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
-            => await base.DeleteAsync(id);
+        {
+            Log.Information($"{User.Identity?.Name}: delete account with Id is {id}.");
+
+            return await base.DeleteAsync(id);
+        }
+
+        [HttpPost("/delete-range")]
+        [Authorize(Roles = "admin")]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
+        public new async Task<IActionResult> DeleteRangeAsync(List<int> ids)
+        {
+            Log.Information($"{User.Identity?.Name}: delete range account with Ids is {ids}.");
+
+            if (ids.Count <= 0)
+                return BadRequest(new BaseResponse<AccountResource>(false));
+
+            return await base.DeleteRangeAsync(ids);
+        }
         #endregion
     }
 }

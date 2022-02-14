@@ -12,6 +12,7 @@ namespace Business.Domain.Services
         Task<BaseResponse<Response>> InsertAsync(Insert insertResource);
         Task<BaseResponse<Response>> UpdateAsync(int id, Update updateResource);
         Task<BaseResponse<Response>> RemoveAsync(int id);
+        Task<DeleteResponse<IEnumerable<Response>>> RemoveRangeAsync(List<int> ids);
         Task<BaseResponse<Response>> SwapAsync(SwapResource swapResource);
     }
 }

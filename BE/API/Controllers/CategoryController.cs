@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -29,28 +30,44 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetAllAsync()
-            => await base.GetAllAsync();
+        {
+            Log.Information($"{User.Identity?.Name}: get all category data.");
+
+            return await base.GetAllAsync();
+        }
 
         [HttpPost]
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateCategoryResource resource)
-            => await base.CreateAsync(resource);
+        {
+            Log.Information($"{User.Identity?.Name}: create a {resource.Name} category.");
+
+            return await base.CreateAsync(resource);
+        }
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateCategoryResource resource)
-            => await base.UpdateAsync(id, resource);
+        {
+            Log.Information($"{User.Identity?.Name}: update a category with Id is {id}.");
+
+            return await base.UpdateAsync(id, resource);
+        }
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
-            => await base.DeleteAsync(id);
+        {
+            Log.Information($"{User.Identity?.Name}: delete a category with Id is {id}.");
+
+            return await base.DeleteAsync(id);
+        }
         #endregion
     }
 }

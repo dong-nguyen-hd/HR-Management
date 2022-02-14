@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System;
 using System.Threading.Tasks;
 
@@ -40,7 +41,10 @@ namespace API.Controllers
             var result = await _tokenManagementService.GenerateTokensAsync(resource, DateTime.UtcNow, userAgent);
 
             if (result.Success)
+            {
+                Log.Information($"{result.Resource.UserName}: is login.");
                 return Ok(result);
+            }
 
             return Unauthorized(result);
         }
@@ -51,6 +55,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<TokenResource>), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GenerateNewTokensAsync([FromBody] RefreshTokenResource resource)
         {
+            Log.Information($"Account-id {resource.AccountId}: using refresh token with Id is {resource.Id}.");
+
             resource.UserAgent = Request.Headers["User-Agent"].ToString();
             var result = await _tokenManagementService.GenerateNewTokensAsync(resource, DateTime.UtcNow);
 
@@ -66,6 +72,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> LogoutAsync([FromBody] LogoutResource resource)
         {
+            Log.Information($"Refresh-Token-Id {resource.Id}: is log out.");
+
             var result = await _tokenManagementService.LogoutAsync(resource);
 
             if (!result.Success)

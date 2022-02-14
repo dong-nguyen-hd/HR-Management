@@ -55,7 +55,7 @@ namespace API
             services.AddCronJob<DeleteRefreshTokenJob>(c =>
             {
                 c.TimeZoneInfo = TimeZoneInfo.Local;
-                c.CronExpression = @"* * * * *";
+                c.CronExpression = @"0 3 * * *"; // At 03:00 AM
             });
 
             // Get the base URL of the application (http(s)://www.api.com) from the HTTP Request and Context.

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -34,7 +35,11 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetAllAsync()
-            => await base.GetAllAsync();
+        {
+            Log.Information($"{User.Identity?.Name}: get all technology data.");
+
+            return await base.GetAllAsync();
+        }
 
         [HttpGet("{categoryId:int}")]
         [Authorize(Roles = "viewer, editor, admin")]
@@ -43,6 +48,8 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetByCategoryAsync(int categoryId)
         {
+            Log.Information($"{User.Identity?.Name}: get all technology data by category.");
+
             var result = await _technologyService.GetByCategoryAsync(categoryId);
 
             if (!result.Success)
@@ -59,21 +66,33 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateTechnologyResource resource)
-            => await base.CreateAsync(resource);
+        {
+            Log.Information($"{User.Identity?.Name}: create a technology.");
+
+            return await base.CreateAsync(resource);
+        }
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateTechnologyResource resource)
-            => await base.UpdateAsync(id, resource);
+        {
+            Log.Information($"{User.Identity?.Name}: update a technology with Id is {id}.");
+
+            return await base.UpdateAsync(id, resource);
+        }
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
-            => await base.DeleteAsync(id);
+        {
+            Log.Information($"{User.Identity?.Name}: delete a technology with Id is {id}.");
+
+            return await base.DeleteAsync(id);
+        }
         #endregion
     }
 }

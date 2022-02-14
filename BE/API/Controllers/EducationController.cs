@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -27,28 +28,44 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateEducationResource resource)
-            => await base.CreateAsync(resource);
+        {
+            Log.Information($"{User.Identity?.Name}: create a education.");
+
+            return await base.CreateAsync(resource);
+        }
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateEducationResource resource)
-            => await base.UpdateAsync(id, resource);
+        {
+            Log.Information($"{User.Identity?.Name}: update a education with Id is {id}.");
+
+            return await base.UpdateAsync(id, resource);
+        }
 
         [HttpPut]
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> SwapAsync([FromBody] SwapResource resource)
-            => await base.SwapAsync(resource);
+        {
+            Log.Information($"{User.Identity?.Name}: swap a education.");
+
+            return await base.SwapAsync(resource);
+        }
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
-            => await base.DeleteAsync(id);
+        {
+            Log.Information($"{User.Identity?.Name}: delete a education with Id is {id}.");
+
+            return await base.DeleteAsync(id);
+        }
         #endregion
     }
 }

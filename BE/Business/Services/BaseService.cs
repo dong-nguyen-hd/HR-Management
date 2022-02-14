@@ -103,6 +103,29 @@ namespace Business.Services
             }
         }
 
+        public virtual async Task<DeleteResponse<IEnumerable<Response>>> RemoveRangeAsync(List<int> ids)
+        {
+            try
+            {
+                var tempEntity = await _baseRepository.GetWithPrimaryKeyAsync(ids);
+                var totalDeleted = await _baseRepository.RemoveRangeAsync(tempEntity);
+
+                if (totalDeleted == 0 && ids.Count > 0)
+                    return new DeleteResponse<IEnumerable<Response>>(ResponseMessage.Values["Deleting_Error"]);
+
+                await UnitOfWork.CompleteAsync();
+
+                // Mapping
+                var resource = Mapper.Map<IEnumerable<Entity>, IEnumerable<Response>>(tempEntity);
+
+                return new DeleteResponse<IEnumerable<Response>> (ids.Count, totalDeleted, resource);
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["Deleting_Error"], ex);
+            }
+        }
+
         public virtual async Task<BaseResponse<Response>> UpdateAsync(int id, Update updateResource)
         {
             // Validate Id is existent?
