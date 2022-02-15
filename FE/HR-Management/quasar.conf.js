@@ -137,8 +137,8 @@ module.exports = configure(function (ctx) {
 
       manifest: {
         name: `Human Resource Management`,
-        short_name: `Human Resource Management`,
-        description: `Unknown`,
+        short_name: `HR Management`,
+        description: `Human Resource Management for IT Company`,
         display: "standalone",
         orientation: "portrait",
         background_color: "#ffffff",

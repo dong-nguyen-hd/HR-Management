@@ -190,7 +190,7 @@ namespace API.Controllers
             return await base.DeleteAsync(id);
         }
 
-        [HttpPost("/delete-range")]
+        [HttpPost("delete-range")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]

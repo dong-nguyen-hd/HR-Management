@@ -167,7 +167,7 @@ export default {
   },
   created() {
     if (this.isAuthenticated) {
-      this.$router.push("/index");
+      this.$router.replace("index");
     }
   },
   mounted() {

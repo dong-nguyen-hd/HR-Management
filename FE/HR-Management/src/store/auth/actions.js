@@ -2,44 +2,115 @@ import { api } from "src/boot/axios";
 
 export const login = async ({ commit, dispatch }, payload) => {
   let resource = payload.resource;
-  localStorage.setItem("hrtoken", resource.accessToken);
-  localStorage.setItem("test", JSON.stringify(resource));
-  commit("setToken", resource.accessToken);
+
+  // Assign data to localStorage
+  localStorage.setItem("hraccountid", JSON.stringify(resource.id));
+  localStorage.setItem(
+    "hraccounttoken",
+    JSON.stringify(resource.tokenResource)
+  );
+
+  commit("setToken", resource.tokenResource);
   commit("setInformation", resource);
   dispatch("setHeaderJWT");
 };
 
-export const logOut = async ({ commit, dispatch }) => {
-  localStorage.removeItem('hrtoken');
+export const logOut = async ({ commit, dispatch, getters }) => {
+  let tempToken = getters.getToken;
+  let payload = {
+    id: tempToken.id,
+    refreshToken: tempToken.refreshToken,
+  };
+
+  await api.post(`/api/v1/token/logout`, payload);
+
+  localStorage.removeItem("hraccounttoken");
+  localStorage.removeItem("hraccountid");
   commit("removeToken");
   dispatch("setHeaderJWT");
 };
 
 export const getInformation = async ({ commit }, id) => {
-  await api.get(`/api/v1/account/${id}`).then(response => {
-    commit('setInformation', response.data.resource)
-  })
-}
+  let result = await api
+    .get(`/api/v1/account/${id}`)
+    .then((response) => {
+      return response.data;
+    })
+    .catch(function (error) {
+      // Checking if throw error
+      if (error.response) {
+        // Server response
+        return error.response.data;
+      } else {
+        // Server not working
+        let temp = { success: false, message: ["Server Error!"] };
+        return temp;
+      }
+    });
+
+  if (result.success) commit("setInformation", result.resource);
+
+  return result.success;
+};
+
+export const useRefreshToken = async ({ dispatch, commit }) => {
+  let idStorage = parseInt(localStorage.getItem("hraccountid"));
+  let tokenStorage = JSON.parse(localStorage.getItem("hraccounttoken"));
+
+  let payload = {
+    id: tokenStorage.id,
+    refreshToken: tokenStorage.refreshToken,
+    accountId: idStorage,
+  };
+
+  let result = await api
+    .post("/api/v1/token/refresh-token", payload)
+    .then((response) => {
+      return response.data;
+    })
+    .catch(function (error) {
+      // Checking if throw error
+      if (error.response) {
+        // Server response
+        return error.response.data;
+      } else {
+        // Server not working
+        let temp = { success: false, message: ["Server Error!"] };
+        return temp;
+      }
+    });
+
+  if (result.success) {
+    // Assign data to localStorage
+    localStorage.setItem("hraccounttoken", JSON.stringify(result.resource));
+
+    commit("setToken", result.resource);
+    dispatch("setHeaderJWT");
+  }
+
+  return result.success;
+};
 
 export const init = async ({ commit, dispatch }) => {
-  // let tokenStorage = localStorage.getItem("hrtoken");
-  // if (tokenStorage) {
-  //   let token = localResource.toString();
-  //   commit("setToken", token);
-  //   dispatch("setHeaderJWT");
+  let idStorage = parseInt(localStorage.getItem("hraccountid"));
+  let tokenStorage = JSON.parse(localStorage.getItem("hraccounttoken"));
+  let isSuccess = false;
 
-  //   await dispatch()
+  if (idStorage && tokenStorage) {
+    let response = await dispatch("useRefreshToken");
+    if (response) isSuccess = true;
+  }
 
-  //   commit("setInformation", resource);
-  // } else {
-  //   commit("removeToken");
-  // }
+  if (isSuccess) await dispatch("getInformation", idStorage);
+  else commit("removeToken");
 };
 
 export const setHeaderJWT = async ({ getters }) => {
   let isAuthenticated = getters.isAuthenticated;
 
-  if (isAuthenticated)
-    api.defaults.headers.common.Authorization = "JWT " + getters.getToken;
-  else api.defaults.headers.common.Authorization = "";
+  if (isAuthenticated) {
+    let tempToken = getters.getToken;
+    api.defaults.headers.common.Authorization =
+      "Bearer " + tempToken.accessToken;
+  } else api.defaults.headers.common.Authorization = "";
 };

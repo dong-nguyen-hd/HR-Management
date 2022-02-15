@@ -3,8 +3,8 @@ export const setToken = (state, payload) => {
     state.isAuthenticated = true;
 }
 
-export const removeToken = (state, payload) => {
-    state.token = '';
+export const removeToken = (state) => {
+    state.token = null;
     state.isAuthenticated = false;
 }
 

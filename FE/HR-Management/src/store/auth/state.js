@@ -1,7 +1,7 @@
 export default function () {
   return {
     information: {},
-    token: '',
+    token: {},
     isAuthenticated: false
   }
 }
