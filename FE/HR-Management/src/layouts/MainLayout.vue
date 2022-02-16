@@ -19,7 +19,7 @@
           <div class="user-name q-mr-md">{{ getInformation.name }}</div>
           <div class="avatar q-mr-sm">
             <q-avatar size="36px">
-              <img :src="getInformation.avatar" />
+              <img :src="getInformation.avatar.thumbnail" />
             </q-avatar>
           </div>
           <div class="role q-mr-sm q-px-sm">
@@ -29,23 +29,37 @@
 
         <div class="information-menu" v-show="isShowInfor">
           <q-list dark separator>
-            <q-item clickable v-ripple>
+            <q-item
+              @click="isShowInfor = false"
+              clickable
+              v-ripple
+              to="/self-update"
+              exact
+              active-class="isActive"
+            >
               <q-item-section avatar>
-                <q-icon color="white" name="fas fa-user-edit" />
+                <q-icon name="fas fa-user-edit" />
               </q-item-section>
               <q-item-section>Update personal information</q-item-section>
             </q-item>
 
-            <q-item clickable v-ripple>
+            <q-item
+              @click="isShowInfor = false"
+              clickable
+              v-ripple
+              to="/change-password"
+              exact
+              active-class="isActive"
+            >
               <q-item-section avatar>
-                <q-icon color="white" name="fas fa-key"/>
+                <q-icon name="fas fa-key" />
               </q-item-section>
               <q-item-section>Change password</q-item-section>
             </q-item>
 
-            <q-item clickable v-ripple>
+            <q-item clickable v-ripple @click.once="logOutButton">
               <q-item-section avatar>
-                <q-icon color="white" name="fas fa-sign-out-alt" />
+                <q-icon name="fas fa-sign-out-alt" />
               </q-item-section>
               <q-item-section>Log Out</q-item-section>
             </q-item>
@@ -92,7 +106,7 @@
       </div>
     </q-drawer>
 
-    <q-page-container @click="isShowInfor = isShowInfor ? false : false">
+    <q-page-container @click="isShowInfor = false">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -100,7 +114,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default defineComponent({
   name: "MainLayout",
@@ -112,17 +126,22 @@ export default defineComponent({
     };
   },
   methods: {
+    ...mapActions("auth", ["logOut"]),
+
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
     },
-    logOut() {
-      console.log("Test: ", JSON.stringify(this.getInformation));
-      //this.$store.dispatch("auth/logOut");
-      //this.$router.replace("/");
+    async logOutButton() {
+      try {
+        this.isShowInfor = false;
+        await this.logOut();
+      } finally {
+        this.$router.replace("/login");
+      }
     },
   },
   computed: {
-    ...mapGetters("auth", ["isAuthenticated", "getInformation", "getToken"]),
+    ...mapGetters("auth", ["getInformation"]),
   },
 });
 </script>
@@ -164,5 +183,9 @@ export default defineComponent({
   position: fixed;
   top: 50px;
   right: 0;
+}
+
+.isActive {
+  color: $accent;
 }
 </style>

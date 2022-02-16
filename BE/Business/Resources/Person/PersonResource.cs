@@ -38,7 +38,7 @@ namespace Business.Resources.Person
         [MaxLength(500)]
         public string Email { get; set; }
 
-        public Uri Avatar { get; set; }
+        public AvatarResource Avatar { get; set; }
 
         [MaxLength(500)]
         public string Description { get; set; }

@@ -22,7 +22,20 @@ export const logOut = async ({ commit, dispatch, getters }) => {
     refreshToken: tempToken.refreshToken,
   };
 
-  await api.post(`/api/v1/token/logout`, payload);
+  let result = await api.post(`/api/v1/token/logout`, payload).then((response) => {
+    return response.data;
+  })
+  .catch(function (error) {
+    // Checking if throw error
+    if (error.response) {
+      // Server response
+      return error.response.data;
+    } else {
+      // Server not working
+      let temp = { success: false, message: ["Server Error!"] };
+      return temp;
+    }
+  });
 
   localStorage.removeItem("hraccounttoken");
   localStorage.removeItem("hraccountid");
@@ -30,9 +43,11 @@ export const logOut = async ({ commit, dispatch, getters }) => {
   dispatch("setHeaderJWT");
 };
 
-export const getInformation = async ({ commit }, id) => {
+export const getInformation = async ({ commit }) => {
+  let idStorage = parseInt(localStorage.getItem("hraccountid"));
+
   let result = await api
-    .get(`/api/v1/account/${id}`)
+    .get(`/api/v1/account/${idStorage}`)
     .then((response) => {
       return response.data;
     })
@@ -92,16 +107,15 @@ export const useRefreshToken = async ({ dispatch, commit }) => {
 };
 
 export const init = async ({ commit, dispatch }) => {
-  let idStorage = parseInt(localStorage.getItem("hraccountid"));
   let tokenStorage = JSON.parse(localStorage.getItem("hraccounttoken"));
   let isSuccess = false;
 
-  if (idStorage && tokenStorage) {
+  if (tokenStorage) {
     let response = await dispatch("useRefreshToken");
     if (response) isSuccess = true;
   }
 
-  if (isSuccess) await dispatch("getInformation", idStorage);
+  if (isSuccess) await dispatch("getInformation");
   else commit("removeToken");
 };
 

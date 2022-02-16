@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Domain.Services;
+using Business.Resources;
 using Business.Resources.Information;
 using Business.Resources.Person;
 using Microsoft.Extensions.Options;
@@ -47,7 +48,7 @@ namespace Business.Mapping.Person
     /// <summary>
     /// Custom Value Resolvers
     /// </summary>
-    class CustomResolver : IValueResolver<Domain.Models.Person, PersonResource, Uri>
+    class CustomResolver : IValueResolver<Domain.Models.Person, PersonResource, AvatarResource>
     {
         #region Property
         private readonly IUriService _uriService;
@@ -63,8 +64,19 @@ namespace Business.Mapping.Person
         #endregion
 
         #region Method
-        public Uri Resolve(Domain.Models.Person source, PersonResource destination, Uri destMember, ResolutionContext context)
-            => string.IsNullOrEmpty(source.Avatar) ? null : _uriService.GetRouteUri($"{_hostResource.ThumbnailImagePath}{source.Avatar}");
+        public AvatarResource Resolve(Domain.Models.Person source, PersonResource destination, AvatarResource destMember, ResolutionContext context)
+        {
+            if (!string.IsNullOrEmpty(source.Avatar))
+            {
+                return new AvatarResource
+                {
+                    Thumbnail = _uriService.GetRouteUri($"{_hostResource.ThumbnailImagePath}{source.Avatar}"),
+                    Original = _uriService.GetRouteUri($"{_hostResource.OriginalImagePath}{source.Avatar}"),
+                };
+            }
+
+            return null;
+        }
         #endregion
     }
 }

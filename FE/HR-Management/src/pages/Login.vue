@@ -119,6 +119,7 @@ export default {
   },
   methods: {
     ...mapActions("auth", ["login"]),
+
     async submitForm() {
       try {
         // Hashing password
@@ -147,7 +148,7 @@ export default {
 
         if (result.success) {
           await this.login(result);
-          this.$router.push("/index");
+          this.$router.replace("/index");
         } else {
           this.$q.notify({
             type: "negative",
@@ -167,7 +168,7 @@ export default {
   },
   created() {
     if (this.isAuthenticated) {
-      this.$router.replace("index");
+      this.$router.replace("/index");
     }
   },
   mounted() {

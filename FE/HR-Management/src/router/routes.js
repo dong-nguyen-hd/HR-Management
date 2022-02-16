@@ -14,6 +14,16 @@ const routes = [
         path: "/index",
         component: () => import("pages/Index.vue"),
       },
+      {
+        name: "Update Personal Information",
+        path: "/self-update",
+        component: () => import("pages/Account/UpdateAccountInformation.vue"),
+      },
+      {
+        name: "Change Password",
+        path: "/change-password",
+        component: () => import("pages/Account/ChangePassword.vue"),
+      },
     ],
   },
 

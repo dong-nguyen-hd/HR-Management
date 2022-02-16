@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Business.Domain.Services;
+using Business.Resources;
 using Business.Resources.Account;
 using Business.Resources.Authentication;
 using Business.Resources.Information;
 using Microsoft.Extensions.Options;
-using System;
 
 namespace Business.Mapping.Account
 {
@@ -23,7 +23,7 @@ namespace Business.Mapping.Account
     /// <summary>
     /// Custom Value Resolvers
     /// </summary>
-    class CustomResolver : IValueResolver<Domain.Models.Account, AccountResource, Uri>
+    class CustomResolver : IValueResolver<Domain.Models.Account, AccountResource, AvatarResource>
     {
         #region Property
         private readonly IUriService _uriService;
@@ -39,8 +39,19 @@ namespace Business.Mapping.Account
         #endregion
 
         #region Method
-        public Uri Resolve(Domain.Models.Account source, AccountResource destination, Uri destMember, ResolutionContext context)
-            => string.IsNullOrEmpty(source.Avatar) ? null : _uriService.GetRouteUri($"{_hostResource.ThumbnailImagePath}{source.Avatar}");
+        public AvatarResource Resolve(Domain.Models.Account source, AccountResource destination, AvatarResource destMember, ResolutionContext context)
+        {
+            if (!string.IsNullOrEmpty(source.Avatar))
+            {
+                return new AvatarResource
+                {
+                    Thumbnail = _uriService.GetRouteUri($"{_hostResource.ThumbnailImagePath}{source.Avatar}"),
+                    Original = _uriService.GetRouteUri($"{_hostResource.OriginalImagePath}{source.Avatar}"),
+                };
+            }
+
+            return null;
+        }
         #endregion
     }
 }

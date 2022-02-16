@@ -66,7 +66,7 @@ namespace API.Controllers
             return Unauthorized(result);
         }
 
-        [Authorize(Roles = "viewer, editor, admin")]
+        [AllowAnonymous]
         [HttpPost("logout")]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<object>), StatusCodes.Status400BadRequest)]
