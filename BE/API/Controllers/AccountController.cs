@@ -133,7 +133,7 @@ namespace API.Controllers
             return await base.UpdateAsync(id, resource);
         }
 
-        [HttpPut("selfUpdate/{id:int}")]
+        [HttpPut("self-update/{id:int}")]
         [Authorize(Roles = "admin, editor, viewer")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
@@ -151,10 +151,10 @@ namespace API.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            return StatusCode(201, result);
+            return Ok(result);
         }
 
-        [HttpPut("updatePassword/{id:int}")]
+        [HttpPut("change-password/{id:int}")]
         [Authorize(Roles = "admin, editor, viewer")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
@@ -176,7 +176,7 @@ namespace API.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-            return StatusCode(201, result);
+            return Ok(result);
         }
 
         [HttpDelete("{id:int}")]

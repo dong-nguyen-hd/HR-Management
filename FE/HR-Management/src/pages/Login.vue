@@ -104,8 +104,6 @@ import MD5 from "crypto-js/md5";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 
-let $q;
-
 export default {
   name: "Login",
   data() {

@@ -1,12 +1,16 @@
-﻿using Business.Communication;
+﻿using AutoMapper;
+using Business.Communication;
 using Business.CustomException;
+using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
+using Business.Resources.Account;
 using Business.Resources.Information;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -18,65 +22,85 @@ namespace Business.Services
     public class ImageService : ResponseMessageService, IImageService
     {
         #region Property
-        private readonly IUriService _uriService;
         private readonly IPersonRepository _personRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly HostResource _hostResource;
         private readonly IWebHostEnvironment _env;
+        private readonly IMapper _mapper;
         #endregion
 
         #region Constructor
-        public ImageService(IUriService uriService,
-            IPersonRepository personRepository,
+        public ImageService(IPersonRepository personRepository,
             IAccountRepository accountRepository,
             IUnitOfWork unitOfWork,
             IWebHostEnvironment env,
+            IMapper mapper,
             IOptionsMonitor<HostResource> hostResource,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(responseMessage)
         {
-            this._uriService = uriService;
             this._personRepository = personRepository;
             this._accountRepository = accountRepository;
             this._unitOfWork = unitOfWork;
             this._hostResource = hostResource.CurrentValue;
             this._env = env;
+            this._mapper = mapper;
         }
         #endregion
 
         #region Method
-        public async Task<BaseResponse<Uri>> SaveImageAccountAsync(int accountId, Stream imageStream)
+        private (string thumbnailPath, string originalPath) GetRootPath(string nameOfAvatar)
         {
+            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{nameOfAvatar}.jpg");
+            string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
+
+            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{nameOfAvatar}.jpg");
+            string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
+
+            return (rootThumbnailPath, rootOriginalPath);
+        }
+
+        private (bool isSuccess, BaseResponse<AccountResource> result) ValidateImage(Stream imageStream)
+        {
+            List<string> messages = new();
+
             // Validate properties of image
             if (imageStream is null || imageStream.Length == 0)
-                return new BaseResponse<Uri>(ResponseMessage.Values["Image_NoData"]);
+                messages.Add(ResponseMessage.Values["Image_NoData"]);
             if (imageStream?.Length > 5242880) // 5 MB
-                return new BaseResponse<Uri>(ResponseMessage.Values["Image_Bigger_Error"]);
+                messages.Add(ResponseMessage.Values["Image_Bigger_Error"]);
+
+            return messages.Count == 0 ? (true, null) : (false, new BaseResponse<AccountResource>(messages));
+        }
+
+        public async Task<BaseResponse<AccountResource>> SaveImageAccountAsync(int accountId, Stream imageStream)
+        {
+            // Validate properties of image
+            var validateImage = ValidateImage(imageStream);
+            if (!validateImage.isSuccess)
+                return validateImage.result;
+
             // Validate Id is existent?
             var tempAccount = await _accountRepository.GetByIdAsync(accountId);
             if (tempAccount is null)
-                return new BaseResponse<Uri>(ResponseMessage.Values["Account_Id_NoData"]);
+                return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Id_NoData"]);
 
             // Path of image
-            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{tempAccount.UserName}.jpg");
-            string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
-
-            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{tempAccount.UserName}.jpg");
-            string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
+            var path = GetRootPath(tempAccount.UserName);
 
             try
             {
-                bool isSuccess = Initialize(hasValue: tempAccount.Avatar, imageStream, rootOriginalPath, rootThumbnailPath);
+                bool isSuccess = Initialize(hasValue: tempAccount.Avatar, imageStream, path.originalPath, path.thumbnailPath);
                 if (!isSuccess)
                 {
                     tempAccount.Avatar = "default.jpg";
-                    return new BaseResponse<Uri>(ResponseMessage.Values["Image_Saving_Error"]);
+                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Image_Saving_Error"]);
                 }
 
                 tempAccount.Avatar = $"{tempAccount.UserName}.jpg";
                 await _unitOfWork.CompleteAsync();
 
-                return new BaseResponse<Uri>(_uriService.GetRouteUri(thumbnailPath));
+                return new BaseResponse<AccountResource>(_mapper.Map<AccountResource>(tempAccount));
             }
             catch (Exception ex)
             {
@@ -84,38 +108,34 @@ namespace Business.Services
             }
         }
 
-        public async Task<BaseResponse<Uri>> SaveImagePersonAsync(int personId, Stream imageStream)
+        public async Task<BaseResponse<AccountResource>> SaveImagePersonAsync(int personId, Stream imageStream)
         {
             // Validate properties of image
-            if (imageStream is null || imageStream.Length == 0)
-                return new BaseResponse<Uri>(ResponseMessage.Values["Image_NoData"]);
-            if (imageStream?.Length > 5242880) // 5 MB
-                return new BaseResponse<Uri>(ResponseMessage.Values["Image_Bigger_Error"]);
+            var validateImage = ValidateImage(imageStream);
+            if (!validateImage.isSuccess)
+                return validateImage.result;
+
             // Validate Id is existent?
             var tempPerson = await _personRepository.GetByIdAsync(personId);
             if (tempPerson is null)
-                return new BaseResponse<Uri>(ResponseMessage.Values["Person_Id_NoData"]);
+                return new BaseResponse<AccountResource>(ResponseMessage.Values["Person_Id_NoData"]);
 
             // Path of image
-            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{tempPerson.StaffId}.jpg");
-            string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
-
-            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{tempPerson.StaffId}.jpg");
-            string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
+            var path = GetRootPath(tempPerson.StaffId);
 
             try
             {
-                bool isSuccess = Initialize(hasValue: tempPerson.Avatar, imageStream, rootOriginalPath, rootThumbnailPath);
+                bool isSuccess = Initialize(hasValue: tempPerson.Avatar, imageStream, path.originalPath, path.thumbnailPath);
                 if (!isSuccess)
                 {
                     tempPerson.Avatar = "default.jpg";
-                    return new BaseResponse<Uri>(ResponseMessage.Values["Image_Saving_Error"]);
+                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Image_Saving_Error"]);
                 }
 
                 tempPerson.Avatar = $"{tempPerson.StaffId}.jpg";
                 await _unitOfWork.CompleteAsync();
 
-                return new BaseResponse<Uri>(_uriService.GetRouteUri(thumbnailPath));
+                return new BaseResponse<AccountResource>(_mapper.Map<AccountResource>(tempPerson));
             }
             catch (Exception ex)
             {
