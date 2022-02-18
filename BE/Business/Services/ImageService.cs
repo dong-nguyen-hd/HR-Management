@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Business.Communication;
 using Business.CustomException;
-using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;

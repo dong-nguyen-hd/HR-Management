@@ -19,6 +19,7 @@
       "Image_Saving_Error": "An error occurred when saving the Image",
 
       "Account_UserName_DuplicateError": "User name is existent",
+      "Account_Password_Error": "Password is incorrect",
       "Account_Not_Permitted": "Account not permitted",
       "Account_Id_NoData": "Id is not existent",
       "Account_NoData": "Account is not existent",

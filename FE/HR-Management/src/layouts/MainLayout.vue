@@ -16,7 +16,7 @@
           </q-avatar>
         </q-toolbar-title>
         <div class="information q-pl-md" @click="isShowInfor = !isShowInfor">
-          <div class="user-name q-mr-md">{{ getInformation.name }}</div>
+          <div class="user-name q-mr-md">{{ showName }}</div>
           <div class="avatar q-mr-sm">
             <q-avatar size="36px">
               <img :src="getInformation.avatar.thumbnail" />
@@ -142,6 +142,11 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
+    showName() {
+      if (this.getInformation.name.length > 30)
+        return `${this.getInformation.name.slice(0, 30)}...`;
+      else return this.getInformation.name;
+    },
   },
 });
 </script>

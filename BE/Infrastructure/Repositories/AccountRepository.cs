@@ -18,6 +18,15 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
+        public async Task<Account> GetByIdAsync(int id, bool hasToken)
+        {
+            var queryable = Context.Accounts.Where(x => x.Id.Equals(id) && x.Status.Equals(true));
+
+            if (hasToken) queryable.Include(x => x.Tokens);
+
+            return await queryable.SingleOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<Account>> ListPaginationAsync(QueryResource pagination)
         => await Context.Accounts.Where(x => x.Status)
             .OrderBy(x => x.Id)

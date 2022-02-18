@@ -87,9 +87,11 @@ namespace Business.Services
         public async Task<BaseResponse<AccountResource>> UpdatePasswordAsync(int id, UpdatePasswordAccountResource resource)
         {
             // Validate Id is existent?
-            var tempAccount = await _accountRepository.GetByIdAsync(id);
-            if(!tempAccount.Password.CheckingPassword(resource.OldPassword))
-                return new BaseResponse<AccountResource>(ResponseMessage.Values["NoData"]);
+            var tempAccount = await _accountRepository.GetByIdAsync(id, hasToken: true);
+            if (tempAccount is null)
+                return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_NoData"]);
+            if (!tempAccount.Password.CheckingPassword(resource.OldPassword))
+                return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Password_Error"]);
 
             // Update infomation
             tempAccount.Password = resource.NewPassword.HashingPassword(Constant.IterationCount);
@@ -97,6 +99,7 @@ namespace Business.Services
 
             try
             {
+                tempAccount.Tokens.Clear(); // Remove all token after when change password
                 await UnitOfWork.CompleteAsync();
 
                 return new BaseResponse<AccountResource>(Mapper.Map<AccountResource>(tempAccount));

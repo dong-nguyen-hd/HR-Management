@@ -33,7 +33,10 @@
           standout
           v-model="accountInfor.userName"
           type="text"
-          prefix="User name:"
+          label="User name:"
+          :label-color="labelColorFocus[0]"
+          @focus="labelColorFocus[0] = 'white'"
+          @blur="labelColorFocus[0] = ''"
         >
           <template v-slot:prepend>
             <q-icon name="fas fa-user" />
@@ -42,12 +45,16 @@
       </div>
       <div class="name q-mt-sm q-px-md">
         <q-input
+          ref="nameRef"
           standout
           clearable
           maxlength="500"
           v-model="accountInfor.name"
           type="text"
-          prefix="Name:"
+          label="Name:"
+          :label-color="labelColorFocus[1]"
+          @focus="labelColorFocus[1] = 'white'"
+          @blur="labelColorFocus[1] = ''"
           :rules="[(val) => !!val || 'Name is required']"
           hide-bottom-space
         >
@@ -58,12 +65,16 @@
       </div>
       <div class="email q-mt-sm q-px-md">
         <q-input
+          ref="emailRef"
           standout
           clearable
           maxlength="500"
           v-model="accountInfor.email"
           type="email"
-          prefix="Email:"
+          label="Email:"
+          :label-color="labelColorFocus[2]"
+          @focus="labelColorFocus[2] = 'white'"
+          @blur="labelColorFocus[2] = ''"
           :rules="[(val) => !!val || 'Email is required']"
           hide-bottom-space
         >
@@ -74,6 +85,8 @@
       </div>
       <div class="btn-save flex flex-center q-pb-md">
         <q-btn
+          :loading="loadingSave"
+          :disable="loadingSave"
           @click="save"
           color="primary"
           label="Save"
@@ -98,6 +111,10 @@ export default defineComponent({
       accountInfor: null,
       imageURL: null,
       imageFile: null,
+
+      loadingSave: false,
+
+      labelColorFocus: [],
     };
   },
   methods: {
@@ -105,34 +122,55 @@ export default defineComponent({
     ...mapMutations("auth", ["setInformation"]),
 
     async save() {
-      
-        let [resultUpdateImage, resultUpdateInfor]  = await Promise.all([
-          this.requestUpdateImage(),
-          this.requestSelfUpdate(),
-        ]);
+      try {
+        if (!this.$refs.nameRef.validate() || !this.$refs.emailRef.validate()) {
+          return null;
+        }
 
-        if (resultUpdateImage.success && resultUpdateInfor.success) {
-          this.setInformation(resultSelfUpdate.resource);
-          this.mapInformation();
+        this.loadingSave = true;
+        let isAuth = await this.useRefreshToken();
 
-          console.log("Ok");
+        if (isAuth) {
+          let [resultUpdateImage, resultUpdateInfor] = await Promise.all([
+            this.requestUpdateImage(),
+            this.requestSelfUpdate(),
+          ]);
+
+          if (resultUpdateInfor.success) {
+            this.setInformation(resultUpdateInfor.resource);
+            this.mapInformation();
+          } else {
+            this.$q.notify({
+              type: "negative",
+              message: resultUpdateInfor.message[0],
+            });
+
+            return null;
+          }
+
+          if (!resultUpdateImage.success && this.imageFile) {
+            this.$q.notify({
+              type: "negative",
+              message: resultUpdateImage.message[0],
+            });
+            return null;
+          }
 
           this.$q.notify({
             type: "positive",
             message: "Successfully updated",
           });
         } else {
-          this.$q.notify({
-            type: "negative",
-            message: resultSelfUpdate.message[0],
-          });
+          this.$router.replace("/login");
         }
-      // } catch {
-      //   this.$q.notify({
-      //     type: "negative",
-      //     message: `Saving error!`,
-      //   });
-      //}
+      } catch {
+        this.$q.notify({
+          type: "negative",
+          message: `Saving error!`,
+        });
+      } finally {
+        this.loadingSave = false;
+      }
     },
     async requestUpdateImage() {
       let fd = new FormData();
