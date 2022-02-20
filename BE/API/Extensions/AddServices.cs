@@ -49,7 +49,7 @@ namespace API.Extensions
 
             services.AddScoped<ITokenRepository, TokenRepository>();
 
-            services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IImageService, ImageCrossPlatformService>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -61,6 +61,7 @@ namespace API.Extensions
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Human Resource Management for IT Company", Version = "v1.0" });
+                c.OperationFilter<SwaggerFileOperationFilter>();
 
                 var securityScheme = new OpenApiSecurityScheme
                 {

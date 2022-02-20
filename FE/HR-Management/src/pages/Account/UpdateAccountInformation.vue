@@ -149,11 +149,18 @@ export default defineComponent({
           }
 
           if (!resultUpdateImage.success && this.imageFile) {
+            this.imageURL = this.getInformation.avatar.original;
+            this.imageFile = null;
             this.$q.notify({
               type: "negative",
               message: resultUpdateImage.message[0],
             });
             return null;
+          } else {
+            resultUpdateInfor.resource.avatar =
+              resultUpdateImage.resource.avatar;
+            this.setInformation(resultUpdateInfor.resource);
+            this.mapInformation();
           }
 
           this.$q.notify({

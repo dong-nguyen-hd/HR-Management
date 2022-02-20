@@ -6,6 +6,7 @@ using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.Account;
 using Business.Resources.Information;
+using Business.Resources.Person;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System;
@@ -48,55 +49,25 @@ namespace Business.Services
         #endregion
 
         #region Method
-        private (string thumbnailPath, string originalPath) GetRootPath(string nameOfAvatar)
-        {
-            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{nameOfAvatar}.jpg");
-            string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
-
-            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{nameOfAvatar}.jpg");
-            string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
-
-            return (rootThumbnailPath, rootOriginalPath);
-        }
-
-        private (bool isSuccess, BaseResponse<AccountResource> result) ValidateImage(Stream imageStream)
-        {
-            List<string> messages = new();
-
-            // Validate properties of image
-            if (imageStream is null || imageStream.Length == 0)
-                messages.Add(ResponseMessage.Values["Image_NoData"]);
-            if (imageStream?.Length > 5242880) // 5 MB
-                messages.Add(ResponseMessage.Values["Image_Bigger_Error"]);
-
-            return messages.Count == 0 ? (true, null) : (false, new BaseResponse<AccountResource>(messages));
-        }
-
         public async Task<BaseResponse<AccountResource>> SaveImageAccountAsync(int accountId, Stream imageStream)
         {
-            // Validate properties of image
-            var validateImage = ValidateImage(imageStream);
-            if (!validateImage.isSuccess)
-                return validateImage.result;
-
-            // Validate Id is existent?
-            var tempAccount = await _accountRepository.GetByIdAsync(accountId);
-            if (tempAccount is null)
-                return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Id_NoData"]);
-
-            // Path of image
-            var path = GetRootPath(tempAccount.UserName);
-
             try
             {
-                bool isSuccess = Initialize(hasValue: tempAccount.Avatar, imageStream, path.originalPath, path.thumbnailPath);
-                if (!isSuccess)
-                {
-                    tempAccount.Avatar = "default.jpg";
-                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Image_Saving_Error"]);
-                }
+                // Validate properties of image
+                var validateImage = ValidateImage<AccountResource>(imageStream);
+                if (!validateImage.isSuccess)
+                    return validateImage.result;
 
-                tempAccount.Avatar = $"{tempAccount.UserName}.jpg";
+                // Validate Id is existent?
+                var tempAccount = await _accountRepository.GetByIdAsync(accountId);
+                if (tempAccount is null)
+                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Id_NoData"]);
+
+                // Path of image
+                var path = GetRootPath(tempAccount.UserName);
+
+                tempAccount.Avatar = Initialize(CheckExistentAvatar(tempAccount.Avatar), tempAccount.UserName, imageStream);
+
                 await _unitOfWork.CompleteAsync();
 
                 return new BaseResponse<AccountResource>(_mapper.Map<AccountResource>(tempAccount));
@@ -107,34 +78,28 @@ namespace Business.Services
             }
         }
 
-        public async Task<BaseResponse<AccountResource>> SaveImagePersonAsync(int personId, Stream imageStream)
+        public async Task<BaseResponse<PersonResource>> SaveImagePersonAsync(int personId, Stream imageStream)
         {
-            // Validate properties of image
-            var validateImage = ValidateImage(imageStream);
-            if (!validateImage.isSuccess)
-                return validateImage.result;
-
-            // Validate Id is existent?
-            var tempPerson = await _personRepository.GetByIdAsync(personId);
-            if (tempPerson is null)
-                return new BaseResponse<AccountResource>(ResponseMessage.Values["Person_Id_NoData"]);
-
-            // Path of image
-            var path = GetRootPath(tempPerson.StaffId);
-
             try
             {
-                bool isSuccess = Initialize(hasValue: tempPerson.Avatar, imageStream, path.originalPath, path.thumbnailPath);
-                if (!isSuccess)
-                {
-                    tempPerson.Avatar = "default.jpg";
-                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Image_Saving_Error"]);
-                }
+                // Validate properties of image
+                var validateImage = ValidateImage<PersonResource>(imageStream);
+                if (!validateImage.isSuccess)
+                    return validateImage.result;
 
-                tempPerson.Avatar = $"{tempPerson.StaffId}.jpg";
+                // Validate Id is existent?
+                var tempPerson = await _personRepository.GetByIdAsync(personId);
+                if (tempPerson is null)
+                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
+
+                // Path of image
+                var path = GetRootPath(tempPerson.StaffId);
+
+                tempPerson.Avatar = Initialize(CheckExistentAvatar(tempPerson.Avatar), tempPerson.StaffId, imageStream);
+
                 await _unitOfWork.CompleteAsync();
 
-                return new BaseResponse<AccountResource>(_mapper.Map<AccountResource>(tempPerson));
+                return new BaseResponse<PersonResource>(_mapper.Map<PersonResource>(tempPerson));
             }
             catch (Exception ex)
             {
@@ -142,69 +107,121 @@ namespace Business.Services
             }
         }
 
-        #region Initialize
-        private bool Initialize(string hasValue, Stream imageStream, string originalPath, string thumbnailPath)
+        #region Private work
+        private static bool CheckExistentAvatar(string avatarName)
+            => (string.IsNullOrEmpty(avatarName) || avatarName.Equals("default.jpg")) ? false : true;
+
+        private string Initialize(bool isExistent, string avatarName, Stream imageStream)
+        {
+            string defaultName = "default.jpg";
+            string originalName = string.Format($"{avatarName}.jpg");
+
+            try
+            {
+                var path = GetRootPath(avatarName);
+                var tempPath = GetTemporaryPath();
+
+                // Change file name if it's existent
+                if (isExistent)
+                {
+                    bool isSuccessChangeFileName = false;
+                    isSuccessChangeFileName = ChangeFileName(path.originalPath, tempPath.originalPath);
+                    isSuccessChangeFileName = ChangeFileName(path.thumbnailPath, tempPath.thumbnailPath);
+
+                    if (!isSuccessChangeFileName)
+                        return defaultName;
+                }
+
+                bool isSuccess = SetThumbnails(imageStream, path.originalPath, path.thumbnailPath);
+
+                if (isSuccess)
+                {
+                    DeletePhotoIfExist(tempPath.originalPath);
+                    DeletePhotoIfExist(tempPath.thumbnailPath);
+
+                    return originalName;
+                }
+                else if (isExistent)
+                {
+                    ChangeFileName(tempPath.originalPath, path.originalPath);
+                    ChangeFileName(tempPath.thumbnailPath, path.thumbnailPath);
+
+                    return originalName;
+                }
+
+                return defaultName;
+            }
+            catch
+            {
+                return defaultName;
+            }
+        }
+
+        private (string thumbnailPath, string originalPath) GetRootPath(string avatarName)
+        {
+            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{avatarName}.jpg");
+            string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
+
+            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{avatarName}.jpg");
+            string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
+
+            return (rootThumbnailPath, rootOriginalPath);
+        }
+
+        private (string thumbnailPath, string originalPath) GetTemporaryPath()
+        {
+            var guid = Guid.NewGuid().ToString();
+
+            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{guid}.jpg");
+            string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
+
+            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{guid}.jpg");
+            string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
+
+            return (rootThumbnailPath, rootOriginalPath);
+        }
+
+        private bool DeletePhotoIfExist(string path)
+        {
+            if (!File.Exists(path))
+                return false;
+
+            File.Delete(path);
+
+            return true;
+        }
+
+        private bool ChangeFileName(string sourceFileName, string destFileName)
+        {
+            if (!File.Exists(sourceFileName) || File.Exists(destFileName))
+                return false;
+
+            File.Move(sourceFileName, destFileName);
+
+            return true;
+        }
+
+        private bool SetThumbnails(Stream imageStream, string originalPath, string thumbnailPath)
         {
             try
             {
-                if (!string.IsNullOrEmpty(hasValue))
+                using (var rawImage = Image.FromStream(imageStream))
                 {
-                    DeletePhotoIfExist(originalPath);
-                    DeletePhotoIfExist(thumbnailPath);
-                }
-                bool isSuccess = SetThumbnails(imageStream, originalPath, thumbnailPath);
+                    // Set Correct Orientation
+                    SetCorrectOrientation(rawImage);
 
-                return isSuccess;
+                    CreateAndSaveImage(rawImage, 500, originalPath);
+                    CreateAndSaveImage(rawImage, 100, thumbnailPath);
+                }
+
+                return true;
             }
             catch
             {
                 return false;
             }
         }
-        #endregion
 
-        #region Set Thumbnails
-        private bool SetThumbnails(Stream imageStream, string originalPath, string thumbnailPath)
-        {
-            var rawImage = Image.FromStream(imageStream);
-
-            if (!ValidateImageFormat(rawImage))
-                throw new Exception();
-
-            SetCorrectOrientation(rawImage);
-
-            bool isSuccessOriginal = CreateAndSaveImage(rawImage, 500, originalPath);
-            bool isSuccessThumbnail = CreateAndSaveImage(rawImage, 100, thumbnailPath);
-
-            rawImage.Dispose();
-
-            if (isSuccessOriginal && isSuccessThumbnail)
-                return true;
-
-            return false;
-        }
-        #endregion
-
-        #region Validate Image Format
-        private static bool ValidateImageFormat(Image image)
-        {
-            if (ImageFormat.Jpeg.Equals(image.RawFormat))
-                return true;
-
-            if (ImageFormat.Png.Equals(image.RawFormat))
-                return true;
-
-            if (ImageFormat.Gif.Equals(image.RawFormat))
-                return true;
-
-            if (ImageFormat.Bmp.Equals(image.RawFormat))
-                return true;
-
-            return false;
-        }
-        #endregion
-
-        #region Set Correct Orientation
         private static void SetCorrectOrientation(Image image)
         {
             // Property Id = 274 describe EXIF orientation parameter
@@ -242,29 +259,17 @@ namespace Business.Services
                 image.RemovePropertyItem(274);
             }
         }
-        #endregion
 
-        #region Create And Save Image
-        private bool CreateAndSaveImage(Image image, int size, string imagePath)
+        private void CreateAndSaveImage(Image image, int size, string imagePath)
         {
             var thumbnailSize = GetThumbnailSize(image, size);
-            try
-            {
-                using (var bitmap = ResizeImage(image, thumbnailSize.Width, thumbnailSize.Height))
-                {
-                    bitmap.Save($"{imagePath}", ImageFormat.Jpeg);
-                }
 
-                return true;
-            }
-            catch
+            using (var bitmap = ResizeImage(image, thumbnailSize.Width, thumbnailSize.Height))
             {
-                return false;
+                bitmap.Save($"{imagePath}", ImageFormat.Jpeg);
             }
         }
-        #endregion
 
-        #region Get Thumbnail Size
         private static Size GetThumbnailSize(Image original, int size = 500)
         {
             var originalWidth = original.Width;
@@ -282,9 +287,7 @@ namespace Business.Services
 
             return new Size((int)(originalWidth * factor), (int)(originalHeight * factor));
         }
-        #endregion
 
-        #region Resize Image
         private Bitmap ResizeImage(Image image, int width, int height)
         {
             var result = new Bitmap(width, height);
@@ -300,18 +303,41 @@ namespace Business.Services
 
             return result;
         }
-        #endregion
 
-        #region Delete Photo If Exist
-        public void DeletePhotoIfExist(string path)
+        private (bool isSuccess, BaseResponse<T> result) ValidateImage<T>(Stream imageStream)
         {
-            if (path is null)
-                throw new ArgumentNullException(nameof(path));
+            List<string> messages = new();
 
-            if (File.Exists(path))
+            // Validate properties of image
+            if (imageStream is null || imageStream.Length == 0)
+                messages.Add(ResponseMessage.Values["Image_NoData"]);
+            if (imageStream?.Length > 5242880) // 5 MB
+                messages.Add(ResponseMessage.Values["Image_Bigger_Error"]);
+
+            using (var rawImage = Image.FromStream(imageStream))
             {
-                File.Delete(path);
+                if (!ValidateImageFormat(rawImage))
+                    messages.Add(ResponseMessage.Values["Image_Format_Error"]);
             }
+
+            return messages.Count == 0 ? (true, null) : (false, new BaseResponse<T>(messages));
+        }
+
+        private static bool ValidateImageFormat(Image image)
+        {
+            if (ImageFormat.Jpeg.Equals(image.RawFormat))
+                return true;
+
+            if (ImageFormat.Png.Equals(image.RawFormat))
+                return true;
+
+            if (ImageFormat.Gif.Equals(image.RawFormat))
+                return true;
+
+            if (ImageFormat.Bmp.Equals(image.RawFormat))
+                return true;
+
+            return false;
         }
         #endregion
 

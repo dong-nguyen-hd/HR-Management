@@ -53,6 +53,8 @@ namespace API.Controllers
 
             var stream = new FileStream(filePath, FileMode.Create);
             await image.CopyToAsync(stream);
+            stream.Position = 0;
+
             var result = await _imageService.SaveImageAccountAsync(id, stream);
             stream.Dispose();
 

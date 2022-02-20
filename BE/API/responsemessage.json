@@ -15,6 +15,7 @@
       "Token_Saving_Error": "An error occurred when saving the Token",
 
       "Image_NoData": "There is no image.",
+      "Image_Format_Error": "Image format is not supported.",
       "Image_Bigger_Error": "Image cannot be bigger than 5 MB",
       "Image_Saving_Error": "An error occurred when saving the Image",
 
