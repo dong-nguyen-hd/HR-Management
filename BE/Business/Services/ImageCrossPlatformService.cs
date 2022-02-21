@@ -130,21 +130,23 @@ namespace Business.Services
             try
             {
                 bool isExistent = CheckExistentAvatar(oldFileName);
-                var path = GetRootPath(newFileName);
+                var newPath = GetRootPath(newFileName);
+
+                var oldPath = GetRootPath(oldFileName);
                 var tempPath = GetTemporaryPath(oldFileName);
 
                 // Change file name if it's existent
                 if (isExistent)
                 {
                     bool isSuccesschangefilename = false;
-                    isSuccesschangefilename = ChangeFileName(path.originalPath, tempPath.originalPath);
-                    isSuccesschangefilename = ChangeFileName(path.thumbnailPath, tempPath.thumbnailPath);
+                    isSuccesschangefilename = ChangeFileName(oldPath.originalPath, tempPath.originalPath);
+                    isSuccesschangefilename = ChangeFileName(oldPath.thumbnailPath, tempPath.thumbnailPath);
 
                     if (!isSuccesschangefilename)
                         return defaultName;
                 }
 
-                bool isSuccess = await SetThumbnailsAsync(rawImage, path.originalPath, path.thumbnailPath);
+                bool isSuccess = await SetThumbnailsAsync(rawImage, newPath.originalPath, newPath.thumbnailPath);
 
                 if (isSuccess && isExistent)
                 {
@@ -153,8 +155,8 @@ namespace Business.Services
                 }
                 else if (isExistent)
                 {
-                    ChangeFileName(tempPath.originalPath, path.originalPath);
-                    ChangeFileName(tempPath.thumbnailPath, path.thumbnailPath);
+                    ChangeFileName(tempPath.originalPath, oldPath.originalPath);
+                    ChangeFileName(tempPath.thumbnailPath, oldPath.thumbnailPath);
 
                     return oldFileName;
                 }

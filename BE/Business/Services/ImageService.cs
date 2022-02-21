@@ -15,6 +15,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Business.Services
@@ -53,24 +54,27 @@ namespace Business.Services
         {
             try
             {
-                // Validate properties of image
-                var validateImage = ValidateImage<AccountResource>(imageStream);
-                if (!validateImage.isSuccess)
-                    return validateImage.result;
+                using (var rawImage = Image.FromStream(imageStream))
+                {
+                    var fileExtension = GetFilenameExtension(rawImage.RawFormat);
 
-                // Validate Id is existent?
-                var tempAccount = await _accountRepository.GetByIdAsync(accountId);
-                if (tempAccount is null)
-                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Id_NoData"]);
+                    // Validate properties of image
+                    var validateImage = ValidateImage<AccountResource>(imageStream, fileExtension);
+                    if (!validateImage.isSuccess)
+                        return validateImage.result;
 
-                // Path of image
-                var path = GetRootPath(tempAccount.UserName);
+                    // Validate Id is existent?
+                    var tempAccount = await _accountRepository.GetByIdAsync(accountId);
+                    if (tempAccount is null)
+                        return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Id_NoData"]);
 
-                tempAccount.Avatar = Initialize(CheckExistentAvatar(tempAccount.Avatar), tempAccount.UserName, imageStream);
+                    string avatarFileName = CreateFileName(tempAccount.UserName);
+                    tempAccount.Avatar = Initialize(tempAccount.Avatar, avatarFileName, rawImage);
 
-                await _unitOfWork.CompleteAsync();
+                    await _unitOfWork.CompleteAsync();
 
-                return new BaseResponse<AccountResource>(_mapper.Map<AccountResource>(tempAccount));
+                    return new BaseResponse<AccountResource>(_mapper.Map<AccountResource>(tempAccount));
+                }
             }
             catch (Exception ex)
             {
@@ -82,24 +86,27 @@ namespace Business.Services
         {
             try
             {
-                // Validate properties of image
-                var validateImage = ValidateImage<PersonResource>(imageStream);
-                if (!validateImage.isSuccess)
-                    return validateImage.result;
+                using (var rawImage = Image.FromStream(imageStream))
+                {
+                    var fileExtension = GetFilenameExtension(rawImage.RawFormat);
 
-                // Validate Id is existent?
-                var tempPerson = await _personRepository.GetByIdAsync(personId);
-                if (tempPerson is null)
-                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
+                    // Validate properties of image
+                    var validateImage = ValidateImage<PersonResource>(imageStream, fileExtension);
+                    if (!validateImage.isSuccess)
+                        return validateImage.result;
 
-                // Path of image
-                var path = GetRootPath(tempPerson.StaffId);
+                    // Validate Id is existent?
+                    var tempPerson = await _personRepository.GetByIdAsync(personId);
+                    if (tempPerson is null)
+                        return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
 
-                tempPerson.Avatar = Initialize(CheckExistentAvatar(tempPerson.Avatar), tempPerson.StaffId, imageStream);
+                    string avatarFileName = CreateFileName(tempPerson.StaffId);
+                    tempPerson.Avatar = Initialize(tempPerson.Avatar, avatarFileName, rawImage);
 
-                await _unitOfWork.CompleteAsync();
+                    await _unitOfWork.CompleteAsync();
 
-                return new BaseResponse<PersonResource>(_mapper.Map<PersonResource>(tempPerson));
+                    return new BaseResponse<PersonResource>(_mapper.Map<PersonResource>(tempPerson));
+                }
             }
             catch (Exception ex)
             {
@@ -108,48 +115,61 @@ namespace Business.Services
         }
 
         #region Private work
+        private static string CreateFileName(string avatarName)
+            => $"{avatarName}-{Guid.NewGuid()}.jpg";
+
+        private static string GetFilenameExtension(ImageFormat imageFormat)
+        {
+            return ImageCodecInfo.GetImageEncoders()
+                         .First(x => x.FormatID == imageFormat.Guid)
+                         .FilenameExtension
+                         .Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                         .FirstOrDefault()
+                         .Trim(new[] { '*', '.' });
+        }
+
         private static bool CheckExistentAvatar(string avatarName)
             => (string.IsNullOrEmpty(avatarName) || avatarName.Equals("default.jpg")) ? false : true;
 
-        private string Initialize(bool isExistent, string avatarName, Stream imageStream)
+        private string Initialize(string oldFileName, string newFileName, Image rawImage)
         {
             string defaultName = "default.jpg";
-            string originalName = string.Format($"{avatarName}.jpg");
 
             try
             {
-                var path = GetRootPath(avatarName);
-                var tempPath = GetTemporaryPath();
+                bool isExistent = CheckExistentAvatar(oldFileName);
+                var newPath = GetRootPath(newFileName);
+
+                var oldPath = GetRootPath(oldFileName);
+                var tempPath = GetTemporaryPath(oldFileName);
 
                 // Change file name if it's existent
                 if (isExistent)
                 {
-                    bool isSuccessChangeFileName = false;
-                    isSuccessChangeFileName = ChangeFileName(path.originalPath, tempPath.originalPath);
-                    isSuccessChangeFileName = ChangeFileName(path.thumbnailPath, tempPath.thumbnailPath);
+                    bool isSuccesschangefilename = false;
+                    isSuccesschangefilename = ChangeFileName(oldPath.originalPath, tempPath.originalPath);
+                    isSuccesschangefilename = ChangeFileName(oldPath.thumbnailPath, tempPath.thumbnailPath);
 
-                    if (!isSuccessChangeFileName)
+                    if (!isSuccesschangefilename)
                         return defaultName;
                 }
 
-                bool isSuccess = SetThumbnails(imageStream, path.originalPath, path.thumbnailPath);
+                bool isSuccess = SetThumbnails(rawImage, newPath.originalPath, newPath.thumbnailPath);
 
-                if (isSuccess)
+                if (isSuccess && isExistent)
                 {
                     DeletePhotoIfExist(tempPath.originalPath);
                     DeletePhotoIfExist(tempPath.thumbnailPath);
-
-                    return originalName;
                 }
                 else if (isExistent)
                 {
-                    ChangeFileName(tempPath.originalPath, path.originalPath);
-                    ChangeFileName(tempPath.thumbnailPath, path.thumbnailPath);
+                    ChangeFileName(tempPath.originalPath, oldPath.originalPath);
+                    ChangeFileName(tempPath.thumbnailPath, oldPath.thumbnailPath);
 
-                    return originalName;
+                    return oldFileName;
                 }
 
-                return defaultName;
+                return newFileName;
             }
             catch
             {
@@ -157,25 +177,25 @@ namespace Business.Services
             }
         }
 
-        private (string thumbnailPath, string originalPath) GetRootPath(string avatarName)
+        private (string thumbnailPath, string originalPath) GetRootPath(string avatarFileName)
         {
-            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{avatarName}.jpg");
+            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{avatarFileName}");
             string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
 
-            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{avatarName}.jpg");
+            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{avatarFileName}");
             string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
 
             return (rootThumbnailPath, rootOriginalPath);
         }
 
-        private (string thumbnailPath, string originalPath) GetTemporaryPath()
+        private (string thumbnailPath, string originalPath) GetTemporaryPath(string avatarFileName)
         {
             var guid = Guid.NewGuid().ToString();
 
-            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{guid}.jpg");
+            string originalPath = string.Format($"{_hostResource.OriginalImagePath}{guid}{avatarFileName}");
             string rootOriginalPath = string.Concat(_env.WebRootPath, originalPath);
 
-            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{guid}.jpg");
+            string thumbnailPath = string.Format($"{_hostResource.ThumbnailImagePath}{guid}{avatarFileName}");
             string rootThumbnailPath = string.Concat(_env.WebRootPath, thumbnailPath);
 
             return (rootThumbnailPath, rootOriginalPath);
@@ -201,18 +221,15 @@ namespace Business.Services
             return true;
         }
 
-        private bool SetThumbnails(Stream imageStream, string originalPath, string thumbnailPath)
+        private bool SetThumbnails(Image rawImage, string originalPath, string thumbnailPath)
         {
             try
             {
-                using (var rawImage = Image.FromStream(imageStream))
-                {
-                    // Set Correct Orientation
-                    SetCorrectOrientation(rawImage);
+                // Set Correct Orientation
+                SetCorrectOrientation(rawImage);
 
-                    CreateAndSaveImage(rawImage, 500, originalPath);
-                    CreateAndSaveImage(rawImage, 100, thumbnailPath);
-                }
+                CreateAndSaveImage(rawImage, 500, originalPath);
+                CreateAndSaveImage(rawImage, 100, thumbnailPath);
 
                 return true;
             }
@@ -266,7 +283,7 @@ namespace Business.Services
 
             using (var bitmap = ResizeImage(image, thumbnailSize.Width, thumbnailSize.Height))
             {
-                bitmap.Save($"{imagePath}", ImageFormat.Jpeg);
+                bitmap.Save(imagePath, ImageFormat.Jpeg);
             }
         }
 
@@ -290,21 +307,21 @@ namespace Business.Services
 
         private Bitmap ResizeImage(Image image, int width, int height)
         {
-            var result = new Bitmap(width, height);
+            var bitmapResult = new Bitmap(width, height);
 
-            using (var graphics = Graphics.FromImage(result))
+            using (var graphics = Graphics.FromImage(bitmapResult))
             {
                 graphics.CompositingQuality = CompositingQuality.HighQuality;
                 graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
 
-                graphics.DrawImage(image, 0, 0, result.Width, result.Height);
+                graphics.DrawImage(image, 0, 0, bitmapResult.Width, bitmapResult.Height);
             }
 
-            return result;
+            return bitmapResult;
         }
 
-        private (bool isSuccess, BaseResponse<T> result) ValidateImage<T>(Stream imageStream)
+        private (bool isSuccess, BaseResponse<T> result) ValidateImage<T>(Stream imageStream, string imageFormat)
         {
             List<string> messages = new();
 
@@ -313,28 +330,24 @@ namespace Business.Services
                 messages.Add(ResponseMessage.Values["Image_NoData"]);
             if (imageStream?.Length > 5242880) // 5 MB
                 messages.Add(ResponseMessage.Values["Image_Bigger_Error"]);
-
-            using (var rawImage = Image.FromStream(imageStream))
-            {
-                if (!ValidateImageFormat(rawImage))
-                    messages.Add(ResponseMessage.Values["Image_Format_Error"]);
-            }
+            if (!ValidateImageFormat(imageFormat))
+                messages.Add(ResponseMessage.Values["Image_Format_Error"]);
 
             return messages.Count == 0 ? (true, null) : (false, new BaseResponse<T>(messages));
         }
 
-        private static bool ValidateImageFormat(Image image)
+        private static bool ValidateImageFormat(string imageFormat)
         {
-            if (ImageFormat.Jpeg.Equals(image.RawFormat))
+            if (imageFormat.Equals("JPG"))
                 return true;
 
-            if (ImageFormat.Png.Equals(image.RawFormat))
+            if (imageFormat.Equals("PNG"))
                 return true;
 
-            if (ImageFormat.Gif.Equals(image.RawFormat))
+            if (imageFormat.Equals("GIF"))
                 return true;
 
-            if (ImageFormat.Bmp.Equals(image.RawFormat))
+            if (imageFormat.Equals("BMP"))
                 return true;
 
             return false;

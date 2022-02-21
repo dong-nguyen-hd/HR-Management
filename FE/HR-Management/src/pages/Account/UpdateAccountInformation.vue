@@ -156,7 +156,7 @@ export default defineComponent({
               message: resultUpdateImage.message[0],
             });
             return null;
-          } else {
+          } else if (resultUpdateImage.success) {
             resultUpdateInfor.resource.avatar =
               resultUpdateImage.resource.avatar;
             this.setInformation(resultUpdateInfor.resource);

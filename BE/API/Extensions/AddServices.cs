@@ -49,7 +49,7 @@ namespace API.Extensions
 
             services.AddScoped<ITokenRepository, TokenRepository>();
 
-            services.AddScoped<IImageService, ImageCrossPlatformService>();
+            services.AddScoped<IImageService, ImageService>(); // ImageCrossPlatformService (use for other OSs except Windows)
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
