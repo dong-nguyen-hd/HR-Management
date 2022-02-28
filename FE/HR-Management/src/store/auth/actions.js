@@ -1,4 +1,17 @@
 import { api } from "src/boot/axios";
+import jwt_decode from "jwt-decode";
+
+export const validateToken = async ({ dispatch, getters }) => {
+  let token = getters.getToken.accessToken;
+  let { exp } = jwt_decode(token);
+  let timeUntilRefresh = exp - Date.now() / 1000;
+
+  let result = false;
+  if (timeUntilRefresh < 30) result = await dispatch("useRefreshToken");
+  else return true;
+
+  return result;
+};
 
 export const login = async ({ commit, dispatch }, payload) => {
   let resource = payload.resource;
@@ -22,20 +35,22 @@ export const logOut = async ({ commit, dispatch, getters }) => {
     refreshToken: tempToken.refreshToken,
   };
 
-  let result = await api.post(`/api/v1/token/logout`, payload).then((response) => {
-    return response.data;
-  })
-  .catch(function (error) {
-    // Checking if throw error
-    if (error.response) {
-      // Server response
-      return error.response.data;
-    } else {
-      // Server not working
-      let temp = { success: false, message: ["Server Error!"] };
-      return temp;
-    }
-  });
+  let result = await api
+    .post(`/api/v1/token/logout`, payload)
+    .then((response) => {
+      return response.data;
+    })
+    .catch(function (error) {
+      // Checking if throw error
+      if (error.response) {
+        // Server response
+        return error.response.data;
+      } else {
+        // Server not working
+        let temp = { success: false, message: ["Server Error!"] };
+        return temp;
+      }
+    });
 
   localStorage.removeItem("hraccounttoken");
   localStorage.removeItem("hraccountid");
@@ -100,6 +115,9 @@ export const useRefreshToken = async ({ dispatch, commit }) => {
     localStorage.setItem("hraccounttoken", JSON.stringify(result.resource));
 
     commit("setToken", result.resource);
+    dispatch("setHeaderJWT");
+  } else {
+    commit("removeToken");
     dispatch("setHeaderJWT");
   }
 

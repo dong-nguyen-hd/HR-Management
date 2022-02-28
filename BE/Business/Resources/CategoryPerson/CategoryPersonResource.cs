@@ -18,6 +18,10 @@ namespace Business.Resources.CategoryPerson
         public int CategoryId { get; set; }
 
         [Required]
+        [Display(Name = "Category Name")]
+        public string CategoryName { get; set; }
+
+        [Required]
         public List<TechnologyResource> Technology { get; set; } = new List<TechnologyResource>();
     }
 }

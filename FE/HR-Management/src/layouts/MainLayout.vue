@@ -77,32 +77,38 @@
       class="bg-primary"
     >
       <!-- drawer content -->
-      <div class="q-py-md bg-primary text-white">
-        <q-list style="max-width: 318px">
-          <q-item clickable v-ripple>
-            <q-item-section avatar>
-              <q-icon color="text" name="bluetooth" />
-            </q-item-section>
+      <div class="left-side-bar bg-primary">
+        <q-list dark separator>
+            <q-item
+              clickable
+              v-ripple
+              to="/list-employee"
+              exact
+              active-class="isActive"
+              class="q-pl-lg"
+            >
+              <q-item-section avatar>
+                <q-icon name="fas fa-list" />
+              </q-item-section>
+              <q-item-section>List employee</q-item-section>
+            </q-item>
 
-            <q-item-section>Icon as avatar</q-item-section>
-          </q-item>
+            <q-item
+              @click="isShowInfor = false"
+              clickable
+              v-ripple
+              to="/change-password"
+              exact
+              active-class="isActive"
+              class="q-pl-lg"
+            >
+              <q-item-section avatar>
+                <q-icon name="fas fa-key" />
+              </q-item-section>
+              <q-item-section>Change password</q-item-section>
+            </q-item>
 
-          <q-item clickable v-ripple>
-            <q-item-section avatar>
-              <q-icon color="text" name="bluetooth" />
-            </q-item-section>
-
-            <q-item-section>Icon as avatar</q-item-section> </q-item
-          ><q-item clickable v-ripple>
-            <q-item-section avatar>
-              <q-icon color="text" name="bluetooth" />
-            </q-item-section>
-
-            <q-item-section>Icon as avatar</q-item-section>
-          </q-item>
-
-          <q-separator class="bg-grey-7" />
-        </q-list>
+          </q-list>
       </div>
     </q-drawer>
 

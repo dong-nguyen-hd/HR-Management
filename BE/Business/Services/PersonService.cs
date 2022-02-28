@@ -65,7 +65,7 @@ namespace Business.Services
         {
             // Validate Id is existent?
             var tempPerson = await _personRepository.GetByIdAsync(id);
-            if(tempPerson is null)
+            if (tempPerson is null)
                 return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
 
             // Validate LocationId is existent?

@@ -10,9 +10,9 @@ const routes = [
     meta: { requireLogin: true },
     children: [
       {
-        name: "Index",
-        path: "/index",
-        component: () => import("pages/Index.vue"),
+        name: "List Employee",
+        path: "/list-employee",
+        component: () => import("src/pages/Employee/ListEmployee.vue"),
       },
       {
         name: "Update Personal Information",

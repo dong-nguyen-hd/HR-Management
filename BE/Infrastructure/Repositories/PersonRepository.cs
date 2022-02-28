@@ -28,10 +28,12 @@ namespace Infrastructure.Repositories
                 .Include(y => y.Location)
                 .Include(y => y.WorkHistories.Where(z => z.Status))
                 .Include(y => y.CategoryPersons.Where(z => z.Status))
+                .ThenInclude(z => z.Category)
                 .Include(y => y.Educations.Where(z => z.Status))
                 .Include(y => y.Certificates.Where(z => z.Status))
                 .Include(y => y.Projects.Where(z => z.Status))
                 .AsNoTracking()
+                .AsSplitQuery()
                 .ToListAsync();
         }
 

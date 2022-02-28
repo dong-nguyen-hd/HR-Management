@@ -142,7 +142,7 @@ export default defineComponent({
     };
   },
   methods: {
-    ...mapActions("auth", ["useRefreshToken", "logOut"]),
+    ...mapActions("auth", ["validateToken", "logOut"]),
 
     async save() {
       try {
@@ -155,7 +155,7 @@ export default defineComponent({
         }
 
         this.loadingSave = true;
-        let isAuth = await this.useRefreshToken();
+        let isAuth = await this.validateToken();
 
         if (isAuth) {
           let result = await this.requestChangePassword();
@@ -182,7 +182,6 @@ export default defineComponent({
           this.$router.replace("/login");
         }
       } catch (ex) {
-        console.log("Test:", ex);
         this.$q.notify({
           type: "negative",
           message: `Saving error!`,

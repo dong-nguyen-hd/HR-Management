@@ -146,7 +146,7 @@ export default {
 
         if (result.success) {
           await this.login(result);
-          this.$router.replace("/index");
+          this.$router.replace("/list-employee");
         } else {
           this.$q.notify({
             type: "negative",
@@ -162,15 +162,22 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated'])
+    ...mapGetters("auth", ["isAuthenticated"]),
   },
   created() {
     if (this.isAuthenticated) {
-      this.$router.replace("/index");
+      this.$router.replace("/list-employee");
     }
   },
   mounted() {
     const $q = useQuasar();
+  },
+  watch: {
+    isAuthenticated: function () {
+      if (this.isAuthenticated) {
+        this.$router.replace("/list-employee");
+      }
+    },
   },
 };
 </script>

@@ -54,11 +54,11 @@ namespace Business.Services
 
         public virtual async Task<BaseResponse<Response>> InsertAsync(Insert insertResource)
         {
-            // Mapping Resource to Entity
-            var tempEntity = Mapper.Map<Insert, Entity>(insertResource);
-            
             try
             {
+                // Mapping Resource to Entity
+                var tempEntity = Mapper.Map<Insert, Entity>(insertResource);
+
                 var personId = (int)tempEntity.GetType().GetProperty("PersonId").GetValue(tempEntity);
                 int orderIndex = await _baseRepository.MaximumOrderIndexAsync(personId);
                 tempEntity.GetType().GetProperty("OrderIndex").SetValue(tempEntity, orderIndex);
@@ -79,13 +79,13 @@ namespace Business.Services
 
         public virtual async Task<BaseResponse<Response>> RemoveAsync(int id)
         {
-            // Validate Id is existent?
-            var tempEntity = await _baseRepository.GetByIdAsync(id);
-            if (tempEntity is null)
-                return new BaseResponse<Response>(ResponseMessage.Values["Id_NoData"]);
-
             try
             {
+                // Validate Id is existent?
+                var tempEntity = await _baseRepository.GetByIdAsync(id);
+                if (tempEntity is null)
+                    return new BaseResponse<Response>(ResponseMessage.Values["Id_NoData"]);
+
                 // Change property Status: true -> false
                 PropertyInfo prop = tempEntity.GetType().GetProperty("Status");
                 prop.SetValue(tempEntity, false);
@@ -118,7 +118,7 @@ namespace Business.Services
                 // Mapping
                 var resource = Mapper.Map<IEnumerable<Entity>, IEnumerable<Response>>(tempEntity);
 
-                return new DeleteResponse<IEnumerable<Response>> (ids.Count, totalDeleted, resource);
+                return new DeleteResponse<IEnumerable<Response>>(ids.Count, totalDeleted, resource);
             }
             catch (Exception ex)
             {
@@ -128,15 +128,15 @@ namespace Business.Services
 
         public virtual async Task<BaseResponse<Response>> UpdateAsync(int id, Update updateResource)
         {
-            // Validate Id is existent?
-            var tempEntity = await _baseRepository.GetByIdAsync(id);
-            if (tempEntity is null)
-                return new BaseResponse<Response>(ResponseMessage.Values["NoData"]);
-            // Update infomation
-            Mapper.Map(updateResource, tempEntity);
-
             try
             {
+                // Validate Id is existent?
+                var tempEntity = await _baseRepository.GetByIdAsync(id);
+                if (tempEntity is null)
+                    return new BaseResponse<Response>(ResponseMessage.Values["NoData"]);
+                // Update infomation
+                Mapper.Map(updateResource, tempEntity);
+
                 await UnitOfWork.CompleteAsync();
                 // Mapping
                 var resource = Mapper.Map<Entity, Response>(tempEntity);
@@ -151,17 +151,17 @@ namespace Business.Services
 
         public virtual async Task<BaseResponse<Response>> SwapAsync(SwapResource swapResource)
         {
-            // Validate Id duplicate
-            if (swapResource.CurrentId == swapResource.TurnedId)
-                return new BaseResponse<Response>(ResponseMessage.Values["Swap_Id_Invalid"]);
-            // Validate Id is existent?
-            var currentEntity = await _baseRepository.GetByIdAsync(swapResource.CurrentId);
-            var turnedEntity = await _baseRepository.GetByIdAsync(swapResource.TurnedId);
-            if (currentEntity is null || turnedEntity is null)
-                return new BaseResponse<Response>(ResponseMessage.Values["NoData"]);
-
             try
             {
+                // Validate Id duplicate
+                if (swapResource.CurrentId == swapResource.TurnedId)
+                    return new BaseResponse<Response>(ResponseMessage.Values["Swap_Id_Invalid"]);
+                // Validate Id is existent?
+                var currentEntity = await _baseRepository.GetByIdAsync(swapResource.CurrentId);
+                var turnedEntity = await _baseRepository.GetByIdAsync(swapResource.TurnedId);
+                if (currentEntity is null || turnedEntity is null)
+                    return new BaseResponse<Response>(ResponseMessage.Values["NoData"]);
+
                 var currentEntityValue = (int)currentEntity.GetType().GetProperty("PersonId").GetValue(currentEntity);
                 var turnedEntityValue = (int)turnedEntity.GetType().GetProperty("PersonId").GetValue(turnedEntity);
 

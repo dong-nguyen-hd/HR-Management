@@ -118,7 +118,7 @@ export default defineComponent({
     };
   },
   methods: {
-    ...mapActions("auth", ["useRefreshToken"]),
+    ...mapActions("auth", ["validateToken"]),
     ...mapMutations("auth", ["setInformation"]),
 
     async save() {
@@ -128,7 +128,7 @@ export default defineComponent({
         }
 
         this.loadingSave = true;
-        let isAuth = await this.useRefreshToken();
+        let isAuth = await this.validateToken();
 
         if (isAuth) {
           let [resultUpdateImage, resultUpdateInfor] = await Promise.all([
