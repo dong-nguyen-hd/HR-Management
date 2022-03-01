@@ -18,7 +18,7 @@
         <div class="information q-pl-md" @click="isShowInfor = !isShowInfor">
           <div class="user-name q-mr-md">{{ showName }}</div>
           <div class="avatar q-mr-sm">
-            <q-avatar size="36px">
+            <q-avatar size="38px">
               <img :src="getInformation.avatar.thumbnail" />
             </q-avatar>
           </div>
@@ -169,10 +169,6 @@ export default defineComponent({
   -webkit-transition: all 0.4s;
   -o-transition: all 0.4s;
   -moz-transition: all 0.4s;
-  .avatar {
-    border-radius: 50%;
-    border: solid 2px #fff;
-  }
   .user-name {
     font-size: 18px;
   }

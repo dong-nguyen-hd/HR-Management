@@ -111,10 +111,10 @@ namespace Business.Services
             }
         }
 
-        public async Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, int? locationId = null)
+        public async Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource)
         {
             var totalTechnology = await _technologyService.GetAllAsync();
-            var paginationPerson = await _personRepository.GetPaginationAsync(pagination, locationId);
+            var paginationPerson = await _personRepository.GetPaginationAsync(pagination, filterResource);
             var totalRecords = await _personRepository.TotalRecordAsync();
 
             // Mapping

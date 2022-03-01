@@ -10,6 +10,6 @@ namespace Business.Domain.Services
     public interface IPersonService : IBaseService<PersonResource, CreatePersonResource, UpdatePersonResource, Person>
     {
         Task<BaseResponse<PersonResource>> AssignComponentAsync(int id, ComponentResource component);
-        Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, int? locationId = null);
+        Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Business.Domain.Models;
 using Business.Domain.Repositories;
+using Business.Extensions;
 using Business.Resources;
+using Business.Resources.Person;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -16,12 +18,25 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        public async Task<IEnumerable<Person>> GetPaginationAsync(QueryResource pagination, int? locationId = null)
+        public async Task<IEnumerable<Person>> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource)
         {
             var queryable = Context.People.OrderBy(x => x.Id).Where(x => x.Status);
 
-            if (locationId != null)
-                queryable.Where(x => x.LocationId == locationId);
+            if (filterResource != null)
+            {
+                if (!string.IsNullOrEmpty(filterResource.StaffId))
+                    queryable.Where(x => x.StaffId.Equals(filterResource.StaffId.RemoveSpaceCharacter()));
+
+                if (filterResource.LocationId != null)
+                    queryable.Where(x => x.LocationId.Equals(filterResource.LocationId));
+
+                if (!string.IsNullOrEmpty(filterResource.FullName))
+                {
+                    string fullName = filterResource.FullName.RemoveSpaceCharacter();
+                    queryable.Where(x => x.FirstName.Contains(fullName) || x.LastName.Contains(fullName));
+                }
+            }
+                
 
             return await queryable.Skip((pagination.Page - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)

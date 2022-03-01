@@ -7,9 +7,6 @@
         </div>
 
         <q-table
-          card-class="bg-accent text-black"
-          table-class="text-white bg-primary"
-          table-header-class="text-black"
           class="table-content"
           :rows="listEmployee"
           :columns="headerTable"
@@ -17,8 +14,123 @@
           flat
           bordered
           dark
-          virtual-scroll
+          :loading="loadingData"
+          v-model:pagination="pagination"
         >
+          <template v-slot:header-cell-staffId="props">
+            <q-th :props="props">
+              <div :style="`min-width: ${widthOfStaffId}`">
+                <q-input
+                  dark
+                  dense
+                  standout
+                  v-model="filter.staffId"
+                  input-class="text-right"
+                  :label="props.col.label"
+                  :label-color="labelColorFocus[0]"
+                  @focus="
+                    labelColorFocus[0] = 'black';
+                    widthOfStaffId = '154px';
+                  "
+                  @blur="
+                    labelColorFocus[0] = 'white';
+                    widthOfStaffId = '110px';
+                  "
+                >
+                  <template v-slot:append>
+                    <q-icon v-if="!filter.staffId" name="search" />
+                    <q-icon
+                      v-else
+                      name="clear"
+                      class="cursor-pointer"
+                      @click="filter.staffId = ''"
+                    />
+                  </template>
+                </q-input>
+              </div>
+            </q-th>
+          </template>
+
+          <template v-slot:header-cell-office="props">
+            <q-th :props="props">
+              <div :style="`width: ${widthOfOffice};`">
+                <q-select
+                  dense
+                  standout
+                  dark
+                  clearable
+                  v-model="filter.locationId"
+                  :options="tempListLocation"
+                  :label="props.col.label"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  @filter="filterFn"
+                  input-debounce="100"
+                  fill-input
+                  hide-selected
+                  use-input
+                  :label-color="labelColorFocus[1]"
+                  @popup-show="
+                    labelColorFocus[1] = 'black';
+                    widthOfOffice = '140px';
+                  "
+                  @popup-hide="
+                    labelColorFocus[1] = 'white';
+                    widthOfOffice = !filter.locationId ? '100px' : '140px';
+                  "
+                  @clear="
+                    labelColorFocus[1] = 'white';
+                    widthOfOffice = '100px';
+                  "
+                  ><template v-slot:no-option>
+                    <q-item>
+                      <q-item-section class="text-grey">
+                        No results
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+            </q-th>
+          </template>
+
+          <template v-slot:header-cell-fullName="props">
+            <q-th :props="props">
+              <div :style="`min-width: ${widthOfFullName};`">
+                <q-input
+                  dark
+                  dense
+                  standout
+                  v-model="filter.fullName"
+                  input-class="text-right"
+                  :label="props.col.label"
+                  :label-color="labelColorFocus[2]"
+                  @focus="
+                    labelColorFocus[2] = 'black';
+                    widthOfFullName = '150px';
+                  "
+                  @blur="
+                    labelColorFocus[2] = 'white';
+                    widthOfFullName = '130px';
+                  "
+                >
+                  <template v-slot:append>
+                    <q-icon v-if="!filter.fullName" name="search" />
+                    <q-icon
+                      v-else
+                      name="clear"
+                      class="cursor-pointer"
+                      @click="filter.fullName = ''"
+                    />
+                  </template>
+                </q-input>
+              </div>
+            </q-th>
+          </template>
+
           <template v-slot:body-cell-avatar="props">
             <q-td :props="props">
               <q-avatar>
@@ -27,19 +139,63 @@
             </q-td>
           </template>
 
+          <template v-slot:body-cell-action="props">
+            <q-td :props="props">
+              <div>
+                <q-btn
+                  style="width: 60px"
+                  dense
+                  color="white"
+                  text-color="black"
+                  label="Edit"
+                />
+              </div>
+              <div class="q-mt-sm">
+                <q-btn
+                  style="width: 60px"
+                  dense
+                  color="negative"
+                  label="delete"
+                />
+              </div>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-fullName="props">
+            <q-td :props="props">
+              {{ showName(props.value) }}
+            </q-td>
+          </template>
+
           <template v-slot:body-cell-skill="props">
             <q-td :props="props">
               <div v-if="props.value.length">
                 <div v-for="(item, index) in props.value" :key="index">
-                   <q-badge :color="index % 2 == 0 ? 'blue-10' : 'teal-8' ">
-                    <span>{{ props?.value[index].categoryName }}:</span>
+                  <q-badge :color="index % 2 == 0 ? 'blue-10' : 'teal-8'">
+                    <span style="font-size: 14px;">{{ props?.value[index].categoryName }}:</span>
                   </q-badge>
-                 <span>
-                    {{ props?.value[index]?.technology[0]?.name?` ${props?.value[index]?.technology[0]?.name},`:'' }}{{ props?.value[index]?.technology[1]?.name?` ${props?.value[index]?.technology[1]?.name},`:'' }}{{ props?.value[index]?.technology[2]?.name?` ${props?.value[index]?.technology[2]?.name},`:'' }}...
+                  <span>
+                    {{
+                      props?.value[index]?.technology[0]?.name
+                        ? ` ${props?.value[index]?.technology[0]?.name},`
+                        : ""
+                    }}{{
+                      props?.value[index]?.technology[1]?.name
+                        ? ` ${props?.value[index]?.technology[1]?.name},`
+                        : ""
+                    }}{{
+                      props?.value[index]?.technology[2]?.name
+                        ? ` ${props?.value[index]?.technology[2]?.name},`
+                        : ""
+                    }}...
                   </span>
                 </div>
               </div>
             </q-td>
+          </template>
+
+          <template v-slot:loading>
+            <q-inner-loading showing color="primary" />
           </template>
         </q-table>
       </div>
@@ -58,22 +214,40 @@ export default defineComponent({
 
   data() {
     return {
+      labelColorFocus: ["white", "white", "white"],
+
+      widthOfStaffId: "110px",
+      widthOfOffice: "100px",
+      widthOfFullName: "130px",
+
+      loadingData: false,
+
+      filter: {
+        staffId: null,
+        locationId: null,
+        fullName: null,
+      },
+
       pagination: {
         page: 1,
-        pageSize: 10,
+        rowsPerPage: 10,
+        rowsNumber: 0,
+
         firstPage: 1,
-        lastPage: 0,
-        nextPage: 0,
+        lastPage: null,
+        nextPage: null,
         previousPage: null,
         totalPages: 0,
         totalRecords: 0,
       },
-
+      tempListLocation: [],
+      listLocation: [],
       listEmployee: [],
       headerTable: [
         {
           name: "index",
           label: "#",
+          align: "center",
           field: "index",
         },
         {
@@ -107,10 +281,10 @@ export default defineComponent({
           field: (row) => row.categoryPerson,
         },
         {
-          name: "fullName",
-          align: "left",
+          name: "action",
+          align: "center",
           label: "Actions",
-          field: "Test",
+          field: (row) => row.id,
         },
       ],
     };
@@ -120,14 +294,52 @@ export default defineComponent({
     ...mapMutations("auth", ["setInformation"]),
 
     async getEmployee() {
+      try {
+        this.loadingData = true;
+
+        let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        // Request API
+        let result = await api
+          .get(
+            `/api/v1/person?page=${this.pagination.page}&pageSize=${this.pagination.rowsPerPage}`
+          )
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          this.mappingPagination(result);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } finally {
+        this.loadingData = false;
+      }
+    },
+    async getWithFilter(props) {},
+    async getLocation() {
       let isValid = await this.validateToken();
       if (!isValid) this.$router.replace("/login");
 
       // Request API
       let result = await api
-        .get(
-          `/api/v1/person?page=${this.pagination.page}&pageSize=${this.pagination.pageSize}`
-        )
+        .get("/api/v1/location")
         .then((response) => {
           return response.data;
         })
@@ -144,11 +356,7 @@ export default defineComponent({
         });
 
       if (result.success) {
-        this.listEmployee = result.resource;
-
-        this.listEmployee.forEach((row, index) => {
-          row.index = index + 1;
-        });
+        this.listLocation = result.resource;
       } else {
         this.$q.notify({
           type: "negative",
@@ -156,12 +364,46 @@ export default defineComponent({
         });
       }
     },
+    mappingPagination(resource) {
+      this.listEmployee = resource.resource;
+
+      this.listEmployee.forEach((row, index) => {
+        row.index = index + 1;
+      });
+
+      this.pagination.page = resource.page;
+      this.pagination.rowsPerPage = resource.pageSize;
+      this.pagination.rowsNumber = resource.totalRecords;
+
+      this.pagination.firstPage = resource.firstPage;
+      this.pagination.lastPage = resource.lastPage;
+      this.pagination.nextPage = resource.nextPage;
+      this.pagination.previousPage = resource.previousPage;
+      this.pagination.totalPages = resource.totalPages;
+    },
+    showName(text) {
+      if (text.length > 20) return `${texttext.slice(0, 20)}...`;
+      else return text;
+    },
+    filterFn(val, update, abort) {
+      update(() => {
+        if (!val) {
+          this.tempListLocation = this.listLocation;
+        } else {
+          let needle = val.toLowerCase();
+          this.tempListLocation = this.listLocation.filter(
+            (v) => v.name.toLowerCase().indexOf(needle) > -1
+          );
+        }
+      });
+    },
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
   },
   async created() {
     await this.getEmployee();
+    await this.getLocation();
   },
   mounted() {
     const $q = useQuasar();
@@ -170,14 +412,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.table-component {
-  // width: 100%;
-  // height: 100%;
-}
-
 .table-content {
   /* height or max-height is important */
   max-height: 600px;
+  min-height: 200px;
   width: 96%;
 }
 </style>
@@ -194,6 +432,12 @@ export default defineComponent({
   thead tr th {
     position: sticky;
     z-index: 1;
+    font-size: 14px !important;
+    font-family: Poppins-Medium !important;
+  }
+
+  tbody tr td {
+    font-size: 14px !important;
   }
 
   thead tr:first-child th {
@@ -215,21 +459,18 @@ export default defineComponent({
 
 /* Track */
 
-::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px $secondary;
-  border-radius: 10px;
-}
+// ::-webkit-scrollbar-track {
+//   box-shadow: inset 0 0 5px $secondary;
+//   border-radius: 10px;
+// }
 
 /* Handle */
 
 ::-webkit-scrollbar-thumb {
   background: $accent;
-  border-radius: 10px;
 }
 
-/* Handle on hover */
-
-// ::-webkit-scrollbar-thumb:hover {
-//     background: $secondary;
-// }
+::-webkit-scrollbar-corner{
+  background: $secondary;
+}
 </style>

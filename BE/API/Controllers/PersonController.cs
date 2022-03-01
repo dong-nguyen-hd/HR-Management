@@ -71,7 +71,29 @@ namespace API.Controllers
 
             QueryResource pagintation = new QueryResource(page, pageSize);
 
-            var result = await _personService.GetPaginationAsync(pagintation);
+            var result = await _personService.GetPaginationAsync(pagintation, null);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            if (result.Resource is null)
+                return NoContent();
+
+            return Ok(result);
+        }
+
+        [HttpPost("pagination")]
+        [Authorize(Roles = "viewer, editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PersonResource>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PersonResource>>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PersonResource>>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetPaginationWithFilterAsync([FromQuery] int page, [FromQuery] int pageSize, [FromBody] FilterPersonResource filterResource)
+        {
+            Log.Information($"{User.Identity?.Name}: get pagination person.");
+
+            QueryResource pagintation = new QueryResource(page, pageSize);
+
+            var result = await _personService.GetPaginationAsync(pagintation, filterResource);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -104,12 +126,7 @@ namespace API.Controllers
 
             resource.CreatedBy = User.Identity?.Name;
 
-            var result = await _personService.InsertAsync(resource);
-
-            if (result.Success)
-                return StatusCode(201, result);
-
-            return BadRequest(result);
+            return await base.CreateAsync(resource);
         }
 
         [HttpPut("{id:int}")]
@@ -120,12 +137,7 @@ namespace API.Controllers
         {
             Log.Information($"{User.Identity?.Name}: update a person with Id is {id}.");
 
-            var result = await _personService.UpdateAsync(id, resource);
-
-            if (result.Success)
-                return Ok(result);
-
-            return BadRequest(result);
+            return await base.UpdateAsync(id, resource);
         }
 
         [HttpPut("swap/{id:int}")]
