@@ -115,15 +115,14 @@ namespace Business.Services
         {
             var totalTechnology = await _technologyService.GetAllAsync();
             var paginationPerson = await _personRepository.GetPaginationAsync(pagination, filterResource);
-            var totalRecords = await _personRepository.TotalRecordAsync();
 
             // Mapping
-            var tempResource = ConvertPersonResource(totalTechnology.Resource, paginationPerson);
+            var tempResource = ConvertPersonResource(totalTechnology.Resource, paginationPerson.records);
 
             var resource = new PaginationResponse<IEnumerable<PersonResource>>(tempResource);
 
             // Using extension-method for pagination
-            resource.CreatePaginationResponse(pagination, totalRecords);
+            resource.CreatePaginationResponse(pagination, paginationPerson.total);
 
             return resource;
         }

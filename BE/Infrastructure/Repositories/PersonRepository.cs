@@ -18,27 +18,28 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        public async Task<IEnumerable<Person>> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource)
+        public async Task<(IEnumerable<Person> records, int total)> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource)
         {
-            var queryable = Context.People.OrderBy(x => x.Id).Where(x => x.Status);
+            var queryable = Context.People.Where(x => x.Status);
 
             if (filterResource != null)
             {
                 if (!string.IsNullOrEmpty(filterResource.StaffId))
-                    queryable.Where(x => x.StaffId.Equals(filterResource.StaffId.RemoveSpaceCharacter()));
+                    queryable = queryable.Where(x => x.StaffId.Equals(filterResource.StaffId.RemoveSpaceCharacter()));
 
                 if (filterResource.LocationId != null)
-                    queryable.Where(x => x.LocationId.Equals(filterResource.LocationId));
+                    queryable = queryable.Where(x => x.LocationId.Equals(filterResource.LocationId));
 
-                if (!string.IsNullOrEmpty(filterResource.FullName))
+                if (!string.IsNullOrEmpty(filterResource.FirstName))
                 {
-                    string fullName = filterResource.FullName.RemoveSpaceCharacter();
-                    queryable.Where(x => x.FirstName.Contains(fullName) || x.LastName.Contains(fullName));
+                    string fullName = filterResource.FirstName.RemoveSpaceCharacter().ToLower();
+                    queryable = queryable.Where(x => x.FirstName.Contains(fullName));
                 }
             }
-                
 
-            return await queryable.Skip((pagination.Page - 1) * pagination.PageSize)
+            var total = await queryable.CountAsync();
+
+            var records = await queryable.OrderBy(x => x.Id).Skip((pagination.Page - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .Include(y => y.Location)
                 .Include(y => y.WorkHistories.Where(z => z.Status))
@@ -50,6 +51,8 @@ namespace Infrastructure.Repositories
                 .AsNoTracking()
                 .AsSplitQuery()
                 .ToListAsync();
+
+            return (records, total);
         }
 
         public async Task<Person> GetByIdAsync(string staffId)

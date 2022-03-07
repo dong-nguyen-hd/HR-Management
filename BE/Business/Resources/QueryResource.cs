@@ -3,8 +3,8 @@
     public class QueryResource
     {
         #region Property
-        public int Page { get; set; }
-        public int PageSize { get; set; }
+        public int Page { get; }
+        public int PageSize { get; }
         #endregion
 
         #region Constructor

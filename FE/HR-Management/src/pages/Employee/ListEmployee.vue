@@ -1,6 +1,38 @@
 <template>
   <q-page class="full-height full-width flex flex-center">
     <div class="container full-height full-width">
+      <q-dialog v-model="showDelete" :persistent="deleteProcess">
+        <q-card>
+          <q-card-section class="row items-center">
+            <span class="text-h6">Delete {{ getNameDelete }}?</span>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section>
+            <span
+              >This can’t be undone and it will be removed from database.</span
+            >
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn 
+            flat 
+            :disable ="deleteProcess"
+            label="Cancel" 
+            color="primary"
+            v-close-popup />
+            <q-btn
+              flat
+              label="Delete"
+              color="negative"
+              @click="deleteEmployee"
+              :loading="deleteProcess"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
       <div class="table-component full-width flex flex-center">
         <div class="new-item q-mb-md flex justify-end" style="width: 96%">
           <q-btn color="primary" label="New employee" />
@@ -16,11 +48,14 @@
           dark
           :loading="loadingData"
           v-model:pagination="pagination"
+          :rows-per-page-options="[5, 10, 15, 20]"
+          @request="getWithFilter"
         >
           <template v-slot:header-cell-staffId="props">
             <q-th :props="props">
               <div :style="`min-width: ${widthOfStaffId}`">
                 <q-input
+                  @update:model-value="getWithFilter(false)"
                   dark
                   dense
                   standout
@@ -28,6 +63,7 @@
                   input-class="text-right"
                   :label="props.col.label"
                   :label-color="labelColorFocus[0]"
+                  debounce="300"
                   @focus="
                     labelColorFocus[0] = 'black';
                     widthOfStaffId = '154px';
@@ -43,7 +79,10 @@
                       v-else
                       name="clear"
                       class="cursor-pointer"
-                      @click="filter.staffId = ''"
+                      @click="
+                        filter.staffId = '';
+                        getWithFilter(false);
+                      "
                     />
                   </template>
                 </q-input>
@@ -55,6 +94,7 @@
             <q-th :props="props">
               <div :style="`width: ${widthOfOffice};`">
                 <q-select
+                  @update:model-value="getWithFilter(false)"
                   dense
                   standout
                   dark
@@ -84,6 +124,7 @@
                   @clear="
                     labelColorFocus[1] = 'white';
                     widthOfOffice = '100px';
+                    getWithFilter(false);
                   "
                   ><template v-slot:no-option>
                     <q-item>
@@ -101,10 +142,12 @@
             <q-th :props="props">
               <div :style="`min-width: ${widthOfFullName};`">
                 <q-input
+                  @update:model-value="getWithFilter(false)"
                   dark
                   dense
                   standout
-                  v-model="filter.fullName"
+                  debounce="400"
+                  v-model="filter.firstName"
                   input-class="text-right"
                   :label="props.col.label"
                   :label-color="labelColorFocus[2]"
@@ -118,12 +161,15 @@
                   "
                 >
                   <template v-slot:append>
-                    <q-icon v-if="!filter.fullName" name="search" />
+                    <q-icon v-if="!filter.firstName" name="search" />
                     <q-icon
                       v-else
                       name="clear"
                       class="cursor-pointer"
-                      @click="filter.fullName = ''"
+                      @click="
+                        filter.firstName = '';
+                        getWithFilter(false);
+                      "
                     />
                   </template>
                 </q-input>
@@ -156,6 +202,10 @@
                   dense
                   color="negative"
                   label="delete"
+                  @click="
+                    idDelete = props.value;
+                    showDelete = true;
+                  "
                 />
               </div>
             </q-td>
@@ -172,7 +222,9 @@
               <div v-if="props.value.length">
                 <div v-for="(item, index) in props.value" :key="index">
                   <q-badge :color="index % 2 == 0 ? 'blue-10' : 'teal-8'">
-                    <span style="font-size: 14px;">{{ props?.value[index].categoryName }}:</span>
+                    <span style="font-size: 14px"
+                      >{{ props?.value[index].categoryName }}:</span
+                    >
                   </q-badge>
                   <span>
                     {{
@@ -222,23 +274,26 @@ export default defineComponent({
 
       loadingData: false,
 
+      showDelete: false,
+      idDelete: null,
+      deleteProcess: false,
+
       filter: {
         staffId: null,
         locationId: null,
-        fullName: null,
+        firstName: null,
       },
 
       pagination: {
         page: 1,
         rowsPerPage: 10,
-        rowsNumber: 0,
+        rowsNumber: 10, // is total records
 
         firstPage: 1,
         lastPage: null,
         nextPage: null,
         previousPage: null,
         totalPages: 0,
-        totalRecords: 0,
       },
       tempListLocation: [],
       listLocation: [],
@@ -302,8 +357,50 @@ export default defineComponent({
 
         // Request API
         let result = await api
-          .get(
-            `/api/v1/person?page=${this.pagination.page}&pageSize=${this.pagination.rowsPerPage}`
+          .get(`/api/v1/person?page=1&pageSize=10`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          this.mappingPagination(result);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } finally {
+        this.loadingData = false;
+      }
+    },
+    async getWithFilter(props) {
+      try {
+        this.loadingData = true;
+
+        let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        let { page, rowsPerPage } = props
+          ? props.pagination
+          : { page: 1, rowsPerPage: this.pagination.rowsPerPage };
+
+        // Request API
+        let result = await api
+          .post(
+            `/api/v1/person/pagination?page=${page}&pageSize=${rowsPerPage}`,
+            this.filter
           )
           .then((response) => {
             return response.data;
@@ -332,7 +429,6 @@ export default defineComponent({
         this.loadingData = false;
       }
     },
-    async getWithFilter(props) {},
     async getLocation() {
       let isValid = await this.validateToken();
       if (!isValid) this.$router.replace("/login");
@@ -397,9 +493,59 @@ export default defineComponent({
         }
       });
     },
+    async deleteEmployee() {
+      try {
+        this.deleteProcess = true;
+
+        let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        // Request API
+        let result = await api
+          .delete(`/api/v1/person/${this.idDelete}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          await this.getWithFilter(false);
+
+          this.$q.notify({
+            type: "positive",
+            message: "Deleted successfully!",
+          });
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } finally {
+        this.deleteProcess = false;
+        this.showDelete = false;
+      }
+    },
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
+    getNameDelete() {
+      let tempEmployee = this.listEmployee.filter((x) => x.id == this.idDelete);
+
+      let name = tempEmployee[0]?.firstName;
+
+      return name ? this.showName(name) : '';
+    },
   },
   async created() {
     await this.getEmployee();
@@ -457,20 +603,11 @@ export default defineComponent({
   height: 10px;
 }
 
-/* Track */
-
-// ::-webkit-scrollbar-track {
-//   box-shadow: inset 0 0 5px $secondary;
-//   border-radius: 10px;
-// }
-
-/* Handle */
-
 ::-webkit-scrollbar-thumb {
   background: $accent;
 }
 
-::-webkit-scrollbar-corner{
-  background: $secondary;
+::-webkit-scrollbar-corner {
+  background: $grey;
 }
 </style>

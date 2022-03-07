@@ -9,8 +9,8 @@ namespace Business.Resources.Person
         public string StaffId { get; set; }
 
         [MaxLength(500)]
-        [Display(Name = "Full Name")]
-        public string FullName { get; set; }
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
 
         [Display(Name = "Location Id")]
         public int? LocationId { get; set; }
