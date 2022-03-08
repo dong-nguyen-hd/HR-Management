@@ -108,7 +108,7 @@ namespace Business.Services
             try
             {
                 var tempEntity = await _baseRepository.GetWithPrimaryKeyAsync(ids);
-                var totalDeleted = await _baseRepository.RemoveRangeAsync(tempEntity);
+                var totalDeleted = _baseRepository.RemoveRange(tempEntity);
 
                 if (totalDeleted == 0 && ids.Count > 0)
                     return new DeleteResponse<IEnumerable<Response>>(ResponseMessage.Values["Deleting_Error"]);

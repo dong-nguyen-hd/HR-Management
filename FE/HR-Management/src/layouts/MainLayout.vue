@@ -19,7 +19,7 @@
           <div class="user-name q-mr-md">{{ showName }}</div>
           <div class="avatar q-mr-sm">
             <q-avatar size="38px">
-              <img :src="getInformation.avatar.thumbnail" />
+              <img :src="getInformation?.avatar?.thumbnail" />
             </q-avatar>
           </div>
           <div class="role q-mr-sm q-px-sm">
@@ -149,9 +149,9 @@ export default defineComponent({
   computed: {
     ...mapGetters("auth", ["getInformation"]),
     showName() {
-      if (this.getInformation.name.length > 30)
-        return `${this.getInformation.name.slice(0, 30)}...`;
-      else return this.getInformation.name;
+      if (this.getInformation?.name?.length > 30)
+        return `${this.getInformation?.name.slice(0, 30)}...`;
+      else return this.getInformation?.name;
     },
   },
 });

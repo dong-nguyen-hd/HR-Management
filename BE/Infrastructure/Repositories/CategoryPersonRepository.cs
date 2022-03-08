@@ -14,9 +14,10 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        public async Task<bool> ValidateExistent(int personId, int categoryId)
-            => await Context.CategoryPersons.
-            Where(x => x.PersonId.Equals(personId) && x.Id.Equals(categoryId)).SingleOrDefaultAsync() is null ? false : true;
+        public async Task<bool> ValidateExistent(int personId, int categoryId) =>
+            await Context.CategoryPersons
+            .Where(x => x.PersonId.Equals(personId) && x.Id.Equals(categoryId))
+            .SingleOrDefaultAsync() is null ? false : true;
         #endregion
     }
 }

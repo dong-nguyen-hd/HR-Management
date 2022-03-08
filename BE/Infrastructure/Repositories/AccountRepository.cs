@@ -27,16 +27,16 @@ namespace Infrastructure.Repositories
             return await queryable.SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Account>> ListPaginationAsync(QueryResource pagination)
-        => await Context.Accounts.Where(x => x.Status)
+        public async Task<IEnumerable<Account>> ListPaginationAsync(QueryResource pagination) =>
+            await Context.Accounts.Where(x => x.Status)
             .OrderBy(x => x.Id)
             .Skip((pagination.Page - 1) * pagination.PageSize)
             .Take(pagination.PageSize)
             .AsNoTracking()
             .ToListAsync();
 
-        public async Task<int> TotalRecordAsync()
-        => await Context.Accounts.CountAsync(x => x.Status);
+        public async Task<int> TotalRecordAsync() =>
+            await Context.Accounts.CountAsync(x => x.Status);
 
         public async Task<Account> ValidateCredentialsAsync(LoginResource loginResource)
         {
@@ -67,8 +67,8 @@ namespace Infrastructure.Repositories
         /// <item>False: invalid</item>
         /// </list>
         /// </returns>
-        public async Task<bool> ValidateUserNameAsync(string userName)
-        => !await Context.Accounts.Where(x => x.UserName == userName).AnyAsync();
+        public async Task<bool> ValidateUserNameAsync(string userName) =>
+            !await Context.Accounts.Where(x => x.UserName == userName).AnyAsync();
         #endregion
     }
 }

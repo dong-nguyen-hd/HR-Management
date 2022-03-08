@@ -55,8 +55,8 @@ namespace Infrastructure.Repositories
             return (records, total);
         }
 
-        public async Task<Person> GetByIdAsync(string staffId)
-            => await Context.People
+        public async Task<Person> GetByIdAsync(string staffId) =>
+            await Context.People
                 .Include(y => y.Location)
                 .Include(y => y.WorkHistories.Where(z => z.Status))
                 .Include(y => y.CategoryPersons.Where(z => z.Status))
@@ -66,8 +66,8 @@ namespace Infrastructure.Repositories
                 .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.Status && x.StaffId == staffId);
 
-        public async Task<int> TotalRecordAsync()
-            => await Context.People.CountAsync(x => x.Status);
+        public async Task<int> TotalRecordAsync() =>
+            await Context.People.CountAsync(x => x.Status);
         #endregion
     }
 }

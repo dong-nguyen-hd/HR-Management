@@ -16,12 +16,13 @@
           </q-card-section>
 
           <q-card-actions align="right">
-            <q-btn 
-            flat 
-            :disable ="deleteProcess"
-            label="Cancel" 
-            color="primary"
-            v-close-popup />
+            <q-btn
+              flat
+              :disable="deleteProcess"
+              label="Cancel"
+              color="primary"
+              v-close-popup
+            />
             <q-btn
               flat
               label="Delete"
@@ -33,9 +34,9 @@
         </q-card>
       </q-dialog>
 
-      <div class="table-component full-width flex flex-center">
+      <div class="table-component full-height full-width flex flex-center">
         <div class="new-item q-mb-md flex justify-end" style="width: 96%">
-          <q-btn color="primary" label="New employee" />
+          <q-btn to="/new-employee" color="primary" label="New employee" />
         </div>
 
         <q-table
@@ -346,14 +347,10 @@ export default defineComponent({
   },
   methods: {
     ...mapActions("auth", ["useRefreshToken", "validateToken"]),
-    ...mapMutations("auth", ["setInformation"]),
 
     async getEmployee() {
       try {
         this.loadingData = true;
-
-        let isValid = await this.validateToken();
-        if (!isValid) this.$router.replace("/login");
 
         // Request API
         let result = await api
@@ -430,9 +427,6 @@ export default defineComponent({
       }
     },
     async getLocation() {
-      let isValid = await this.validateToken();
-      if (!isValid) this.$router.replace("/login");
-
       // Request API
       let result = await api
         .get("/api/v1/location")
@@ -538,18 +532,19 @@ export default defineComponent({
     },
   },
   computed: {
-    ...mapGetters("auth", ["getInformation"]),
     getNameDelete() {
       let tempEmployee = this.listEmployee.filter((x) => x.id == this.idDelete);
 
       let name = tempEmployee[0]?.firstName;
 
-      return name ? this.showName(name) : '';
+      return name ? this.showName(name) : "";
     },
   },
   async created() {
-    await this.getEmployee();
-    await this.getLocation();
+    let isValid = await this.validateToken();
+    if (!isValid) this.$router.replace("/login");
+
+    await Promise.all([this.getEmployee(), this.getLocation()]);
   },
   mounted() {
     const $q = useQuasar();
@@ -558,11 +553,16 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.table-content {
-  /* height or max-height is important */
-  max-height: 600px;
-  min-height: 200px;
-  width: 96%;
+.container {
+  position: relative;
+  .table-component {
+    position: relative;
+    .table-content {
+      /* height or max-height is important */
+      height: 600px;
+      width: 96%;
+    }
+  }
 }
 </style>
 
@@ -577,7 +577,7 @@ export default defineComponent({
 
   thead tr th {
     position: sticky;
-    z-index: 1;
+    z-index: 99;
     font-size: 14px !important;
     font-family: Poppins-Medium !important;
   }
@@ -593,7 +593,7 @@ export default defineComponent({
   /* this is when the loading indicator appears */
   &.q-table--loading thead tr:last-child th {
     /* height of all previous header rows */
-    top: 48px;
+    top: 0;
   }
 }
 

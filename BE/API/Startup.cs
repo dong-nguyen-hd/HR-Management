@@ -38,7 +38,6 @@ namespace API
 
         #region Property
         public IConfiguration Configuration { get; }
-        public static string WebHost { get; private set; }
         public static JwtConfig JwtConfig { get; private set; }
         #endregion
 

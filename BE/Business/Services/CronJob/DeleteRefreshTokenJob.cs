@@ -61,7 +61,7 @@ namespace Business.Services.CronJob
 
             var tempTokens = await tokenRepository.FindAsync(x => DateTime.Compare(x.ExpireTime, now) < 0 || x.IsUse);
 
-            await tokenRepository.RemoveRangeAsync(tempTokens);
+            tokenRepository.RemoveRange(tempTokens);
 
             await unitOfWork.CompleteAsync();
         }

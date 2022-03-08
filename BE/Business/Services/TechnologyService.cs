@@ -8,7 +8,6 @@ using Business.Resources;
 using Business.Resources.Technology;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Business.Services
@@ -30,16 +29,6 @@ namespace Business.Services
         #endregion
 
         #region Method
-        public async Task<BaseResponse<IEnumerable<TechnologyResource>>> GetByCategoryAsync(int categoryId)
-        {
-            // Get list record from DB
-            var tempTechnology = await _technologyRepository.GetByCategoryAsync(categoryId);
-            // Mapping Technology to TechnologyResource
-            var result = Mapper.Map<IEnumerable<Technology>, IEnumerable<TechnologyResource>>(tempTechnology);
-
-            return new BaseResponse<IEnumerable<TechnologyResource>>(result);
-        }
-
         public override async Task<BaseResponse<TechnologyResource>> InsertAsync(CreateTechnologyResource createTechnologyResource)
         {
             try

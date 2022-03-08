@@ -13,15 +13,13 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Constructor
-        public UnitOfWork(AppDbContext context)
-        {
+        public UnitOfWork(AppDbContext context) =>
             this._context = context;
-        }
         #endregion
 
         #region Method
-        public async Task CompleteAsync()
-            => await _context.SaveChangesAsync();
+        public async Task CompleteAsync() =>
+            await _context.SaveChangesAsync();
 
         protected virtual void Dispose(bool disposing)
         {

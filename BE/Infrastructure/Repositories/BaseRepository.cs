@@ -26,8 +26,8 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        public virtual async Task<IEnumerable<Entity>> FindAsync(Expression<Func<Entity, bool>> expression)
-            => await _entities.Where(expression).ToListAsync();
+        public virtual async Task<IEnumerable<Entity>> FindAsync(Expression<Func<Entity, bool>> expression) =>
+            await _entities.Where(expression).ToListAsync();
 
         public virtual async Task<Entity> GetByIdAsync(int entityId)
         {
@@ -39,8 +39,8 @@ namespace Infrastructure.Repositories
                 .SingleOrDefaultAsync();
         }
 
-        public virtual async Task InsertAsync(Entity entity)
-            => await _entities.AddAsync(entity);
+        public virtual async Task InsertAsync(Entity entity) =>
+            await _entities.AddAsync(entity);
 
         /// <summary>
         /// Removing by change value of status true -> false
@@ -53,8 +53,8 @@ namespace Infrastructure.Repositories
             entity.GetType().GetProperty("Status").SetValue(entity, false);
         }
 
-        public virtual void Update(Entity entity)
-        => _entities.Update(entity);
+        public virtual void Update(Entity entity) =>
+            _entities.Update(entity);
 
         public virtual async Task<int> MaximumOrderIndexAsync(int personId)
         {
@@ -69,8 +69,10 @@ namespace Infrastructure.Repositories
         public virtual async Task<IEnumerable<Entity>> GetAllAsync()
         {
             var statusName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Status").Name;
+            var propertyName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Name").Name;
 
             return await _entities.Where(entity => EF.Property<bool>(entity, statusName).Equals(true))
+                .OrderBy(entity => EF.Property<string>(entity, propertyName)) // Warning: make sure the Entity contain "Name" property!
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -80,7 +82,7 @@ namespace Infrastructure.Repositories
         /// </summary>
         /// <param name="entities"></param>
         /// <returns>The number of entities deleted</returns>
-        public virtual async Task<int> RemoveRangeAsync(IEnumerable<Entity> entities)
+        public virtual int RemoveRange(IEnumerable<Entity> entities)
         {
             int count = 0;
             foreach (var entity in entities)
@@ -133,9 +135,10 @@ namespace Infrastructure.Repositories
             return await _entities.Where(predicateExpression).ToListAsync();
         }
 
-        private static MethodInfo ContainsMethod => typeof(Enumerable).GetMethods()
-        .FirstOrDefault(m => m.Name == "Contains" && m.GetParameters().Length == 2)
-        .MakeGenericMethod(typeof(int));
+        private static MethodInfo ContainsMethod =>
+            typeof(Enumerable).GetMethods()
+            .FirstOrDefault(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+            .MakeGenericMethod(typeof(int));
         #endregion
     }
 }

@@ -41,26 +41,6 @@ namespace API.Controllers
             return await base.GetAllAsync();
         }
 
-        [HttpGet("{categoryId:int}")]
-        [Authorize(Roles = "viewer, editor, admin")]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByCategoryAsync(int categoryId)
-        {
-            Log.Information($"{User.Identity?.Name}: get all technology data by category.");
-
-            var result = await _technologyService.GetByCategoryAsync(categoryId);
-
-            if (!result.Success)
-                return BadRequest(result);
-
-            if (result.Resource is null)
-                return NoContent();
-
-            return Ok(result);
-        }
-
         [HttpPost]
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status201Created)]

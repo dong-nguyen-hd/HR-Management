@@ -15,10 +15,10 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        public override async Task<Token> GetByIdAsync(int id)
-        => await Context.Tokens.SingleOrDefaultAsync(x => x.Id.Equals(id));
+        public override async Task<Token> GetByIdAsync(int id) =>
+            await Context.Tokens.SingleOrDefaultAsync(x => x.Id.Equals(id));
 
-        public override async Task<int> RemoveRangeAsync(IEnumerable<Token> tokens)
+        public override int RemoveRange(IEnumerable<Token> tokens)
         {
             Context.Tokens.RemoveRange(tokens);
 

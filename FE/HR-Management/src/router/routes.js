@@ -15,6 +15,11 @@ const routes = [
         component: () => import("src/pages/Employee/ListEmployee.vue"),
       },
       {
+        name: "New Employee",
+        path: "/new-employee",
+        component: () => import("src/pages/Employee/NewEmployee.vue"),
+      },
+      {
         name: "Update Personal Information",
         path: "/self-update",
         component: () => import("pages/Account/UpdateAccountInformation.vue"),
