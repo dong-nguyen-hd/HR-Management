@@ -1,6 +1,9 @@
-﻿using Business.Communication;
+﻿using AutoMapper;
+using Business.Communication;
 using Business.Domain.Models;
+using Business.Domain.Repositories;
 using Business.Domain.Services;
+using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Technology;
 using Microsoft.AspNetCore.Authorization;
@@ -18,14 +21,16 @@ namespace API.Controllers
     {
         #region Constructor
         public TechnologyController(ITechnologyService technologyService,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(technologyService, responseMessage)
+            ITechnologyRepository technologyRepository,
+            IMapper mapper,
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(technologyService, mapper, responseMessage)
         {
-            this._technologyService = technologyService;
+            this._technologyRepository = technologyRepository;
         }
         #endregion
 
         #region Property
-        private readonly ITechnologyService _technologyService;
+        private readonly ITechnologyRepository _technologyRepository;
         #endregion
 
         #region Action
@@ -39,6 +44,23 @@ namespace API.Controllers
             Log.Information($"{User.Identity?.Name}: get all technology data.");
 
             return await base.GetAllAsync();
+        }
+
+        [HttpGet("search")]
+        [Authorize(Roles = "viewer, editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> FindAsync([FromQuery] string filterName)
+        {
+            Log.Information($"{User.Identity?.Name}: find technology data with {filterName}-keyword.");
+
+            var result = await _technologyRepository.FindByNameAsync(filterName.RemoveSpaceCharacter());
+
+            if (result is null)
+                return NoContent();
+
+            return Ok(new BaseResponse<IEnumerable<TechnologyResource>>(Mapper.Map<IEnumerable<Technology>, IEnumerable<TechnologyResource>>(result)));
         }
 
         [HttpPost]

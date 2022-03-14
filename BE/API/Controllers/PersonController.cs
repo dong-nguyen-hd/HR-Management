@@ -1,4 +1,5 @@
-﻿using Business.Communication;
+﻿using AutoMapper;
+using Business.Communication;
 using Business.Domain.Models;
 using Business.Domain.Services;
 using Business.Resources;
@@ -25,7 +26,8 @@ namespace API.Controllers
         #region Constructor
         public PersonController(IPersonService personService,
             IImageService imageService,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(personService, responseMessage)
+            IMapper mapper,
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(personService, mapper, responseMessage)
         {
             this._personService = personService;
             this._imageService = imageService;

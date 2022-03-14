@@ -24,6 +24,8 @@ namespace Infrastructure.Contexts.Config
             entity.Property(x => x.OrderIndex).IsRequired().HasColumnType("varchar(250)");
             entity.Property(x => x.StaffId).IsRequired().HasColumnType("varchar(25)");
             entity.Property(x => x.Status).HasDefaultValue(true);
+            entity.HasIndex(x => x.StaffId);
+            entity.HasIndex(x => x.FirstName);
         }
     }
 }

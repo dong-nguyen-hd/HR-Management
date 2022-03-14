@@ -4,7 +4,7 @@ using Business.Extensions.Validation;
 using Business.Resources.CategoryPerson;
 using Business.Resources.Certificate;
 using Business.Resources.Education;
-using Business.Resources.Location;
+using Business.Resources.Office;
 using Business.Resources.Project;
 using Business.Resources.WorkHistory;
 using Newtonsoft.Json;
@@ -67,12 +67,14 @@ namespace Business.Resources.Person
         [Display(Name = "Created At")]
         public DateTime CreatedAt { get; set; }
 
+        public bool Available { get; set; }
+
         [Required]
         [MaxLength(250)]
         [Display(Name = "Order Index")]
         public List<int> OrderIndex { get; set; }
 
-        public LocationResource Location { get; set; }
+        public OfficeResource Office { get; set; }
 
         [Display(Name = "Work-History")]
         public List<WorkHistoryResource> WorkHistory { get; set; }

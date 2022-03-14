@@ -21,35 +21,36 @@ namespace Business.Services
         #region Constructor
         public PersonService(IPersonRepository personRepository,
             ITechnologyService technologyService,
-            ILocationRepository locationRepository,
+            IOfficeRepository officeRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(personRepository, mapper, unitOfWork, responseMessage)
         {
             this._personRepository = personRepository;
-            this._locationRepository = locationRepository;
+            this._officeRepository = officeRepository;
             this._technologyService = technologyService;
         }
         #endregion
 
         #region Property
         private readonly IPersonRepository _personRepository;
-        private readonly ILocationRepository _locationRepository;
+        private readonly IOfficeRepository _officeRepository;
         private readonly ITechnologyService _technologyService;
         #endregion
 
         #region Method
         public override async Task<BaseResponse<PersonResource>> InsertAsync(CreatePersonResource createPersonResource)
         {
-            // Validate Location is existent?
-            var tempLocation = !createPersonResource.LocationId.HasValue ? null : await _locationRepository.GetByIdAsync((int)createPersonResource.LocationId);
-            if (tempLocation is null)
-                createPersonResource.LocationId = null;
-            // Mapping Resource to Person
-            var person = Mapper.Map<CreatePersonResource, Person>(createPersonResource);
-
             try
             {
+                // Validate Office is existent?
+                var tempOffice = await _officeRepository.GetByIdAsync(createPersonResource.OfficeId);
+                if (tempOffice is null)
+                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Office_NoData"]);
+
+                // Mapping Resource to Person
+                var person = Mapper.Map<CreatePersonResource, Person>(createPersonResource);
+
                 await _personRepository.InsertAsync(person);
                 await UnitOfWork.CompleteAsync();
 
@@ -63,21 +64,20 @@ namespace Business.Services
 
         public override async Task<BaseResponse<PersonResource>> UpdateAsync(int id, UpdatePersonResource updatePersonResource)
         {
-            // Validate Id is existent?
-            var tempPerson = await _personRepository.GetByIdAsync(id);
-            if (tempPerson is null)
-                return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
-
-            // Validate LocationId is existent?
-            var tempLocation = !updatePersonResource.LocationId.HasValue ? null : await _locationRepository.GetByIdAsync((int)updatePersonResource.LocationId);
-            if (tempLocation is null)
-                updatePersonResource.LocationId = null;
-
-            // Mapping Resource to Person
-            Mapper.Map(updatePersonResource, tempPerson);
-
             try
             {
+                // Validate Id is existent?
+                var tempPerson = await _personRepository.GetByIdAsync(id);
+                if (tempPerson is null)
+                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
+                // Validate Office is existent?
+                var tempOffice = await _officeRepository.GetByIdAsync(updatePersonResource.OfficeId);
+                if (tempOffice is null)
+                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Office_NoData"]);
+
+                // Mapping Resource to Person
+                Mapper.Map(updatePersonResource, tempPerson);
+
                 await UnitOfWork.CompleteAsync();
 
                 return new BaseResponse<PersonResource>(Mapper.Map<Person, PersonResource>(tempPerson));
@@ -90,13 +90,13 @@ namespace Business.Services
 
         public async Task<BaseResponse<PersonResource>> AssignComponentAsync(int id, ComponentResource component)
         {
-            // Validate Id is existent?
-            var tempPerson = await _personRepository.GetByIdAsync(id);
-            if (tempPerson is null)
-                return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
-
             try
             {
+                // Validate Id is existent?
+                var tempPerson = await _personRepository.GetByIdAsync(id);
+                if (tempPerson is null)
+                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
+
                 tempPerson.OrderIndex = component.OrderIndex.RemoveDuplicate().ConcatenateWithComma();
 
                 await UnitOfWork.CompleteAsync();
@@ -139,8 +139,8 @@ namespace Business.Services
                 var listProject = person.Projects.ToList();
                 var countProject = listProject.Count;
                 for (int i = 0; i < countProject; i++)
-                    if (!string.IsNullOrEmpty(listProject?[i].Technology))
-                        tempPersonResource.Project[i].Technology = totalTechnology.IntersectTechnology(listProject[i].Technology);
+                    if (!string.IsNullOrEmpty(listProject?[i]?.Group.Technology))
+                        tempPersonResource.Project[i].Technology = totalTechnology.IntersectTechnology(listProject[i]?.Group.Technology);
 
                 // Category-Person mapping
                 var listCategoryPerson = person.CategoryPersons.ToList();

@@ -1,4 +1,5 @@
-﻿using Business.Communication;
+﻿using AutoMapper;
+using Business.Communication;
 using Business.Data;
 using Business.Domain.Models;
 using Business.Domain.Services;
@@ -28,7 +29,8 @@ namespace API.Controllers
         #region Constructor
         public AccountController(IAccountService accountService,
             IImageService imageService,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(accountService, responseMessage)
+            IMapper mapper,
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(accountService, mapper, responseMessage)
         {
             this._accountService = accountService;
             this._imageService = imageService;
@@ -44,7 +46,7 @@ namespace API.Controllers
         {
             Log.Information($"{User.Identity?.Name}: save image for Id is {id}.");
 
-            var identifier = (User.Identity as ClaimsIdentity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+            var identifier = (User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.NameIdentifier).Value;
 
             if (!identifier.Equals(id.ToString()))
                 return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
@@ -143,7 +145,7 @@ namespace API.Controllers
         {
             Log.Information($"{User.Identity?.Name}: self-update account with Id is {id}.");
 
-            var identifier = (User.Identity as ClaimsIdentity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+            var identifier = (User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.NameIdentifier).Value;
 
             if (!identifier.Equals(id.ToString()))
                 return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
@@ -165,7 +167,7 @@ namespace API.Controllers
             Log.Information($"{User.Identity?.Name}: update account password with Id is {id}.");
 
             // Check if the id belongs to me
-            var identifier = (User.Identity as ClaimsIdentity).FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
+            var identifier = (User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!identifier.Equals(id.ToString()))
                 return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
 

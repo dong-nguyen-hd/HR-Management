@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Person
 {
@@ -12,7 +13,13 @@ namespace Business.Resources.Person
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Display(Name = "Location Id")]
-        public int? LocationId { get; set; }
+        [Display(Name = "Office Id")]
+        public int? OfficeId { get; set; }
+
+        public bool Available { get; set; }
+
+        [Display(Name = "Technology Id")]
+        [MaxLength(3)]
+        public List<int> TechnologyId { get; set; }
     }
 }

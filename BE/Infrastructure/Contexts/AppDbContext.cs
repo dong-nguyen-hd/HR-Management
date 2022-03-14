@@ -16,12 +16,13 @@ namespace Infrastructure.Contexts
         public DbSet<Education> Educations { get; set; }
         public DbSet<WorkHistory> WorkHistories { get; set; }
         public DbSet<Certificate> Certificates { get; set; }
-        public DbSet<Location> Locations { get; set; }
+        public DbSet<Office> Offices { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<CategoryPerson> CategoryPersons { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Technology> Technologies { get; set; }
         public DbSet<Person> People { get; set; }
+        public DbSet<Group> Groups { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Token> Tokens { get; set; }
         #endregion

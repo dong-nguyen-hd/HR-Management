@@ -50,13 +50,13 @@
           :loading="loadingData"
           v-model:pagination="pagination"
           :rows-per-page-options="[5, 10, 15, 20]"
-          @request="getWithFilter"
+          @request="getEmployeeWithFilter"
         >
           <template v-slot:header-cell-staffId="props">
             <q-th :props="props">
               <div :style="`min-width: ${widthOfStaffId}`">
                 <q-input
-                  @update:model-value="getWithFilter(false)"
+                  @update:model-value="getEmployeeWithFilter(false)"
                   dark
                   dense
                   standout
@@ -82,7 +82,7 @@
                       class="cursor-pointer"
                       @click="
                         filter.staffId = '';
-                        getWithFilter(false);
+                        getEmployeeWithFilter(false);
                       "
                     />
                   </template>
@@ -95,38 +95,34 @@
             <q-th :props="props">
               <div :style="`width: ${widthOfOffice};`">
                 <q-select
-                  @update:model-value="getWithFilter(false)"
+                  @update:model-value="getEmployeeWithFilter(false)"
                   dense
                   standout
                   dark
                   clearable
-                  v-model="filter.locationId"
-                  :options="tempListLocation"
+                  v-model="filter.officeId"
+                  :options="tempListOffice"
                   :label="props.col.label"
                   option-value="id"
                   option-label="name"
                   emit-value
                   map-options
                   options-selected-class="text-accent"
-                  @filter="filterFn"
+                  @filter="filterOffice"
                   input-debounce="100"
                   fill-input
                   hide-selected
                   use-input
                   :label-color="labelColorFocus[1]"
-                  @popup-show="
+                  @focus="
                     labelColorFocus[1] = 'black';
                     widthOfOffice = '140px';
                   "
-                  @popup-hide="
+                  @blur="
                     labelColorFocus[1] = 'white';
-                    widthOfOffice = !filter.locationId ? '100px' : '140px';
+                    widthOfOffice = !filter.officeId ? '100px' : '140px';
                   "
-                  @clear="
-                    labelColorFocus[1] = 'white';
-                    widthOfOffice = '100px';
-                    getWithFilter(false);
-                  "
+                  @clear="getEmployeeWithFilter(false)"
                   ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
@@ -143,7 +139,7 @@
             <q-th :props="props">
               <div :style="`min-width: ${widthOfFullName};`">
                 <q-input
-                  @update:model-value="getWithFilter(false)"
+                  @update:model-value="getEmployeeWithFilter(false)"
                   dark
                   dense
                   standout
@@ -169,11 +165,71 @@
                       class="cursor-pointer"
                       @click="
                         filter.firstName = '';
-                        getWithFilter(false);
+                        getEmployeeWithFilter(false);
                       "
                     />
                   </template>
                 </q-input>
+              </div>
+            </q-th>
+          </template>
+
+          <template v-slot:header-cell-available="props">
+            <q-th :props="props">
+              <div>
+                <q-checkbox
+                  left-label
+                  dense
+                  dark
+                  v-model="filter.available"
+                  color="accent"
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  label="Available"
+                />
+              </div>
+            </q-th>
+          </template>
+
+          <template v-slot:header-cell-skill="props">
+            <q-th :props="props">
+              <div :style="`width: ${widthOfSkill};`">
+                <q-select
+                  dense
+                  standout
+                  dark
+                  max-values="3"
+                  clearable
+                  multiple
+                  use-chips
+                  use-input
+                  input-debounce="200"
+                  v-model="filter.technologyId"
+                  :options="tempListSkill"
+                  :label="props.col.label"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  :label-color="labelColorFocus[3]"
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  @filter="filterSkill"
+                  @focus="
+                    labelColorFocus[3] = 'black';
+                    widthOfSkill = '250px';
+                  "
+                  @blur="
+                    labelColorFocus[3] = 'white';
+                    widthOfSkill = !filter?.technologyId?.length ? '150px' : '250px';
+                  "
+                  ><template v-slot:no-option>
+                    <q-item>
+                      <q-item-section class="text-grey">
+                        No results
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
               </div>
             </q-th>
           </template>
@@ -209,6 +265,17 @@
                   "
                 />
               </div>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-available="props">
+            <q-td :props="props">
+              <q-icon
+                v-show="props.value"
+                name="fas fa-check"
+                color="positive"
+                size="16px"
+              />
             </q-td>
           </template>
 
@@ -258,7 +325,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { mapGetters, mapActions, mapMutations } from "vuex";
+import { mapActions } from "vuex";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 
@@ -267,11 +334,12 @@ export default defineComponent({
 
   data() {
     return {
-      labelColorFocus: ["white", "white", "white"],
+      labelColorFocus: ["white", "white", "white", "white"],
 
       widthOfStaffId: "110px",
       widthOfOffice: "100px",
       widthOfFullName: "130px",
+      widthOfSkill: "150px",
 
       loadingData: false,
 
@@ -281,8 +349,10 @@ export default defineComponent({
 
       filter: {
         staffId: null,
-        locationId: null,
+        officeId: null,
         firstName: null,
+        available: false,
+        technologyId: [],
       },
 
       pagination: {
@@ -296,8 +366,11 @@ export default defineComponent({
         previousPage: null,
         totalPages: 0,
       },
-      tempListLocation: [],
-      listLocation: [],
+
+      tempListOffice: [],
+      listOffice: [],
+      tempListSkill: [],
+      listSkill: [],
       listEmployee: [],
       headerTable: [
         {
@@ -316,7 +389,7 @@ export default defineComponent({
           name: "office",
           align: "left",
           label: "Office",
-          field: (row) => row.location.name,
+          field: (row) => row.office.name,
         },
         {
           name: "avatar",
@@ -329,6 +402,12 @@ export default defineComponent({
           align: "left",
           label: "Full Name",
           field: (row) => `${row.firstName} ${row.lastName}`,
+        },
+        {
+          name: "available",
+          align: "center",
+          label: "Available",
+          field: (row) => row.available,
         },
         {
           name: "skill",
@@ -382,7 +461,7 @@ export default defineComponent({
         this.loadingData = false;
       }
     },
-    async getWithFilter(props) {
+    async getEmployeeWithFilter(props) {
       try {
         this.loadingData = true;
 
@@ -426,10 +505,10 @@ export default defineComponent({
         this.loadingData = false;
       }
     },
-    async getLocation() {
+    async getOffice() {
       // Request API
       let result = await api
-        .get("/api/v1/location")
+        .get("/api/v1/office")
         .then((response) => {
           return response.data;
         })
@@ -446,7 +525,43 @@ export default defineComponent({
         });
 
       if (result.success) {
-        this.listLocation = result.resource;
+        this.listOffice = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+    },
+    async findTechnology(keyword, seedValue) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .get(
+          `/api/v1/technology/search?filterName=${
+            !keyword ? '' : keyword.trim()
+          }`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.tempListSkill = result.resource;
+        if (seedValue) this.listSkill = result.resource;
       } else {
         this.$q.notify({
           type: "negative",
@@ -475,16 +590,22 @@ export default defineComponent({
       if (text.length > 20) return `${texttext.slice(0, 20)}...`;
       else return text;
     },
-    filterFn(val, update, abort) {
+    filterOffice(val, update, abort) {
       update(() => {
         if (!val) {
-          this.tempListLocation = this.listLocation;
+          this.tempListOffice = this.listOffice.slice(0, 5);
         } else {
           let needle = val.toLowerCase();
-          this.tempListLocation = this.listLocation.filter(
+          this.tempListOffice = this.listOffice.filter(
             (v) => v.name.toLowerCase().indexOf(needle) > -1
           );
         }
+      });
+    },
+    filterSkill(val, update, abort) {
+      update(async () => {
+        if (val.length < 2) this.tempListSkill = this.listSkill;
+        else await this.findTechnology(val, false);
       });
     },
     async deleteEmployee() {
@@ -513,7 +634,7 @@ export default defineComponent({
           });
 
         if (result.success) {
-          await this.getWithFilter(false);
+          await this.getEmployeeWithFilter(false);
 
           this.$q.notify({
             type: "positive",
@@ -544,7 +665,11 @@ export default defineComponent({
     let isValid = await this.validateToken();
     if (!isValid) this.$router.replace("/login");
 
-    await Promise.all([this.getEmployee(), this.getLocation()]);
+    await Promise.all([
+      this.getEmployee(),
+      this.getOffice(),
+      this.findTechnology(false, true),
+    ]);
   },
   mounted() {
     const $q = useQuasar();

@@ -1,4 +1,5 @@
 ﻿using Business.Extensions.Validation;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Account
@@ -27,5 +28,8 @@ namespace Business.Resources.Account
         [Required]
         [Role]
         public int Role { get; set; }
+
+        [MaxLength(50)]
+        public List<int> Group { get; set; }
     }
 }

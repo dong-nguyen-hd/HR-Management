@@ -17,10 +17,12 @@ namespace Infrastructure.Contexts.Config
             entity.Property(x => x.Password).IsRequired().HasColumnType("varchar(125)");
             entity.Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
             entity.Property(x => x.Email).IsRequired().HasColumnType("nvarchar(500)");
+            entity.Property(x => x.Group).HasColumnType("varchar(max)");
             entity.Property(x => x.Role).IsRequired().HasColumnType("varchar(50)");
             entity.Property(x => x.CreatedAt).IsRequired().HasColumnType("datetime2");
             entity.Property(x => x.LastActivity).IsRequired().HasColumnType("datetime2");
             entity.Property(x => x.Status).HasDefaultValue(true);
+            entity.HasIndex(x => x.UserName);
 
             // Seeding data for Account table
             entity.HasData(

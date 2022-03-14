@@ -40,7 +40,7 @@ namespace Business.Resources.Person
         public eGender Gender { get; set; }
 
         [Display(Name = "Location Id")]
-        public int? LocationId { get; set; }
+        public int OfficeId { get; set; }
 
         [JsonIgnore]
         [Display(Name = "Created By")]

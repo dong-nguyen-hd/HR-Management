@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Business.Resources.Location
+namespace Business.Resources.Office
 {
-    public class UpdateLocationResource
+    public class CreateOfficeResource
     {
         [Required]
         [MaxLength(250)]

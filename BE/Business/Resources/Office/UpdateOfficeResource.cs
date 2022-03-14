@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Business.Resources.Location
+namespace Business.Resources.Office
 {
-    public class LocationResource
+    public class UpdateOfficeResource
     {
-        [Required]
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(250)]
         public string Name { get; set; }

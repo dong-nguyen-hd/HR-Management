@@ -7,8 +7,7 @@ namespace Business.Extensions
 {
     static public class RelateElementOfList
     {
-        public static List<T> RemoveDuplicate<T>(this List<T> source)
-            => new HashSet<T>(source).ToList();
+        public static List<T> RemoveDuplicate<T>(this List<T> source) => new HashSet<T>(source).ToList();
 
         public static List<TechnologyResource> IntersectTechnology(this IEnumerable<TechnologyResource> total, string technologies)
         {

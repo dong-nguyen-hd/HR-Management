@@ -1,6 +1,8 @@
 ﻿using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -8,6 +10,13 @@ namespace Infrastructure.Repositories
     {
         #region Constructor
         public ProjectRepository(AppDbContext context) : base(context) { }
+        #endregion
+
+        #region Method
+        public override async Task<Project> GetByIdAsync(int id) =>
+            await Context.Projects
+                .Include(y => y.Group)
+                .SingleOrDefaultAsync(x => x.Status && x.Id == id);
         #endregion
     }
 }

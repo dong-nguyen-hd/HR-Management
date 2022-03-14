@@ -39,7 +39,7 @@
       "Category_Updating_Error": "An error occurred when updating the Category",
       "Category_Deleting_Error": "An error occurred when deleting the Category",
 
-      "Technology_Id_NoData": "Technology-Id is not existent",
+      "Technology_NoData": "Technology is not existent",
       "Technology_Saving_Error": "An error occurred when saving the Technology",
       "Technology_Updating_Error": "An error occurred when updating the Technology",
       "Technology_Deleting_Error": "An error occurred when deleting the Technology",
@@ -69,10 +69,10 @@
       "Education_Deleting_Error": "An error occurred when deleting the Education",
       "Education_NoData": "Education is not existent",
 
-      "Location_Saving_Error": "An error occurred when saving the Location",
-      "Location_Deleting_Error": "An error occurred when deleting the Location",
-      "Location_Updating_Error": "An error occurred when updating the Location",
-      "Location_NoData": "Location is not existent.",
+      "Office_Saving_Error": "An error occurred when saving the Office",
+      "Office_Deleting_Error": "An error occurred when deleting the Office",
+      "Office_Updating_Error": "An error occurred when updating the Office",
+      "Office_NoData": "Office is not existent.",
 
       "WorkHistory_Saving_Error": "An error occurred when saving the Work-History",
       "WorkHistory_Deleting_Error": "An error occurred when deleting the Work-History",

@@ -19,8 +19,10 @@ namespace Business.Domain.Models
         public DateTime CreatedAt { get; set; }
         public bool Status { get; set; }
         public string OrderIndex { get; set; }
-        public int? LocationId { get; set; }
-        public Location Location { get; set; }
+        public int OfficeId { get; set; }
+        public Office Office { get; set; }
+        public int? GroupId { get; set; }
+        public Group Group { get; set; }
         public HashSet<Certificate> Certificates { get; set; }
         public HashSet<CategoryPerson> CategoryPersons { get; set; }
         public HashSet<Education> Educations { get; set; }

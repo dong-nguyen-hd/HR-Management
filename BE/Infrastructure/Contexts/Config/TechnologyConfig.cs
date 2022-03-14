@@ -14,6 +14,7 @@ namespace Infrastructure.Contexts.Config
             entity.ToTable("Technology");
             entity.Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
             entity.Property(x => x.Status).HasDefaultValue(true);
+            entity.HasIndex(x => x.Name);
         }
     }
 }

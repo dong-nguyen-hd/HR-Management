@@ -15,6 +15,7 @@ namespace Infrastructure.Contexts.Config
             entity.Property(x => x.RefreshToken).IsRequired().HasColumnType("varchar(125)");
             entity.Property(x => x.ExpireTime).HasColumnType("datetime2");
             entity.Property(x => x.UserAgent).IsRequired().HasColumnType("nvarchar(500)");
+            entity.HasIndex(x => x.ExpireTime);
         }
     }
 }

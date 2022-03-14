@@ -1,4 +1,5 @@
-﻿using Business.Communication;
+﻿using AutoMapper;
+using Business.Communication;
 using Business.Domain.Models;
 using Business.Domain.Services;
 using Business.Resources;
@@ -17,7 +18,8 @@ namespace API.Controllers
     {
         #region Constructor
         public WorkHistoryController(IWorkHistoryService workHistoryService,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(workHistoryService, responseMessage)
+            IMapper mapper,
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(workHistoryService, mapper, responseMessage)
         {
         }
         #endregion

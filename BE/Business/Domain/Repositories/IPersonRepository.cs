@@ -9,7 +9,6 @@ namespace Business.Domain.Repositories
     public interface IPersonRepository : IBaseRepository<Person>
     {
         Task<(IEnumerable<Person> records, int total)> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource);
-        Task<Person> GetByIdAsync(string staffId);
         Task<int> TotalRecordAsync();
     }
 }

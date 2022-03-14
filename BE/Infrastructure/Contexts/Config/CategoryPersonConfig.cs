@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Infrastructure.Contexts.Config
 {
     /// <summary>
-    /// Setting schema for CategoryPerson table
+    /// Setting schema for Category-Person table
     /// </summary>
     public class CategoryPersonConfig : IEntityTypeConfiguration<CategoryPerson>
     {

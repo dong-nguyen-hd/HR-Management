@@ -2,7 +2,7 @@
 
 namespace Business.Domain.Models
 {
-    public class Location
+    public class Office
     {
         public int Id { get; set; }
         public string Name { get; set; }

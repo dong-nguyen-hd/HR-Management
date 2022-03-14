@@ -2,7 +2,7 @@
 
 namespace Business.Domain.Repositories
 {
-    public interface ILocationRepository : IBaseRepository<Location>
+    public interface IOfficeRepository : IBaseRepository<Office>
     {
     }
 }

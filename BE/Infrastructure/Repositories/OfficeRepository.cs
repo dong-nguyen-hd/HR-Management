@@ -4,10 +4,10 @@ using Infrastructure.Contexts;
 
 namespace Infrastructure.Repositories
 {
-    public class LocationRepository : BaseRepository<Location>, ILocationRepository
+    public class OfficeRepository : BaseRepository<Office>, IOfficeRepository
     {
         #region Constructor
-        public LocationRepository(AppDbContext context) : base(context) { }
+        public OfficeRepository(AppDbContext context) : base(context) { }
         #endregion
     }
 }

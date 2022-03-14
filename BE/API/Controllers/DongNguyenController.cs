@@ -1,4 +1,5 @@
-﻿using Business.Domain.Services;
+﻿using AutoMapper;
+using Business.Domain.Services;
 using Business.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -13,14 +14,17 @@ namespace API.Controllers
         #region Property
         private readonly IBaseService<Response, Insert, Update, Entity> _baseService;
         protected readonly ResponseMessage ResponseMessage;
+        protected readonly IMapper Mapper;
         #endregion
 
         #region Constructor
         public DongNguyenController(IBaseService<Response, Insert, Update, Entity> baseService,
+            IMapper mapper,
             IOptionsMonitor<ResponseMessage> responseMessage)
         {
             this._baseService = baseService;
             this.ResponseMessage = responseMessage.CurrentValue;
+            this.Mapper = mapper;
         }
         #endregion
 

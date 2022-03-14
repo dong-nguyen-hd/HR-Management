@@ -1,4 +1,5 @@
-﻿using Business.Communication;
+﻿using AutoMapper;
+using Business.Communication;
 using Business.Domain.Models;
 using Business.Domain.Services;
 using Business.Resources;
@@ -18,7 +19,8 @@ namespace API.Controllers
     {
         #region Constructor
         public CategoryController(ICategoryService categoryService,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(categoryService, responseMessage)
+            IMapper mapper,
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(categoryService, mapper, responseMessage)
         {
         }
         #endregion

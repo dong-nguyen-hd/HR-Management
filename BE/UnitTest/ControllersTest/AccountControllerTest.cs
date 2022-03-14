@@ -1,4 +1,5 @@
 ﻿using API.Controllers;
+using AutoMapper;
 using Business.Communication;
 using Business.Domain.Services;
 using Business.Resources;
@@ -28,11 +29,12 @@ namespace UnitTest.ControllersTest
 
             var mockAccountService = new Mock<IAccountService>();
             var mockImageService = new Mock<IImageService>();
+            var mapper = new Mock<IMapper>();
 
             var tempResult = new BaseResponse<AccountResource>(tempResoucre);
             mockAccountService.Setup(service => service.GetByIdAsync(id)).ReturnsAsync(tempResult);
 
-            var controller = new AccountController(mockAccountService.Object, mockImageService.Object, monitor);
+            var controller = new AccountController(mockAccountService.Object, mockImageService.Object, mapper.Object, monitor);
 
             // Act
             var result = await controller.GetByIdAsync(id);
@@ -56,11 +58,12 @@ namespace UnitTest.ControllersTest
 
             var mockAccountService = new Mock<IAccountService>();
             var mockImageService = new Mock<IImageService>();
+            var mapper = new Mock<IMapper>();
 
             var tempResult = new BaseResponse<AccountResource>(tempResoucre);
             mockAccountService.Setup(service => service.GetByIdAsync(id)).ReturnsAsync(tempResult);
 
-            var controller = new AccountController(mockAccountService.Object, mockImageService.Object, monitor);
+            var controller = new AccountController(mockAccountService.Object, mockImageService.Object, mapper.Object, monitor);
 
             // Act
             var result = await controller.GetByIdAsync(id);

@@ -45,6 +45,11 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers(options =>
+            {
+                // Adds a custom ModelBinderProviders
+                options.ModelBinderProviders.Insert(0, new QueryStringModelBinderProvider());
+            });
             services.AddControllers().ConfigureApiBehaviorOptions(options =>
             {
                 // Adds a custom error response factory when ModelState is invalid
