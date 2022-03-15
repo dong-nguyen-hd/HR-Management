@@ -54,7 +54,7 @@ namespace Business.Services
             var tempRefreshToken = await _tokenRepository.GetByIdAsync(refreshTokenResource.Id);
             if (tempRefreshToken is null ||
                 !tempRefreshToken.RefreshToken.Equals(refreshTokenResource.RefreshToken) ||
-                tempRefreshToken.IsUse ||
+                tempRefreshToken.IsUsed ||
                 !(DateTime.Compare(tempRefreshToken.ExpireTime, now) > 0))
                 return new BaseResponse<TokenResource>(ResponseMessage.Values["Token_Not_Permitted"]);
 
@@ -74,7 +74,7 @@ namespace Business.Services
 
             try
             {
-                tempRefreshToken.IsUse = true; // Disable refresh-token older
+                tempRefreshToken.IsUsed = true; // Disable refresh-token older
 
                 tempAccount.Tokens.Add(refreshToken);
                 await _unitOfWork.CompleteAsync();
@@ -96,7 +96,7 @@ namespace Business.Services
 
             try
             {
-                tempRefreshToken.IsUse = true;
+                tempRefreshToken.IsUsed = true;
                 await _unitOfWork.CompleteAsync();
 
                 return new BaseResponse<object>(true);
@@ -125,7 +125,7 @@ namespace Business.Services
 
             try
             {
-                tempAccount.Tokens.Add(refreshToken);
+                tempAccount.Tokens = new() { refreshToken };
                 await _unitOfWork.CompleteAsync();
 
                 return new BaseResponse<AccessTokenResource>(MappingTokenResoure(tempAccount, refreshToken, accessToken));
@@ -185,7 +185,7 @@ namespace Business.Services
                 RefreshToken = GenerateRefreshTokenString(),
                 ExpireTime = now.AddMinutes(_jwtConfig.RefreshTokenExpiration),
                 UserAgent = userAgent,
-                IsUse = false
+                IsUsed = false
             };
 
         private static string GenerateRefreshTokenString()

@@ -17,12 +17,12 @@ namespace Infrastructure.Repositories
         #region Method
         public async Task<IEnumerable<Technology>> FindByNameAsync(string filterName)
         {
-            var queryable = Context.Technologies.Where(x => x.Status);
+            var queryable = Context.Technologies.AsQueryable();
 
             if (!string.IsNullOrEmpty(filterName))
                 queryable = queryable.Where(x => x.Name.Contains(filterName));
 
-            return await queryable.OrderBy(x => x.Name).Take(5).AsNoTracking().ToListAsync();
+            return await queryable.AsNoTracking().OrderBy(x => x.Name).Take(5).ToListAsync();
         }
         #endregion
     }

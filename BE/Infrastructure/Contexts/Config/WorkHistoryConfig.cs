@@ -16,7 +16,7 @@ namespace Infrastructure.Contexts.Config
             entity.Property(x => x.CompanyName).IsRequired().HasColumnType("nvarchar(500)");
             entity.Property(x => x.StartDate).IsRequired().HasColumnType("date");
             entity.Property(x => x.EndDate).HasColumnType("date");
-            entity.Property(x => x.Status).HasDefaultValue(true);
+            entity.HasQueryFilter(x => !x.IsDeleted);
         }
     }
 }

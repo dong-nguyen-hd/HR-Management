@@ -13,7 +13,7 @@ namespace Infrastructure.Contexts.Config
         {
             entity.ToTable("CategoryPerson");
             entity.Property(x => x.Technology).IsRequired().HasColumnType("varchar(max)");
-            entity.Property(x => x.Status).HasDefaultValue(true);
+            entity.HasQueryFilter(x => !x.IsDeleted);
         }
     }
 }

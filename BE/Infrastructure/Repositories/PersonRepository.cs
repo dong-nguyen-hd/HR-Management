@@ -25,18 +25,19 @@ namespace Infrastructure.Repositories
 
             var total = await queryable.CountAsync();
 
-            var records = await queryable.OrderBy(x => x.Id).Skip((pagination.Page - 1) * pagination.PageSize)
+            var records = await queryable.AsNoTracking()
+                .AsSplitQuery()
+                .OrderByDescending(x => x.StaffId)
+                .Skip((pagination.Page - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .Include(y => y.Office)
-                .Include(y => y.WorkHistories.Where(z => z.Status))
-                .Include(y => y.CategoryPersons.Where(z => z.Status))
+                .Include(y => y.WorkHistories)
+                .Include(y => y.CategoryPersons)
                 .ThenInclude(z => z.Category)
-                .Include(y => y.Educations.Where(z => z.Status))
-                .Include(y => y.Certificates.Where(z => z.Status))
-                .Include(y => y.Projects.Where(z => z.Status))
+                .Include(y => y.Educations)
+                .Include(y => y.Certificates)
+                .Include(y => y.Projects)
                 .ThenInclude(z => z.Group)
-                .AsNoTracking()
-                .AsSplitQuery()
                 .ToListAsync();
 
             return (records, total);
@@ -44,7 +45,7 @@ namespace Infrastructure.Repositories
 
         private IQueryable<Person> ConditionFilter(FilterPersonResource filterResource)
         {
-            var queryable = Context.People.Where(x => x.Status);
+            var queryable = Context.People.AsQueryable();
 
             if (filterResource != null)
             {
@@ -65,7 +66,7 @@ namespace Infrastructure.Repositories
 
                 if (filterResource.TechnologyId?.Count > 0)
                 {
-                    var tempQueryable = Context.CategoryPersons.Where(x => x.Status);
+                    var tempQueryable = Context.CategoryPersons.AsQueryable();
 
                     int count = filterResource.TechnologyId.Count;
 
@@ -107,21 +108,20 @@ namespace Infrastructure.Repositories
         }
 
         public override async Task<Person> GetByIdAsync(int id) =>
-            await Context.People
-                .Include(y => y.Office)
-                .Include(y => y.WorkHistories.Where(z => z.Status))
-                .Include(y => y.CategoryPersons.Where(z => z.Status))
-                .ThenInclude(z => z.Category)
-                .Include(y => y.Educations.Where(z => z.Status))
-                .Include(y => y.Certificates.Where(z => z.Status))
-                .Include(y => y.Projects.Where(z => z.Status))
-                .ThenInclude(z => z.Group)
-                .AsNoTracking()
+            await Context.People.AsNoTracking()
                 .AsSplitQuery()
-                .SingleOrDefaultAsync(x => x.Status && x.Id == id);
+                .Include(y => y.Office)
+                .Include(y => y.WorkHistories)
+                .Include(y => y.CategoryPersons)
+                .ThenInclude(z => z.Category)
+                .Include(y => y.Educations)
+                .Include(y => y.Certificates)
+                .Include(y => y.Projects)
+                .ThenInclude(z => z.Group)
+                .SingleOrDefaultAsync(x => x.Id == id);
 
         public async Task<int> TotalRecordAsync() =>
-            await Context.People.CountAsync(x => x.Status);
+            await Context.People.CountAsync();
         #endregion
     }
 }

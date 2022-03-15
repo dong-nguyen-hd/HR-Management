@@ -10,7 +10,7 @@ namespace Business.Domain.Models
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int OrderIndex { get; set; }
-        public bool Status { get; set; }
+        public bool IsDeleted { get; set; }
         public int PersonId { get; set; }
         public Person People { get; set; }
         public int GroupId { get; set; }

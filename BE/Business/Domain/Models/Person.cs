@@ -17,7 +17,7 @@ namespace Business.Domain.Models
         public byte Gender { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
-        public bool Status { get; set; }
+        public bool IsDeleted { get; set; }
         public string OrderIndex { get; set; }
         public int OfficeId { get; set; }
         public Office Office { get; set; }

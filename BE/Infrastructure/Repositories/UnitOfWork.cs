@@ -13,15 +13,14 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Constructor
-        public UnitOfWork(AppDbContext context) =>
-            this._context = context;
+        public UnitOfWork(AppDbContext context) => this._context = context;
         #endregion
 
         #region Method
         public async Task CompleteAsync() =>
             await _context.SaveChangesAsync();
 
-        protected virtual void Dispose(bool disposing)
+        protected virtual void Clean(bool disposing)
         {
             if (!this._disposed)
             {
@@ -35,7 +34,7 @@ namespace Infrastructure.Repositories
 
         public void Dispose()
         {
-            Dispose(true);
+            Clean(true);
             GC.SuppressFinalize(this);
         }
         #endregion

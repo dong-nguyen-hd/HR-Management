@@ -34,11 +34,11 @@ namespace Business.Services
         #region Method
         public override async Task<BaseResponse<AccountResource>> InsertAsync(CreateAccountResource createAccountResource)
         {
-            // Mapping Resource to Account
-            var tempAccount = Mapper.Map<CreateAccountResource, Account>(createAccountResource);
-
             try
             {
+                // Mapping Resource to Account
+                var tempAccount = Mapper.Map<CreateAccountResource, Account>(createAccountResource);
+
                 await _accountRepository.InsertAsync(tempAccount);
                 await UnitOfWork.CompleteAsync();
 
@@ -67,13 +67,13 @@ namespace Business.Services
 
         public async Task<BaseResponse<AccountResource>> SelfUpdateAsync(int id, SelfUpdateAccountResource resource)
         {
-            var tempAccount = await _accountRepository.GetByIdAsync(id);
-
-            // Update infomation
-            Mapper.Map(resource, tempAccount);
-
             try
             {
+                var tempAccount = await _accountRepository.GetByIdAsync(id);
+
+                // Update infomation
+                Mapper.Map(resource, tempAccount);
+
                 await UnitOfWork.CompleteAsync();
 
                 return new BaseResponse<AccountResource>(Mapper.Map<AccountResource>(tempAccount));
@@ -86,19 +86,20 @@ namespace Business.Services
 
         public async Task<BaseResponse<AccountResource>> UpdatePasswordAsync(int id, UpdatePasswordAccountResource resource)
         {
-            // Validate Id is existent?
-            var tempAccount = await _accountRepository.GetByIdAsync(id, hasToken: true);
-            if (tempAccount is null)
-                return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_NoData"]);
-            if (!tempAccount.Password.CheckingPassword(resource.OldPassword))
-                return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Password_Error"]);
-
-            // Update infomation
-            tempAccount.Password = resource.NewPassword.HashingPassword(Constant.IterationCount);
-            tempAccount.LastActivity = DateTime.UtcNow;
-
             try
             {
+                // Validate Id is existent?
+                var tempAccount = await _accountRepository.GetByIdAsync(id, hasToken: true);
+                if (tempAccount is null)
+                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_NoData"]);
+                if (!tempAccount.Password.CheckingPassword(resource.OldPassword))
+                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Password_Error"]);
+
+                // Update infomation
+                tempAccount.Password = resource.NewPassword.HashingPassword(Constant.IterationCount);
+                tempAccount.LastActivity = DateTime.UtcNow;
+
+
                 tempAccount.Tokens.Clear(); // Remove all token after when change password
                 await UnitOfWork.CompleteAsync();
 

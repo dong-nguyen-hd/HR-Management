@@ -21,8 +21,8 @@ namespace Infrastructure.Contexts.Config
             entity.Property(x => x.Role).IsRequired().HasColumnType("varchar(50)");
             entity.Property(x => x.CreatedAt).IsRequired().HasColumnType("datetime2");
             entity.Property(x => x.LastActivity).IsRequired().HasColumnType("datetime2");
-            entity.Property(x => x.Status).HasDefaultValue(true);
             entity.HasIndex(x => x.UserName);
+            entity.HasQueryFilter(x => !x.IsDeleted);
 
             // Seeding data for Account table
             entity.HasData(
@@ -36,7 +36,7 @@ namespace Infrastructure.Contexts.Config
                     CreatedAt = DateTime.UtcNow,
                     Name = "Dong Nguyen",
                     LastActivity = DateTime.UtcNow,
-                    Status = true,
+                    IsDeleted = false,
                     Avatar = "default.jpg"
                 }
             );

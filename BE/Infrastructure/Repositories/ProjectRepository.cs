@@ -16,7 +16,7 @@ namespace Infrastructure.Repositories
         public override async Task<Project> GetByIdAsync(int id) =>
             await Context.Projects
                 .Include(y => y.Group)
-                .SingleOrDefaultAsync(x => x.Status && x.Id == id);
+                .SingleOrDefaultAsync(x => x.Id == id);
         #endregion
     }
 }

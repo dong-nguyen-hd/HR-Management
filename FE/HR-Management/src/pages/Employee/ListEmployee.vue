@@ -62,15 +62,17 @@
                   standout
                   v-model="filter.staffId"
                   input-class="text-right"
-                  :label="props.col.label"
+                  :label="labelNameFocus[0]"
                   :label-color="labelColorFocus[0]"
                   debounce="300"
                   @focus="
                     labelColorFocus[0] = 'black';
+                    labelNameFocus[0] = 'Search by staff id';
                     widthOfStaffId = '154px';
                   "
                   @blur="
                     labelColorFocus[0] = 'white';
+                    labelNameFocus[0] = props.col.label;
                     widthOfStaffId = '110px';
                   "
                 >
@@ -146,14 +148,16 @@
                   debounce="400"
                   v-model="filter.firstName"
                   input-class="text-right"
-                  :label="props.col.label"
+                  :label="labelNameFocus[2]"
                   :label-color="labelColorFocus[2]"
                   @focus="
                     labelColorFocus[2] = 'black';
-                    widthOfFullName = '150px';
+                    labelNameFocus[2] = 'Search by first name';
+                    widthOfFullName = '170px';
                   "
                   @blur="
                     labelColorFocus[2] = 'white';
+                    labelNameFocus[2] = props.col.label;
                     widthOfFullName = '130px';
                   "
                 >
@@ -205,7 +209,7 @@
                   input-debounce="200"
                   v-model="filter.technologyId"
                   :options="tempListSkill"
-                  :label="props.col.label"
+                  :label="labelNameFocus[3]"
                   option-value="id"
                   option-label="name"
                   emit-value
@@ -216,10 +220,12 @@
                   @filter="filterSkill"
                   @focus="
                     labelColorFocus[3] = 'black';
+                    labelNameFocus[3] = 'Search by skill';
                     widthOfSkill = '250px';
                   "
                   @blur="
                     labelColorFocus[3] = 'white';
+                    labelNameFocus[3] = props.col.label;
                     widthOfSkill = !filter?.technologyId?.length ? '150px' : '250px';
                   "
                   ><template v-slot:no-option>
@@ -335,6 +341,7 @@ export default defineComponent({
   data() {
     return {
       labelColorFocus: ["white", "white", "white", "white"],
+      labelNameFocus: ['Staff ID', '', 'Full Name', 'Skills'],
 
       widthOfStaffId: "110px",
       widthOfOffice: "100px",

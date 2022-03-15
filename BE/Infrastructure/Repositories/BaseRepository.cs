@@ -31,27 +31,20 @@ namespace Infrastructure.Repositories
 
         public virtual async Task<Entity> GetByIdAsync(int entityId)
         {
-            var statusName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Status").Name;
-            var idName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Id").Name;
+            var nameOfPropertyId = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Id").Name;
 
-            return await _entities.Where(entity => EF.Property<int>(entity, idName).Equals(entityId) &&
-                EF.Property<bool>(entity, statusName).Equals(true))
-                .SingleOrDefaultAsync();
+            return await _entities.Where(entity => EF.Property<int>(entity, nameOfPropertyId).Equals(entityId)).SingleOrDefaultAsync();
         }
 
         public virtual async Task InsertAsync(Entity entity) =>
             await _entities.AddAsync(entity);
 
         /// <summary>
-        /// Removing by change value of status true -> false
+        /// Soft-delete by change value of status true -> false
         /// </summary>
-        /// <param name="entityId">Id of entity</param>
-        public virtual async Task RemoveAsync(int entityId)
-        {
-            var entity = await GetByIdAsync(entityId);
-
-            entity.GetType().GetProperty("Status").SetValue(entity, false);
-        }
+        /// <param name="entity">Entity object</param>
+        public virtual void Remove(Entity entity) =>
+            entity.GetType().GetProperty("IsDeleted").SetValue(entity, true);
 
         public virtual void Update(Entity entity) =>
             _entities.Update(entity);
@@ -66,19 +59,11 @@ namespace Infrastructure.Repositories
             return countElement == 0 ? 1 : countElement + 1;
         }
 
-        public virtual async Task<IEnumerable<Entity>> GetAllAsync()
-        {
-            var statusName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Status").Name;
-            var propertyName = Context.Model.FindEntityType(typeof(Entity)).GetProperty("Name").Name;
-
-            return await _entities.Where(entity => EF.Property<bool>(entity, statusName).Equals(true))
-                .OrderBy(entity => EF.Property<string>(entity, propertyName)) // Warning: make sure the Entity contain "Name" property!
-                .AsNoTracking()
-                .ToListAsync();
-        }
+        public virtual async Task<IEnumerable<Entity>> GetAllAsync() =>
+            await _entities.AsNoTracking().ToListAsync();
 
         /// <summary>
-        /// Removing by change value of status true -> false
+        /// Soft-delete by change value of status true -> false
         /// </summary>
         /// <param name="entities"></param>
         /// <returns>The number of entities deleted</returns>
@@ -87,7 +72,7 @@ namespace Infrastructure.Repositories
             int count = 0;
             foreach (var entity in entities)
             {
-                entity.GetType().GetProperty("Status").SetValue(entity, false);
+                entity.GetType().GetProperty("IsDeleted").SetValue(entity, true);
                 count++;
             }
 

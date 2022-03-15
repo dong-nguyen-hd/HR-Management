@@ -16,14 +16,14 @@ namespace Infrastructure.Repositories
 
         #region Method
         public override async Task<IEnumerable<Category>> GetAllAsync() =>
-            await Context.Categories.Where(x => x.Status.Equals(true)).Include(x => x.Technologies)
-            .OrderBy(x => x.Name)
-            .AsNoTracking()
+            await Context.Categories.AsNoTracking()
             .AsSplitQuery()
+            .OrderBy(x => x.Name)
+            .Include(x => x.Technologies)
             .ToListAsync();
 
         public override async Task<Category> GetByIdAsync(int id) =>
-            await Context.Categories.Where(x => x.Status.Equals(true) && x.Id.Equals(id))
+            await Context.Categories.Where(x => x.Id.Equals(id))
             .Include(x => x.Technologies)
             .SingleOrDefaultAsync();
         #endregion

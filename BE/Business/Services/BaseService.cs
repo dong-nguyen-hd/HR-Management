@@ -66,10 +66,7 @@ namespace Business.Services
                 await _baseRepository.InsertAsync(tempEntity);
                 await UnitOfWork.CompleteAsync();
 
-                // Mapping for response
-                var resource = Mapper.Map<Entity, Response>(tempEntity);
-
-                return new BaseResponse<Response>(resource);
+                return new BaseResponse<Response>(Mapper.Map<Entity, Response>(tempEntity));
             }
             catch (Exception ex)
             {
@@ -86,16 +83,10 @@ namespace Business.Services
                 if (tempEntity is null)
                     return new BaseResponse<Response>(ResponseMessage.Values["Id_NoData"]);
 
-                // Change property Status: true -> false
-                PropertyInfo prop = tempEntity.GetType().GetProperty("Status");
-                prop.SetValue(tempEntity, false);
-
+                _baseRepository.Remove(tempEntity);
                 await UnitOfWork.CompleteAsync();
 
-                // Mapping
-                var resource = Mapper.Map<Entity, Response>(tempEntity);
-
-                return new BaseResponse<Response>(resource);
+                return new BaseResponse<Response>(Mapper.Map<Entity, Response>(tempEntity));
             }
             catch (Exception ex)
             {

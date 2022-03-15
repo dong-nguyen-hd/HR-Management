@@ -10,7 +10,7 @@ namespace Business.Domain.Repositories
         Task<Entity> GetByIdAsync(int entityId);
         Task<IEnumerable<Entity>> GetWithPrimaryKeyAsync(List<int> keyValues);
         Task InsertAsync(Entity entity);
-        Task RemoveAsync(int entityId);
+        void Remove(Entity entity);
         int RemoveRange(IEnumerable<Entity> entities);
         void Update(Entity entity);
         Task<int> MaximumOrderIndexAsync(int personId);

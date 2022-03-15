@@ -15,7 +15,7 @@ namespace Business.Domain.Models
         public string Group { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastActivity { get; set; }
-        public bool Status { get; set; }
-        public HashSet<Token> Tokens { get; set; } = new();
+        public bool IsDeleted { get; set; }
+        public HashSet<Token> Tokens { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace Infrastructure.Repositories
         #region Method
         public async Task<Account> GetByIdAsync(int id, bool hasToken)
         {
-            var queryable = Context.Accounts.Where(x => x.Id.Equals(id) && x.Status.Equals(true));
+            var queryable = Context.Accounts.Where(x => x.Id.Equals(id));
 
             if (hasToken) queryable.Include(x => x.Tokens);
 
@@ -28,15 +28,14 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<IEnumerable<Account>> ListPaginationAsync(QueryResource pagination) =>
-            await Context.Accounts.Where(x => x.Status)
+            await Context.Accounts
+            .AsNoTracking()
             .OrderBy(x => x.Id)
             .Skip((pagination.Page - 1) * pagination.PageSize)
             .Take(pagination.PageSize)
-            .AsNoTracking()
             .ToListAsync();
 
-        public async Task<int> TotalRecordAsync() =>
-            await Context.Accounts.CountAsync(x => x.Status);
+        public async Task<int> TotalRecordAsync() => await Context.Accounts.CountAsync();
 
         public async Task<Account> ValidateCredentialsAsync(LoginResource loginResource)
         {
