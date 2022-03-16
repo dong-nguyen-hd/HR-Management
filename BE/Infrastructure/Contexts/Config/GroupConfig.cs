@@ -14,7 +14,7 @@ namespace Infrastructure.Contexts.Config
             entity.ToTable("Group");
             entity.Property(x => x.Name).IsRequired().HasColumnType("nvarchar(500)");
             entity.Property(x => x.Description).IsRequired().HasColumnType("nvarchar(500)");
-            entity.Property(x => x.Technology).IsRequired().HasColumnType("varchar(max)");
+            entity.Property(x => x.Technology).IsRequired().HasColumnType("varchar(500)");
             entity.Property(x => x.StartDate).IsRequired().HasColumnType("date");
             entity.Property(x => x.EndDate).HasColumnType("date");
             entity.HasIndex(x => x.Name);

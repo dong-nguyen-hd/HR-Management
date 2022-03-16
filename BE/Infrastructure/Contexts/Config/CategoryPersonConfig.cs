@@ -12,7 +12,7 @@ namespace Infrastructure.Contexts.Config
         public void Configure(EntityTypeBuilder<CategoryPerson> entity)
         {
             entity.ToTable("CategoryPerson");
-            entity.Property(x => x.Technology).IsRequired().HasColumnType("varchar(max)");
+            entity.Property(x => x.Technology).IsRequired().HasColumnType("varchar(500)");
             entity.HasQueryFilter(x => !x.IsDeleted);
         }
     }
