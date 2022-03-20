@@ -70,6 +70,22 @@ namespace API.Controllers
             return BadRequest(result);
         }
 
+        [HttpPut("reset-avatar/{id:int}")]
+        [Authorize(Roles = "editor, admin, viewer")]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ResetAvatarAsync(int id)
+        {
+            Log.Information($"{User.Identity?.Name}: reset avatar of the account with Id is {id}.");
+
+            var result = await _accountService.ResetAvatarAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
         [HttpGet]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]

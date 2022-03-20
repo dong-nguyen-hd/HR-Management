@@ -122,13 +122,33 @@ namespace API.Controllers
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
-        public new async Task<IActionResult> CreateAsync([FromBody] CreatePersonResource resource)
+        public async Task<IActionResult> CreateAsync([FromForm] IFormFile image, [FromBody] CreatePersonResource resource)
         {
             Log.Information($"{User.Identity?.Name}: create a person.");
 
             resource.CreatedBy = User.Identity?.Name;
 
-            return await base.CreateAsync(resource);
+            var insertResult = await _personService.InsertAsync(resource);
+            if(!insertResult.Success)
+                return BadRequest(insertResult);
+
+            var filePath = Path.GetTempFileName();
+
+            var stream = new FileStream(filePath, FileMode.Create);
+            await image.CopyToAsync(stream);
+            stream.Position = 0;
+
+            var result = await _imageService.SaveImagePersonAsync(insertResult.Resource.Id, stream);
+            stream.Dispose();
+
+            // Clean temp-file
+            if (System.IO.File.Exists(filePath))
+                System.IO.File.Delete(filePath);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return StatusCode(201, insertResult);
         }
 
         [HttpPut("{id:int}")]
@@ -140,6 +160,22 @@ namespace API.Controllers
             Log.Information($"{User.Identity?.Name}: update a person with Id is {id}.");
 
             return await base.UpdateAsync(id, resource);
+        }
+
+        [HttpPut("reset-avatar/{id:int}")]
+        [Authorize(Roles = "editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ResetAvatarAsync(int id)
+        {
+            Log.Information($"{User.Identity?.Name}: reset avatar of the person with Id is {id}.");
+
+            var result = await _personService.ResetAvatarAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         [HttpPut("swap/{id:int}")]

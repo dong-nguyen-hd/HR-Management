@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Business.Data;
 using Business.Extensions;
 using Business.Resources.Person;
 using System;
@@ -16,10 +15,15 @@ namespace Business.Mapping.Person
                 .ForMember(x => x.Email, opt => opt.MapFrom(src => src.Email.RemoveSpaceCharacter()))
                 .ForMember(x => x.Description, opt => opt.MapFrom(src => src.Description.RemoveSpaceCharacter()))
                 .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.Phone.RemoveSpaceCharacter()))
+                .ForMember(x => x.CategoryPersons, opt => opt.MapFrom(src => src.CategoryPersonResource))
+                .ForMember(x => x.Certificates, opt => opt.MapFrom(src => src.CertificateResource))
+                .ForMember(x => x.Educations, opt => opt.MapFrom(src => src.EducationResource))
+                .ForMember(x => x.Projects, opt => opt.MapFrom(src => src.ProjectResource))
+                .ForMember(x => x.WorkHistories, opt => opt.MapFrom(src => src.WorkHistoryResource))
                 .ForMember(x => x.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
                 .ForMember(x => x.StaffId, opt => opt.MapFrom(src => ComputeStaffId()))
                 .ForMember(x => x.Avatar, opt => opt.MapFrom(src => "default.jpg")) // Use default image for new person.
-                .ForMember(x => x.OrderIndex, opt => opt.MapFrom(src => DefaultOrderIndexPerson())); // Use Default value while create a person record
+                .ForMember(x => x.OrderIndex, opt => opt.MapFrom(src => src.OrderIndex.RemoveDuplicate().ConcatenateWithComma()));
 
             CreateMap<UpdatePersonResource, Domain.Models.Person>()
                 .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.FirstName.RemoveSpaceCharacter()))
@@ -28,9 +32,6 @@ namespace Business.Mapping.Person
                 .ForMember(x => x.Description, opt => opt.MapFrom(src => src.Description.RemoveSpaceCharacter()))
                 .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.Phone.RemoveSpaceCharacter()));
         }
-
-        string DefaultOrderIndexPerson()
-            => string.Format($"{(int)eOrder.WorkHistory},{(int)eOrder.Skill},{(int)eOrder.Education},{(int)eOrder.Certificate},{(int)eOrder.Project}");
 
         /// <summary>
         /// You should rewrite this method, rely on Id of person in DB

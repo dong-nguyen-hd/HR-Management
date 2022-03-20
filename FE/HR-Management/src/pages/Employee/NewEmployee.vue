@@ -1,7 +1,376 @@
 <template>
-  <q-page class="full-height full-width flex flex-center">
-    <div class="container full-height full-width">
-        New Test
+  <q-page class="fit">
+    <div class="flex absolute-center container">
+      <div class="row top-side">
+        <div class="col-6 left-side flex flex-center">
+          <div class="fit q-py-lg">
+            <q-scroll-area style="height: 500px">
+              <div class="avatar flex flex-center column">
+                <q-avatar size="100px">
+                  <img :src="imageURL" />
+                </q-avatar>
+                <q-file
+                  class="q-mt-sm cursor-pointer"
+                  dense
+                  tabindex="1"
+                  clearable
+                  standout
+                  input-style="width: 150px;"
+                  max-total-size="5242880"
+                  :display-value="
+                    imageFile ? 'Image is uploaded' : 'Upload image here!'
+                  "
+                  v-model="imageFile"
+                  accept=".jpg, .png, .gif, .bmp, image/*"
+                  @update:model-value="previewImage"
+                  @clear="clearTempImage"
+                  @rejected="onRejected"
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="attach_file" />
+                  </template>
+                </q-file>
+              </div>
+
+              <div class="first-name q-mt-lg q-px-lg">
+                <q-input
+                  ref="firstNameRef"
+                  tabindex="2"
+                  standout
+                  clearable
+                  maxlength="500"
+                  v-model="employeeInfor.firstName"
+                  type="text"
+                  label="First Name:"
+                  :label-color="labelColorFocus[0]"
+                  @focus="labelColorFocus[0] = 'white'"
+                  @blur="labelColorFocus[0] = ''"
+                  :rules="[(val) => !!val || 'First Name is required']"
+                  hide-bottom-space
+                >
+                </q-input>
+              </div>
+
+              <div class="last-name q-mt-sm q-px-lg">
+                <q-input
+                  ref="lastNameRef"
+                  tabindex="3"
+                  standout
+                  clearable
+                  maxlength="500"
+                  v-model="employeeInfor.lastName"
+                  type="text"
+                  label="Last Name:"
+                  :label-color="labelColorFocus[1]"
+                  @focus="labelColorFocus[1] = 'white'"
+                  @blur="labelColorFocus[1] = ''"
+                  :rules="[(val) => !!val || 'Last Name is required']"
+                  hide-bottom-space
+                ></q-input>
+              </div>
+
+              <div class="yob q-mt-sm q-px-lg">
+                <q-input
+                  ref="yobRef"
+                  tabindex="4"
+                  standout
+                  maxlength="500"
+                  v-model="employeeInfor.yearOfBirth"
+                  type="text"
+                  placeholder="MM/DD/YYYY"
+                  mask="##/##/####"
+                  stack-label
+                  label="Year Of Birth:"
+                  :label-color="labelColorFocus[2]"
+                  @focus="labelColorFocus[2] = 'white'"
+                  @blur="labelColorFocus[2] = ''"
+                  :rules="[(val) => !!val || 'YOB is required']"
+                  hide-bottom-space
+                >
+                  <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date
+                          v-model="employeeInfor.yearOfBirth"
+                          mask="MM/DD/YYYY"
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+
+              <div class="gender q-mt-sm q-px-lg">
+                <q-select
+                  standout
+                  ref="genderRef"
+                  tabindex="5"
+                  v-model="employeeInfor.gender"
+                  :options="listGender"
+                  label="Gender:"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  :rules="[(val) => !!val || 'Gender is required']"
+                  hide-bottom-space
+                  :label-color="labelColorFocus[3]"
+                  @focus="labelColorFocus[3] = 'white'"
+                  @blur="labelColorFocus[3] = ''"
+                >
+                </q-select>
+              </div>
+
+              <div class="description q-mt-sm q-px-lg">
+                <q-input
+                  ref="descriptionRef"
+                  standout
+                  tabindex="6"
+                  clearable
+                  maxlength="500"
+                  v-model="employeeInfor.description"
+                  type="text"
+                  autogrow
+                  label="Description:"
+                  :label-color="labelColorFocus[4]"
+                  @focus="labelColorFocus[4] = 'white'"
+                  @blur="labelColorFocus[4] = ''"
+                  hide-bottom-space
+                ></q-input>
+              </div>
+
+              <div class="office q-mt-sm q-px-lg">
+                <q-select
+                  standout
+                  ref="officeRef"
+                  tabindex="7"
+                  v-model="employeeInfor.officeId"
+                  :options="tempListOffice"
+                  label="Office:"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  @filter="filterOffice"
+                  fill-input
+                  hide-selected
+                  use-input
+                  :rules="[(val) => !!val || 'Office is required']"
+                  hide-bottom-space
+                  :label-color="labelColorFocus[5]"
+                  @focus="labelColorFocus[5] = 'white'"
+                  @blur="labelColorFocus[5] = ''"
+                  ><template v-slot:no-option>
+                    <q-item>
+                      <q-item-section class="text-grey">
+                        No results
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+
+              <div class="email q-mt-sm q-px-lg">
+                <q-input
+                  ref="emailRef"
+                  tabindex="8"
+                  standout
+                  clearable
+                  maxlength="500"
+                  v-model="employeeInfor.email"
+                  type="email"
+                  label="Email:"
+                  :label-color="labelColorFocus[6]"
+                  @focus="labelColorFocus[6] = 'white'"
+                  @blur="labelColorFocus[6] = ''"
+                  hide-bottom-space
+                >
+                </q-input>
+              </div>
+
+              <div class="phone q-mt-sm q-px-lg">
+                <q-input
+                  ref="phoneRef"
+                  mask="#########################"
+                  standout
+                  clearable
+                  tabindex="9"
+                  maxlength="25"
+                  v-model="employeeInfor.phone"
+                  type="text"
+                  label="Phone:"
+                  :label-color="labelColorFocus[7]"
+                  @focus="labelColorFocus[7] = 'white'"
+                  @blur="labelColorFocus[7] = ''"
+                  hide-bottom-space
+                >
+                </q-input>
+              </div>
+            </q-scroll-area>
+          </div>
+        </div>
+        <div class="col-6 right-side">
+          <div class="fit q-pa-lg">
+            <q-card>
+              <q-tabs
+                v-model="tab"
+                dense
+                outside-arrows
+                mobile-arrows
+                class="text-grey"
+                active-color="primary"
+                indicator-color="primary"
+                align="justify"
+                narrow-indicator
+              >
+                <q-tab
+                  v-for="item in tabModel"
+                  :key="item.id"
+                  :name="item.id"
+                  :label="item.name"
+                />
+              </q-tabs>
+
+              <q-separator />
+
+              <q-tab-panels v-model="tab" animated>
+                <q-tab-panel name="1" class="tab-skill flex flex-center">
+                  <div class="full-width flex flex-center">
+                    <q-btn-group rounded flat unelevated>
+                      <q-btn
+                        color="primary"
+                        label="<"
+                        @click="orderTabPrev()"
+                      />
+                      <q-btn
+                        color="primary"
+                        label="Skill"
+                        @click="toggleTab(1)"
+                      >
+                        <q-tooltip anchor="top middle" self="center middle">
+                          {{
+                            employeeInfor.orderIndex.some((x) => x == 1)
+                              ? "Hide"
+                              : "Show"
+                          }}
+                        </q-tooltip></q-btn
+                      >
+                      <q-btn
+                        color="primary"
+                        label=">"
+                        @click="orderTabNext()"
+                      />
+                    </q-btn-group>
+                  </div>
+
+                  <div>Expand</div>
+                </q-tab-panel>
+
+                <q-tab-panel name="2">
+                  <div class="tab-skill flex flex-center">
+                    <q-btn-group rounded flat unelevated>
+                      <q-btn
+                        color="primary"
+                        label="<"
+                        @click="orderTabPrev()"
+                      />
+                      <q-btn color="primary" label="Project" disable />
+                      <q-btn
+                        color="primary"
+                        label=">"
+                        @click="orderTabNext()"
+                      />
+                    </q-btn-group>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                </q-tab-panel>
+
+                <q-tab-panel name="3">
+                  <div class="tab-skill flex flex-center">
+                    <q-btn-group rounded flat unelevated>
+                      <q-btn
+                        color="primary"
+                        label="<"
+                        @click="orderTabPrev()"
+                      />
+                      <q-btn color="primary" label="Work History" disable />
+                      <q-btn
+                        color="primary"
+                        label=">"
+                        @click="orderTabNext()"
+                      />
+                    </q-btn-group>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                </q-tab-panel>
+
+                <q-tab-panel name="4">
+                  <div class="tab-skill flex flex-center">
+                    <q-btn-group rounded flat unelevated>
+                      <q-btn
+                        color="primary"
+                        label="<"
+                        @click="orderTabPrev()"
+                      />
+                      <q-btn color="primary" label="Education" disable />
+                      <q-btn
+                        color="primary"
+                        label=">"
+                        @click="orderTabNext()"
+                      />
+                    </q-btn-group>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                </q-tab-panel>
+
+                <q-tab-panel name="5">
+                  <div class="tab-skill flex flex-center">
+                    <q-btn-group rounded flat unelevated>
+                      <q-btn
+                        color="primary"
+                        label="<"
+                        @click="orderTabPrev()"
+                      />
+                      <q-btn color="primary" label="Certificate" disable />
+                      <q-btn
+                        color="primary"
+                        label=">"
+                        @click="orderTabNext()"
+                      />
+                    </q-btn-group>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </div>
+                </q-tab-panel>
+              </q-tab-panels>
+            </q-card>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-side flex flex-center">
+        <q-btn
+          tabindex="10"
+          :loading="loadingSave"
+          :disable="loadingSave"
+          color="primary"
+          label="Save"
+          style="width: 100px"
+        />
+      </div>
     </div>
   </q-page>
 </template>
@@ -17,8 +386,58 @@ export default defineComponent({
 
   data() {
     return {
+      tab: "",
+      tabModel: [
+        { id: "1", name: "Skill" },
+        { id: "2", name: "Project" },
+        { id: "3", name: "Work History" },
+        { id: "4", name: "Education" },
+        { id: "5", name: "Certificate" },
+      ],
+
+      avatarDefault: "",
+      imageURL: null,
+      imageFile: null,
+
+      employeeInfor: {
+        firstName: "",
+        lastName: "",
+        email: "",
+        description: "",
+        phone: "",
+        yearOfBirth: "",
+        officeId: "",
+        gender: "",
+        orderIndex: [1, 2, 3, 4, 5],
+
+        categoryPersonResource: [],
+        certificateResource: [],
+        educationResource: [],
+        projectResource: [],
+        workHistoryResource: [],
+      },
+
+      loadingSave: false,
+
+      labelColorFocus: [],
+
+      listGender: [
+        {
+          name: "Male",
+          id: 1,
+        },
+        {
+          name: "Female",
+          id: 2,
+        },
+        {
+          name: "Sexless",
+          id: 3,
+        },
+      ],
       listCategory: [],
-      listLocation: [],
+      tempListOffice: [],
+      listOffice: [],
     };
   },
   methods: {
@@ -56,36 +475,130 @@ export default defineComponent({
         this.loadingData = false;
       }
     },
-    async getLocation() {
-      try {
-        // Request API
-        let result = await api
-          .get(`/api/v1/location`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+    async getOffice() {
+      // Request API
+      let result = await api
+        .get("/api/v1/office")
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          this.listLocation = result.resource;
+      if (result.success) {
+        this.listOffice = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+    },
+    async getAvatarUrl() {
+      // Request API
+      let result = await api
+        .get(`/api/v1/image/default-image`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.avatarDefault = result?.resource?.originalImagePath;
+      }
+    },
+    previewImage() {
+      this.imageURL = this.imageFile
+        ? URL.createObjectURL(this.imageFile)
+        : null;
+    },
+    clearTempImage() {
+      this.imageURL = this.avatarDefault;
+    },
+    onRejected(rejectedEntries) {
+      this.$q.notify({
+        type: "negative",
+        message: `Image size must lower than 5 MB`,
+      });
+    },
+    filterOffice(val, update, abort) {
+      update(() => {
+        if (!val) {
+          this.tempListOffice = this.listOffice.slice(0, 5);
         } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
+          let needle = val.toLowerCase();
+          this.tempListOffice = this.listOffice.filter(
+            (v) => v.name.toLowerCase().indexOf(needle) > -1
+          );
         }
-      } finally {
-        this.loadingData = false;
+      });
+    },
+    orderTabNext() {
+      let count = this.tabModel.length;
+      let index = this.tabModel.findIndex((x) => x.id == this.tab);
+
+      if (index == count - 1) {
+        let temp = this.tabModel.slice(0, index);
+        temp.unshift(this.tabModel[index]);
+        this.tabModel = temp;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let temp = this.tabModel[i];
+            this.tabModel[i] = this.tabModel[i + 1];
+            this.tabModel[i + 1] = temp;
+            break;
+          }
+        }
+      }
+    },
+    orderTabPrev() {
+      let count = this.tabModel.length;
+      let index = this.tabModel.findIndex((x) => x.id == this.tab);
+
+      if (index == 0) {
+        let temp = this.tabModel.slice(1);
+        temp.push(this.tabModel[index]);
+        this.tabModel = temp;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let temp = this.tabModel[i];
+            this.tabModel[i] = this.tabModel[i - 1];
+            this.tabModel[i - 1] = temp;
+            break;
+          }
+        }
+      }
+    },
+    toggleTab(val) {
+      let index = this.employeeInfor.orderIndex.findIndex(
+        (x) => x == parseInt(val)
+      );
+
+      if (hasValue >= 0) {
+        this.employeeInfor.orderIndex.splice(index, 1);
+      } else {
+        this.employeeInfor.orderIndex.push(parseInt(val));
       }
     },
   },
@@ -96,7 +609,13 @@ export default defineComponent({
     let isValid = await this.validateToken();
     if (!isValid) this.$router.replace("/login");
 
-    await Promise.all([this.getCategory(), this.getLocation()]);
+    await Promise.all([
+      this.getCategory(),
+      this.getOffice(),
+      this.getAvatarUrl(),
+    ]);
+
+    this.imageURL = this.avatarDefault;
   },
   mounted() {
     const $q = useQuasar();
@@ -104,4 +623,25 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.container {
+  min-height: inherit - 50px;
+  height: calc(100% - 50px);
+  width: calc(100% - 50px);
+  background-color: $accent;
+  border-radius: 10px;
+  .top-side {
+    position: absolute;
+    width: 100%;
+    height: 86%;
+    top: 0;
+  }
+
+  .bottom-side {
+    position: absolute;
+    width: 100%;
+    height: 14%;
+    bottom: 0;
+  }
+}
+</style>

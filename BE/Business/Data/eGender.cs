@@ -2,7 +2,7 @@
 {
     public enum eGender : byte
     {
-        Male,
+        Male = 1,
         Female,
         Sexless
     }
