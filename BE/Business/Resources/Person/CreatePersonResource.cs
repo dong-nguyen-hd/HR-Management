@@ -38,8 +38,8 @@ namespace Business.Resources.Person
         [Required]
         [DoB]
         [DataType(DataType.Date)]
-        [Display(Name = "Year Of Birth")]
-        public DateTime YearOfBirth { get; set; }
+        [Display(Name = "Date Of Birth")]
+        public DateTime DateOfBirth { get; set; }
 
         [Required]
         [Gender]

@@ -51,8 +51,8 @@ namespace Business.Resources.Person
         [DoB]
         [DataType(DataType.Date)]
         [JsonConverter(typeof(DateTimeConverter))]
-        [Display(Name = "Year Of Birth")]
-        public DateTime YearOfBirth { get; set; }
+        [Display(Name = "Date Of Birth")]
+        public DateTime DateOfBirth { get; set; }
 
         [Required]
         [Gender]

@@ -20,7 +20,7 @@ namespace Infrastructure.Contexts.Config
             entity.Property(x => x.Phone).HasColumnType("varchar(25)");
             entity.Property(x => x.CreatedBy).IsRequired().HasColumnType("nvarchar(500)");
             entity.Property(x => x.CreatedAt).IsRequired().HasColumnType("datetime2");
-            entity.Property(x => x.YearOfBirth).IsRequired().HasColumnType("date");
+            entity.Property(x => x.DateOfBirth).IsRequired().HasColumnType("date");
             entity.Property(x => x.OrderIndex).IsRequired().HasColumnType("varchar(250)");
             entity.Property(x => x.StaffId).IsRequired().HasColumnType("varchar(25)");
             entity.HasIndex(x => x.StaffId);

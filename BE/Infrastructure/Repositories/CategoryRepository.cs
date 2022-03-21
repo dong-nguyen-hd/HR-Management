@@ -15,17 +15,26 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        public override async Task<IEnumerable<Category>> GetAllAsync() =>
-            await Context.Categories.AsNoTracking()
-            .AsSplitQuery()
-            .OrderBy(x => x.Name)
-            .Include(x => x.Technologies)
-            .ToListAsync();
-
         public override async Task<Category> GetByIdAsync(int id) =>
             await Context.Categories.Where(x => x.Id.Equals(id))
             .Include(x => x.Technologies)
             .SingleOrDefaultAsync();
+
+        public async Task<IEnumerable<Category>> FindByNameAsync(string filterName)
+        {
+            var queryable = Context.Categories.AsQueryable();
+
+            if (!string.IsNullOrEmpty(filterName))
+                queryable = queryable.Where(x => x.Name.Contains(filterName));
+
+            return await queryable
+                .AsNoTracking()
+                .AsSplitQuery()
+                .OrderBy(x => x.Name)
+                .Take(5)
+                .Include(x => x.Technologies)
+                .ToListAsync();
+        }
         #endregion
     }
 }

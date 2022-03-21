@@ -250,35 +250,149 @@
 
               <q-tab-panels v-model="tab" animated>
                 <q-tab-panel name="1" class="tab-skill flex flex-center">
-                  <div class="full-width flex flex-center">
+                  <div class="full-width relative-position flex flex-center">
                     <q-btn-group rounded flat unelevated>
                       <q-btn
                         color="primary"
                         label="<"
                         @click="orderTabPrev()"
+                        size="md"
                       />
                       <q-btn
-                        color="primary"
+                        :color="booleanTab(1) ? 'primary' : 'grey'"
                         label="Skill"
                         @click="toggleTab(1)"
+                        size="md"
                       >
                         <q-tooltip anchor="top middle" self="center middle">
-                          {{
-                            employeeInfor.orderIndex.some((x) => x == 1)
-                              ? "Hide"
-                              : "Show"
-                          }}
+                          {{ booleanTab(1) ? "Hide" : "Show" }}
                         </q-tooltip></q-btn
                       >
                       <q-btn
                         color="primary"
                         label=">"
                         @click="orderTabNext()"
+                        size="md"
                       />
                     </q-btn-group>
+
+                    <q-btn
+                      size="12px"
+                      class="absolute-top-right"
+                      icon="fas fa-plus"
+                      color="primary"
+                      round
+                      unelevated
+                      @click="openDialog(1)"
+                    />
                   </div>
 
-                  <div>Expand</div>
+                  <div class="fit">
+                    <q-scroll-area style="height: 394px">
+                      Expand
+                    </q-scroll-area>
+                  </div>
+
+                  <q-dialog v-model="dialogToggle[1]" persistent>
+                    <q-card style="width: 400px">
+                      <q-card-section class="row items-center">
+                        <span class="text-h6">Add Skill</span>
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <div class="q-mt-sm">
+                          <q-select
+                            standout
+                            ref="categoryRef"
+                            v-model="tempCategoryPersonResource.categoryId"
+                            :options="tempListCategory"
+                            :label="labelNameFocusSkill[0]"
+                            option-value="id"
+                            option-label="name"
+                            emit-value
+                            map-options
+                            options-selected-class="text-accent"
+                            @filter="filterCategory"
+                            fill-input
+                            input-debounce="200"
+                            hide-selected
+                            use-input
+                            :rules="[(val) => !!val || 'Office is required']"
+                            hide-bottom-space
+                            :label-color="colorFocusSkill[0]"
+                            @focus="
+                              colorFocusSkill[0] = 'white';
+                              labelNameFocusSkill[0] = 'Search by category';
+                            "
+                            @blur="
+                              colorFocusSkill[0] = '';
+                              labelNameFocusSkill[0] = 'Category:';
+                            "
+                            ><template v-slot:no-option>
+                              <q-item>
+                                <q-item-section class="text-grey">
+                                  No results
+                                </q-item-section>
+                              </q-item>
+                            </template>
+                          </q-select>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-select
+                            ref="skillRef"
+                            standout
+                            clearable
+                            multiple
+                            use-chips
+                            use-input
+                            :disable="
+                              tempCategoryPersonResource.categoryId
+                                ? false
+                                : true
+                            "
+                            v-model="tempCategoryPersonResource.technology"
+                            :options="tempListSkillCategory"
+                            :label="labelNameFocusSkill[1]"
+                            option-value="id"
+                            option-label="name"
+                            emit-value
+                            map-options
+                            options-selected-class="text-accent"
+                            :label-color="colorFocusSkill[1]"
+                            @filter="filterSkillBelongWithCategory"
+                            @focus="
+                              colorFocusSkill[1] = 'white';
+                              labelNameFocusSkill[1] = 'Search by skill';
+                            "
+                            @blur="
+                              colorFocusSkill[1] = '';
+                              labelNameFocusSkill[1] = 'Skill:';
+                            "
+                            ><template v-slot:no-option>
+                              <q-item>
+                                <q-item-section class="text-grey">
+                                  No results
+                                </q-item-section>
+                              </q-item>
+                            </template>
+                          </q-select>
+                        </div>
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          label="Cancel"
+                          color="primary"
+                          v-close-popup
+                        />
+                        <q-btn flat label="Add" color="info" />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
                 </q-tab-panel>
 
                 <q-tab-panel name="2">
@@ -417,9 +531,17 @@ export default defineComponent({
         workHistoryResource: [],
       },
 
+      tempCategoryPersonResource: {
+        personId: 0,
+        categoryId: 0,
+        technology: [],
+      },
+
       loadingSave: false,
 
       labelColorFocus: [],
+      colorFocusSkill: [],
+      labelNameFocusSkill: ["Category:", "Skill:"],
 
       listGender: [
         {
@@ -435,6 +557,10 @@ export default defineComponent({
           id: 3,
         },
       ],
+      dialogToggle: [],
+      tempOrderIndex: [],
+      tempListSkillCategory: [],
+      tempListCategory: [],
       listCategory: [],
       tempListOffice: [],
       listOffice: [],
@@ -443,36 +569,38 @@ export default defineComponent({
   methods: {
     ...mapActions("auth", ["useRefreshToken", "validateToken"]),
 
-    async getCategory() {
-      try {
-        // Request API
-        let result = await api
-          .get(`/api/v1/category`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+    async findCategory(keyword, seedValue) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
 
-        if (result.success) {
-          this.listCategory = result.resource;
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
-      } finally {
-        this.loadingData = false;
+      // Request API
+      let result = await api
+        .get(
+          `/api/v1/category/search?filterName=${!keyword ? "" : keyword.trim()}`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.tempListCategory = result.resource;
+        if (seedValue) this.listCategory = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
       }
     },
     async getOffice() {
@@ -552,6 +680,41 @@ export default defineComponent({
         }
       });
     },
+    filterCategory(val, update, abort) {
+      update(async () => {
+        if (val.length < 2) this.tempListCategory = this.listCategory;
+        else await this.findCategory(val, false);
+      });
+    },
+    filterSkillBelongWithCategory(val, update, abort) {
+      update(() => {
+        let temp = this.getSkillBelongWithCategory();
+        if (!val) {
+          this.tempListSkillCategory = temp.slice(0, 5);
+        } else {
+          let needle = val.toLowerCase();
+          this.tempListSkillCategory = temp.filter(
+            (v) => v.name.toLowerCase().indexOf(needle) > -1
+          );
+        }
+      });
+    },
+
+    getSkillBelongWithCategory() {
+      let categoryId = this.tempCategoryPersonResource.categoryId;
+
+      let obj = this.tempListCategory.find((x) => x.id == categoryId);
+      
+      return obj.technologies;
+    },
+    openDialog(index) {
+      if (index == 1) {
+        this.tempCategoryPersonResource.categoryId = 0;
+        this.tempCategoryPersonResource.technology = [];
+      }
+
+      this.dialogToggle[index] = true;
+    },
     orderTabNext() {
       let count = this.tabModel.length;
       let index = this.tabModel.findIndex((x) => x.id == this.tab);
@@ -595,11 +758,22 @@ export default defineComponent({
         (x) => x == parseInt(val)
       );
 
-      if (hasValue >= 0) {
+      let oldIndex = this.tempOrderIndex[parseInt(val)];
+
+      if (index >= 0) {
         this.employeeInfor.orderIndex.splice(index, 1);
+        this.tempOrderIndex[parseInt(val)] = index;
+      } else if (oldIndex >= 0) {
+        let left = this.employeeInfor.orderIndex.slice(0, oldIndex);
+        let right = this.employeeInfor.orderIndex.slice(oldIndex);
+
+        this.employeeInfor.orderIndex = left.concat(parseInt(val), right);
       } else {
         this.employeeInfor.orderIndex.push(parseInt(val));
       }
+    },
+    booleanTab(val) {
+      return this.employeeInfor.orderIndex.some((x) => x == parseInt(val));
     },
   },
   computed: {
@@ -610,7 +784,7 @@ export default defineComponent({
     if (!isValid) this.$router.replace("/login");
 
     await Promise.all([
-      this.getCategory(),
+      this.findCategory(false, true),
       this.getOffice(),
       this.getAvatarUrl(),
     ]);
