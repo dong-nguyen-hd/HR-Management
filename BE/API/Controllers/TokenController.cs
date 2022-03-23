@@ -55,10 +55,10 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<TokenResource>), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GenerateNewTokensAsync([FromBody] RefreshTokenResource resource)
         {
-            Log.Information($"Account-id {resource.AccountId}: using refresh token with Id is {resource.Id}.");
-
             resource.UserAgent = Request.Headers["User-Agent"].ToString();
             var result = await _tokenManagementService.GenerateNewTokensAsync(resource, DateTime.UtcNow);
+
+            Log.Information($"Account-id {resource.AccountId}: using refresh token with Id is {resource.Id} - {result.Success}.");
 
             if (result.Success)
                 return Ok(result);

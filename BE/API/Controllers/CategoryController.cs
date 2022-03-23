@@ -46,6 +46,18 @@ namespace API.Controllers
             return await base.GetAllAsync();
         }
 
+        [HttpGet("{id:int}")]
+        [Authorize(Roles = "viewer, editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
+        public new async Task<IActionResult> GetByIdAsync(int id)
+        {
+            Log.Information($"{User.Identity?.Name}: get a office with Id is {id}.");
+
+            return await base.GetByIdAsync(id);
+        }
+
         [HttpGet("search")]
         [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status200OK)]

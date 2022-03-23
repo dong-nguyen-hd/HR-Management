@@ -279,7 +279,7 @@
                     <q-btn
                       size="12px"
                       class="absolute-top-right"
-                      icon="fas fa-plus"
+                      icon="add"
                       color="primary"
                       round
                       unelevated
@@ -288,15 +288,93 @@
                   </div>
 
                   <div class="fit">
-                    <q-scroll-area style="height: 394px">
-                      Expand
+                    <q-scroll-area class="q-mt-md" style="height: 378px">
+                      <q-card
+                        v-for="(category, index) in listTempCategory"
+                        :key="index"
+                        bordered
+                        class="skill-inside"
+                      >
+                        <q-card-section horizontal class="row">
+                          <q-card-section class="col-10">
+                            <div class="q-mb-sm">
+                              <q-badge
+                                class="text-subtitle2"
+                                :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              >
+                                <span>{{ category?.name }}:</span>
+                              </q-badge>
+                            </div>
+
+                            <span
+                              v-for="skill in category?.technologies"
+                              :key="skill?.id"
+                              class="q-mr-sm"
+                            >
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                              >
+                                {{ skill?.name }}
+                              </q-badge>
+                            </span>
+                          </q-card-section>
+
+                          <q-card-actions vertical class="col-2 justify-around">
+                            <q-btn
+                              flat
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_up"
+                            />
+
+                            <q-fab
+                              class="q-my-sm"
+                              icon="more_horiz"
+                              direction="left"
+                              padding="sm"
+                              unelevated
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                            >
+                              <q-fab-action
+                                @click="editSkill(category)"
+                                color="info"
+                                icon="edit"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Edit
+                                </q-tooltip></q-fab-action
+                              >
+                              <q-fab-action color="negative" icon="delete"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Delete
+                                </q-tooltip></q-fab-action
+                              >
+                            </q-fab>
+
+                            <q-btn
+                              flat
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_down"
+                            />
+                          </q-card-actions>
+                        </q-card-section>
+                      </q-card>
                     </q-scroll-area>
                   </div>
 
                   <q-dialog v-model="dialogToggle[1]" persistent>
                     <q-card style="width: 400px">
                       <q-card-section class="row items-center">
-                        <span class="text-h6">Add Skill</span>
+                        <span class="text-h6">{{
+                          showEditBtn ? "Edit Skill" : "Add Skill"
+                        }}</span>
                       </q-card-section>
 
                       <q-separator />
@@ -353,7 +431,7 @@
                                 ? false
                                 : true
                             "
-                            v-model="tempCategoryPersonResource.technology"
+                            v-model="tempCategoryPersonResource.technologies"
                             :options="tempListSkillCategory"
                             :label="labelNameFocusSkill[1]"
                             option-value="id"
@@ -362,6 +440,9 @@
                             map-options
                             options-selected-class="text-accent"
                             :label-color="colorFocusSkill[1]"
+                            :rules="[
+                              (val) => val?.length || 'Skill is required',
+                            ]"
                             @filter="filterSkillBelongWithCategory"
                             @focus="
                               colorFocusSkill[1] = 'white';
@@ -389,7 +470,20 @@
                           color="primary"
                           v-close-popup
                         />
-                        <q-btn flat label="Add" color="info" />
+                        <q-btn
+                          flat
+                          label="Add"
+                          color="info"
+                          @click="addSkill"
+                          v-show="!showEditBtn"
+                        />
+                        <q-btn
+                          flat
+                          label="Save"
+                          color="info"
+                          @click="saveSkill"
+                          v-show="showEditBtn"
+                        />
                       </q-card-actions>
                     </q-card>
                   </q-dialog>
@@ -500,7 +594,7 @@ export default defineComponent({
 
   data() {
     return {
-      tab: "",
+      tab: "1",
       tabModel: [
         { id: "1", name: "Skill" },
         { id: "2", name: "Project" },
@@ -534,14 +628,16 @@ export default defineComponent({
       tempCategoryPersonResource: {
         personId: 0,
         categoryId: 0,
-        technology: [],
+        technologies: [],
       },
+      listTempCategory: [],
 
       loadingSave: false,
 
       labelColorFocus: [],
       colorFocusSkill: [],
       labelNameFocusSkill: ["Category:", "Skill:"],
+      showEditBtn: false,
 
       listGender: [
         {
@@ -596,6 +692,39 @@ export default defineComponent({
       if (result.success) {
         this.tempListCategory = result.resource;
         if (seedValue) this.listCategory = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+    },
+    async getByCategoryId(id) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .get(
+          `/api/v1/category/${id}`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.tempListCategory.push(result.resource);
       } else {
         this.$q.notify({
           type: "negative",
@@ -681,6 +810,8 @@ export default defineComponent({
       });
     },
     filterCategory(val, update, abort) {
+      if(!val) abort()
+
       update(async () => {
         if (val.length < 2) this.tempListCategory = this.listCategory;
         else await this.findCategory(val, false);
@@ -690,7 +821,7 @@ export default defineComponent({
       update(() => {
         let temp = this.getSkillBelongWithCategory();
         if (!val) {
-          this.tempListSkillCategory = temp.slice(0, 5);
+          this.tempListSkillCategory = temp;
         } else {
           let needle = val.toLowerCase();
           this.tempListSkillCategory = temp.filter(
@@ -699,18 +830,17 @@ export default defineComponent({
         }
       });
     },
-
     getSkillBelongWithCategory() {
       let categoryId = this.tempCategoryPersonResource.categoryId;
 
       let obj = this.tempListCategory.find((x) => x.id == categoryId);
-      
+
       return obj.technologies;
     },
     openDialog(index) {
       if (index == 1) {
         this.tempCategoryPersonResource.categoryId = 0;
-        this.tempCategoryPersonResource.technology = [];
+        this.tempCategoryPersonResource.technologies = [];
       }
 
       this.dialogToggle[index] = true;
@@ -775,6 +905,53 @@ export default defineComponent({
     booleanTab(val) {
       return this.employeeInfor.orderIndex.some((x) => x == parseInt(val));
     },
+    addSkill() {
+      if (
+        !this.$refs.categoryRef.validate() ||
+        !this.$refs.skillRef.validate()
+      ) {
+        return null;
+      }
+
+      let category = this.tempListCategory.find(
+        (x) => x.id == this.tempCategoryPersonResource.categoryId
+      );
+      category.technologies = category.technologies.filter((x) =>
+        this.tempCategoryPersonResource.technologies.includes(x.id)
+      );
+
+      this.listTempCategory.unshift(category);
+      this.dialogToggle[1] = false;
+    },
+    editSkill(item) {
+      this.getByCategoryId(item.id);
+      this.tempListSkillCategory = this.getSkillBelongWithCategory();
+      
+      let temp = [];
+      item.technologies.forEach((x) => temp.push(x.id));
+
+      this.tempCategoryPersonResource.categoryId = item.id;
+      this.tempCategoryPersonResource.technologies = temp;
+
+      this.showEditBtn = true;
+      this.dialogToggle[1] = true;
+    },
+    saveSkill() {
+      let index = this.employeeInfor.categoryPersonResource.findIndex(x => x.id == this.tempCategoryPersonResource.categoryId);
+      this.employeeInfor.categoryPersonResource[index] = this.tempCategoryPersonResource;
+      
+      let indexTemp = this.listTempCategory.findIndex(x => x.id == this.tempCategoryPersonResource.categoryId);
+      let category = this.tempListCategory.find(
+        (x) => x.id == this.tempCategoryPersonResource.categoryId
+      );
+      category.technologies = category.technologies.filter((x) =>
+        this.tempCategoryPersonResource.technologies.includes(x.id)
+      );
+      this.listTempCategory[indexTemp] = category;
+
+      this.showEditBtn = false;
+      this.dialogToggle[1] = false;
+    },
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
@@ -816,6 +993,16 @@ export default defineComponent({
     width: 100%;
     height: 14%;
     bottom: 0;
+  }
+}
+
+.skill-inside {
+  margin: 16px;
+  &:last-child {
+    margin: 16px 16px 0 16px;
+  }
+  &:first-child {
+    margin: 0 16px 16px 16px;
   }
 }
 </style>
