@@ -1,6 +1,7 @@
 ﻿# Web API Project:<p/>Human Resource Management for IT Company
 
-This project building on **.NET 6**, using for Human Resource Management for IT Company. 
+This project building on **.NET 6**, using for Human Resource Management for IT Company.
+## Status: unfinished
 
 ## Technologies
 
