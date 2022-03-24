@@ -322,6 +322,7 @@
 
                           <q-card-actions vertical class="col-2 justify-around">
                             <q-btn
+                              @click="orderSkillPrev(category)"
                               flat
                               round
                               :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
@@ -347,7 +348,10 @@
                                   Edit
                                 </q-tooltip></q-fab-action
                               >
-                              <q-fab-action color="negative" icon="delete"
+                              <q-fab-action 
+                              @click="deleteSkill(category)"
+                              color="negative"
+                              icon="delete"
                                 ><q-tooltip
                                   anchor="top middle"
                                   self="center middle"
@@ -359,6 +363,7 @@
 
                             <q-btn
                               flat
+                              @click="orderSkillNext(category)"
                               round
                               :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
                               icon="keyboard_arrow_down"
@@ -387,6 +392,12 @@
                             v-model="tempCategoryPersonResource.categoryId"
                             :options="tempListCategory"
                             :label="labelNameFocusSkill[0]"
+                            :option-disable="
+                              (item) =>
+                                getDisableCategory.some((x) => x == item.id)
+                                  ? true
+                                  : false
+                            "
                             option-value="id"
                             option-label="name"
                             emit-value
@@ -425,6 +436,7 @@
                             clearable
                             multiple
                             use-chips
+                            max-values="̀50"
                             use-input
                             :disable="
                               tempCategoryPersonResource.categoryId
@@ -483,6 +495,39 @@
                           color="info"
                           @click="saveSkill"
                           v-show="showEditBtn"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
+
+                  <q-dialog v-model="deleteToggle[1]" persistent>
+                    <q-card>
+                      <q-card-section class="row items-center">
+                        <span class="text-h6"
+                          >Delete {{ tempDeleteSkill.name }} category?</span
+                        >
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <span
+                          >This can’t be undone and it will be removed.</span
+                        >
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          v-close-popup
+                          label="Cancel"
+                          color="primary"
+                        />
+                        <q-btn
+                          flat
+                          label="Delete"
+                          color="negative"
+                          @click="saveDeleteSkill"
                         />
                       </q-card-actions>
                     </q-card>
@@ -585,7 +630,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { mapGetters, mapActions, mapMutations } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 
@@ -632,6 +677,8 @@ export default defineComponent({
       },
       listTempCategory: [],
 
+      tempDeleteSkill: null,
+
       loadingSave: false,
 
       labelColorFocus: [],
@@ -654,6 +701,7 @@ export default defineComponent({
         },
       ],
       dialogToggle: [],
+      deleteToggle: [],
       tempOrderIndex: [],
       tempListSkillCategory: [],
       tempListCategory: [],
@@ -705,9 +753,7 @@ export default defineComponent({
 
       // Request API
       let result = await api
-        .get(
-          `/api/v1/category/${id}`
-        )
+        .get(`/api/v1/category/${id}`)
         .then((response) => {
           return response.data;
         })
@@ -724,7 +770,9 @@ export default defineComponent({
         });
 
       if (result.success) {
-        this.tempListCategory.push(result.resource);
+        let category = result.resource;
+        this.tempListCategory = [];
+        this.tempListCategory.unshift(category);
       } else {
         this.$q.notify({
           type: "negative",
@@ -810,11 +858,10 @@ export default defineComponent({
       });
     },
     filterCategory(val, update, abort) {
-      if(!val) abort()
-
       update(async () => {
-        if (val.length < 2) this.tempListCategory = this.listCategory;
-        else await this.findCategory(val, false);
+        if (val.length > 0 && val.length < 2)
+          this.tempListCategory = this.listCategory;
+        if (val.length >= 2) await this.findCategory(val, false);
       });
     },
     filterSkillBelongWithCategory(val, update, abort) {
@@ -913,48 +960,152 @@ export default defineComponent({
         return null;
       }
 
+      // List for send to server
+      Object.assign({}, this.getInformation);
+      this.employeeInfor.categoryPersonResource.unshift(
+        Object.assign({}, this.tempCategoryPersonResource)
+      );
+
+      // List for print
       let category = this.tempListCategory.find(
         (x) => x.id == this.tempCategoryPersonResource.categoryId
       );
       category.technologies = category.technologies.filter((x) =>
         this.tempCategoryPersonResource.technologies.includes(x.id)
       );
-
       this.listTempCategory.unshift(category);
+
       this.dialogToggle[1] = false;
     },
-    editSkill(item) {
-      this.getByCategoryId(item.id);
-      this.tempListSkillCategory = this.getSkillBelongWithCategory();
-      
+    async editSkill(item) {
+      await this.getByCategoryId(item.id);
+
       let temp = [];
       item.technologies.forEach((x) => temp.push(x.id));
 
       this.tempCategoryPersonResource.categoryId = item.id;
       this.tempCategoryPersonResource.technologies = temp;
 
+      this.tempListSkillCategory = this.getSkillBelongWithCategory();
+
       this.showEditBtn = true;
       this.dialogToggle[1] = true;
     },
     saveSkill() {
-      let index = this.employeeInfor.categoryPersonResource.findIndex(x => x.id == this.tempCategoryPersonResource.categoryId);
-      this.employeeInfor.categoryPersonResource[index] = this.tempCategoryPersonResource;
-      
-      let indexTemp = this.listTempCategory.findIndex(x => x.id == this.tempCategoryPersonResource.categoryId);
+      // Set list API
+      let index = this.employeeInfor.categoryPersonResource.findIndex(
+        (x) => x.categoryId == this.tempCategoryPersonResource.categoryId
+      );
+      this.employeeInfor.categoryPersonResource[index] = Object.assign(
+        {},
+        this.tempCategoryPersonResource
+      );
+
+      // Mapping with print-list
       let category = this.tempListCategory.find(
         (x) => x.id == this.tempCategoryPersonResource.categoryId
       );
       category.technologies = category.technologies.filter((x) =>
         this.tempCategoryPersonResource.technologies.includes(x.id)
       );
-      this.listTempCategory[indexTemp] = category;
+
+      this.listTempCategory[index] = category;
 
       this.showEditBtn = false;
       this.dialogToggle[1] = false;
     },
+    deleteSkill(item){
+      this.tempDeleteSkill = item;
+      this.deleteToggle[1] = true;
+    },
+    saveDeleteSkill(){
+      // Set list API
+      let index = this.employeeInfor.categoryPersonResource.findIndex(
+        (x) => x.categoryId == this.tempDeleteSkill.id
+      );
+      this.employeeInfor.categoryPersonResource.splice(index, 1);
+
+      // Set list temp print
+      this.listTempCategory.splice(index, 1);
+
+      this.deleteToggle[1] = false;
+    },
+    orderSkillNext(item){
+      let count = this.employeeInfor.categoryPersonResource.length;
+      // Set list API
+      let index = this.employeeInfor.categoryPersonResource.findIndex(
+        (x) => x.categoryId == item.id
+      );
+
+      if (index == count - 1) {
+        let tempOne = this.employeeInfor.categoryPersonResource.slice(0, index);
+        tempOne.unshift(this.employeeInfor.categoryPersonResource[index]);
+        this.employeeInfor.categoryPersonResource = tempOne;
+
+        let tempTwo = this.listTempCategory.slice(0, index);
+        tempTwo.unshift(this.listTempCategory[index]);
+        this.listTempCategory = tempTwo;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.categoryPersonResource[i];
+            this.employeeInfor.categoryPersonResource[i] = this.employeeInfor.categoryPersonResource[i + 1];
+            this.employeeInfor.categoryPersonResource[i + 1] = tempOne;
+
+            let tempTwo = this.listTempCategory[i];
+            this.listTempCategory[i] = this.listTempCategory[i + 1];
+            this.listTempCategory[i + 1] = tempTwo;
+
+            break;
+          }
+        }
+      }
+    },
+    orderSkillPrev(item){
+      let count = this.employeeInfor.categoryPersonResource.length;
+      // Set list API
+      let index = this.employeeInfor.categoryPersonResource.findIndex(
+        (x) => x.categoryId == item.id
+      );
+
+      if (index == 0) {
+        let tempOne = this.employeeInfor.categoryPersonResource.slice(1);
+        tempOne.push(this.employeeInfor.categoryPersonResource[index]);
+        this.employeeInfor.categoryPersonResource = tempOne;
+
+        let tempTwo = this.listTempCategory.slice(1);
+        tempTwo.push(this.listTempCategory[index]);
+        this.listTempCategory = tempTwo;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.categoryPersonResource[i];
+            this.employeeInfor.categoryPersonResource[i] = this.employeeInfor.categoryPersonResource[i - 1];
+            this.employeeInfor.categoryPersonResource[i - 1] = tempOne;
+
+            let tempTwo = this.listTempCategory[i];
+            this.listTempCategory[i] = this.listTempCategory[i - 1];
+            this.listTempCategory[i - 1] = tempTwo;
+
+            break;
+          }
+        }
+      }
+    }
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
+    getDisableCategory() {
+      let temp = [];
+      this.employeeInfor.categoryPersonResource.forEach((x) =>
+        temp.push(x.categoryId)
+      );
+
+      return temp;
+    },
+    getCategoryId() {
+      return this.tempCategoryPersonResource.categoryId;
+    },
   },
   async created() {
     let isValid = await this.validateToken();
@@ -967,6 +1118,11 @@ export default defineComponent({
     ]);
 
     this.imageURL = this.avatarDefault;
+  },
+  watch: {
+    getCategoryId: function (newVal, oldVal) {
+      if (oldVal && newVal) this.tempCategoryPersonResource.technologies = [];
+    },
   },
   mounted() {
     const $q = useQuasar();

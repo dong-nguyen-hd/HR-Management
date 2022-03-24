@@ -39,7 +39,7 @@ namespace Infrastructure.Contexts.Config
                     Name = "Dong Nguyen",
                     LastActivity = DateTime.UtcNow,
                     IsDeleted = false,
-                    Avatar = "default.jpg"
+                    Avatar = Constant.DefaultAvatar
                 }
             );
         }

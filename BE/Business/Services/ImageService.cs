@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Communication;
 using Business.CustomException;
+using Business.Data;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
@@ -50,6 +51,50 @@ namespace Business.Services
         #endregion
 
         #region Method
+        public async Task<BaseResponse<AccountResource>> ResetAccountAvatarAsync(int id)
+        {
+            try
+            {
+                // Validate Id is existent?
+                var tempAccount = await _accountRepository.GetByIdAsync(id);
+                if (tempAccount is null)
+                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_NoData"]);
+
+                DeleteFileByName(tempAccount.Avatar);
+                tempAccount.Avatar = Constant.DefaultAvatar; // Reset avatar to default
+
+                await _unitOfWork.CompleteAsync();
+
+                return new BaseResponse<AccountResource>(_mapper.Map<AccountResource>(tempAccount));
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["Account_Saving_Error"], ex);
+            }
+        }
+
+        public async Task<BaseResponse<PersonResource>> ResetPersonAvatarAsync(int id)
+        {
+            try
+            {
+                // Validate Id is existent?
+                var tempPerson = await _personRepository.GetByIdAsync(id);
+                if (tempPerson is null)
+                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
+
+                DeleteFileByName(tempPerson.Avatar);
+                tempPerson.Avatar = Constant.DefaultAvatar; // Reset avatar to default
+
+                await _unitOfWork.CompleteAsync();
+
+                return new BaseResponse<PersonResource>(_mapper.Map<PersonResource>(tempPerson));
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["Person_Saving_Error"], ex);
+            }
+        }
+
         public async Task<BaseResponse<AccountResource>> SaveImageAccountAsync(int accountId, Stream imageStream)
         {
             try
@@ -115,6 +160,16 @@ namespace Business.Services
         }
 
         #region Private work
+        private bool DeleteFileByName(string avatarName)
+        {
+            var path = GetRootPath(avatarName);
+
+            bool one = DeletePhotoIfExist(path.originalPath);
+            bool two = DeletePhotoIfExist(path.thumbnailPath);
+
+            return one && two ? true : false;
+        }
+
         private static string CreateFileName(string avatarName)
             => $"{avatarName}-{Guid.NewGuid()}.jpg";
 
@@ -129,11 +184,11 @@ namespace Business.Services
         }
 
         private static bool CheckExistentAvatar(string avatarName)
-            => (string.IsNullOrEmpty(avatarName) || avatarName.Equals("default.jpg")) ? false : true;
+            => (string.IsNullOrEmpty(avatarName) || avatarName.Equals(Constant.DefaultAvatar)) ? false : true;
 
         private string Initialize(string oldFileName, string newFileName, Image rawImage)
         {
-            string defaultName = "default.jpg";
+            string defaultName = Constant.DefaultAvatar;
 
             try
             {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Data;
 using Business.Extensions;
 using Business.Resources.Person;
 using System;
@@ -22,7 +23,7 @@ namespace Business.Mapping.Person
                 .ForMember(x => x.WorkHistories, opt => opt.MapFrom(src => src.WorkHistoryResource))
                 .ForMember(x => x.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
                 .ForMember(x => x.StaffId, opt => opt.MapFrom(src => ComputeStaffId()))
-                .ForMember(x => x.Avatar, opt => opt.MapFrom(src => "default.jpg")) // Use default image for new person.
+                .ForMember(x => x.Avatar, opt => opt.MapFrom(src => Constant.DefaultAvatar)) // Use default image for new person.
                 .ForMember(x => x.OrderIndex, opt => opt.MapFrom(src => src.OrderIndex.RemoveDuplicate().ConcatenateWithComma()));
 
             CreateMap<UpdatePersonResource, Domain.Models.Person>()

@@ -12,6 +12,5 @@ namespace Business.Domain.Services
         Task<PaginationResponse<IEnumerable<AccountResource>>> ListPaginationAsync(QueryResource pagintation);
         Task<BaseResponse<AccountResource>> SelfUpdateAsync(int id, SelfUpdateAccountResource resource);
         Task<BaseResponse<AccountResource>> UpdatePasswordAsync(int id, UpdatePasswordAccountResource resource);
-        Task<BaseResponse<AccountResource>> ResetAvatarAsync(int id);
     }
 }

@@ -170,7 +170,7 @@ namespace API.Controllers
         {
             Log.Information($"{User.Identity?.Name}: reset avatar of the person with Id is {id}.");
 
-            var result = await _personService.ResetAvatarAsync(id);
+            var result = await _imageService.ResetPersonAvatarAsync(id);
 
             if (!result.Success)
                 return BadRequest(result);

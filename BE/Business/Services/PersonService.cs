@@ -111,27 +111,6 @@ namespace Business.Services
             }
         }
 
-        public async Task<BaseResponse<PersonResource>> ResetAvatarAsync(int id)
-        {
-            try
-            {
-                // Validate Id is existent?
-                var tempPerson = await _personRepository.GetByIdAsync(id);
-                if (tempPerson is null)
-                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
-
-                tempPerson.Avatar = "default.jpg"; // Reset avatar to default
-
-                await UnitOfWork.CompleteAsync();
-
-                return new BaseResponse<PersonResource>(Mapper.Map<Person, PersonResource>(tempPerson));
-            }
-            catch (Exception ex)
-            {
-                throw new MessageResultException(ResponseMessage.Values["Person_Saving_Error"], ex);
-            }
-        }
-
         public async Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource)
         {
             var totalTechnology = await _technologyService.GetAllAsync();

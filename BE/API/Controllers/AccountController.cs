@@ -78,7 +78,7 @@ namespace API.Controllers
         {
             Log.Information($"{User.Identity?.Name}: reset avatar of the account with Id is {id}.");
 
-            var result = await _accountService.ResetAvatarAsync(id);
+            var result = await _imageService.ResetAccountAvatarAsync(id);
 
             if (!result.Success)
                 return BadRequest(result);

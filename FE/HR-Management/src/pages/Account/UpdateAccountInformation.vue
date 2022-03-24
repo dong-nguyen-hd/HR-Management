@@ -5,27 +5,42 @@
         <q-avatar size="200px">
           <img :src="imageURL" />
         </q-avatar>
-        <q-file
-          class="q-mt-sm cursor-pointer"
-          dense
-          clearable
-          standout
-          tabindex="-1"
-          input-style="width: 150px;"
-          max-total-size="5242880"
-          :display-value="
-            imageFile ? 'Image is uploaded' : 'Upload image here!'
-          "
-          v-model="imageFile"
-          accept=".jpg, .png, .gif, .bmp, image/*"
-          @update:model-value="previewImage"
-          @clear="clearTempImage"
-          @rejected="onRejected"
-        >
-          <template v-slot:prepend>
-            <q-icon name="attach_file" />
-          </template>
-        </q-file>
+        <div class="flex row no-wrap">
+          <div class="flex flex-center q-mr-md q-pt-sm">
+            <q-btn
+              round
+              unelevated
+              color="primary"
+              size="10px"
+              icon="restart_alt"
+              @click="resetAvatar"
+              ><q-tooltip anchor="top middle" self="bottom middle"
+                >Reset Avatar</q-tooltip
+              >
+            </q-btn>
+          </div>
+          <q-file
+            class="q-mt-sm cursor-pointer"
+            dense
+            clearable
+            standout
+            tabindex="-1"
+            input-style="width: 150px;"
+            max-total-size="5242880"
+            :display-value="
+              imageFile ? 'Image is uploaded' : 'Upload image here!'
+            "
+            v-model="imageFile"
+            accept=".jpg, .png, .gif, .bmp, image/*"
+            @update:model-value="previewImage"
+            @clear="clearTempImage"
+            @rejected="onRejected"
+          >
+            <template v-slot:prepend>
+              <q-icon name="attach_file" />
+            </template>
+          </q-file>
+        </div>
       </div>
       <div class="userName q-mt-lg q-px-md">
         <q-input
@@ -177,6 +192,46 @@ export default defineComponent({
         });
       } finally {
         this.loadingSave = false;
+      }
+    },
+    async resetAvatar() {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .put(`/api/v1/account/reset-avatar/${this.accountInfor.id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        let path = result.resource.avatar;
+        this.imageFile = null;
+        let infor = Object.assign({}, this.getInformation);
+        infor.avatar = path;
+        this.setInformation(infor);
+        this.mapInformation();
+        this.$q.notify({
+          type: "positive",
+          message: "Successfully",
+        });
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
       }
     },
     async requestUpdateImage() {

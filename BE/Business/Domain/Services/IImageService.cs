@@ -10,5 +10,7 @@ namespace Business.Domain.Services
     {
         Task<BaseResponse<PersonResource>> SaveImagePersonAsync(int personId, Stream imageStream);
         Task<BaseResponse<AccountResource>> SaveImageAccountAsync(int accountId, Stream imageStream);
+        Task<BaseResponse<AccountResource>> ResetAccountAvatarAsync(int id);
+        Task<BaseResponse<PersonResource>> ResetPersonAvatarAsync(int id);
     }
 }

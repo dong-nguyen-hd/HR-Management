@@ -50,27 +50,6 @@ namespace Business.Services
             }
         }
 
-        public async Task<BaseResponse<AccountResource>> ResetAvatarAsync(int id)
-        {
-            try
-            {
-                // Validate Id is existent?
-                var tempAccount = await _accountRepository.GetByIdAsync(id);
-                if (tempAccount is null)
-                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_NoData"]);
-
-                tempAccount.Avatar = "default.jpg"; // Reset avatar to default
-
-                await UnitOfWork.CompleteAsync();
-
-                return new BaseResponse<AccountResource>(Mapper.Map<Account, AccountResource>(tempAccount));
-            }
-            catch (Exception ex)
-            {
-                throw new MessageResultException(ResponseMessage.Values["Account_Saving_Error"], ex);
-            }
-        }
-
         public async Task<PaginationResponse<IEnumerable<AccountResource>>> ListPaginationAsync(QueryResource pagintation)
         {
             var tempAccount = await _accountRepository.ListPaginationAsync(pagintation);
