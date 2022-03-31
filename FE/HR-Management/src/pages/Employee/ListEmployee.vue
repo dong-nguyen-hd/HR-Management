@@ -293,7 +293,7 @@
 
           <template v-slot:body-cell-skill="props">
             <q-td :props="props">
-              <div v-if="props.value.length">
+              <div v-if="props.value?.length">
                 <div v-for="(item, index) in props.value" :key="index">
                   <q-badge :color="index % 2 == 0 ? 'blue-10' : 'teal-8'">
                     <span style="font-size: 14px"
@@ -302,16 +302,16 @@
                   </q-badge>
                   <span>
                     {{
-                      props?.value[index]?.technology[0]?.name
-                        ? ` ${props?.value[index]?.technology[0]?.name},`
+                      props?.value[index]?.technologies[0]?.name
+                        ? ` ${props?.value[index]?.technologies[0]?.name},`
                         : ""
                     }}{{
-                      props?.value[index]?.technology[1]?.name
-                        ? ` ${props?.value[index]?.technology[1]?.name},`
+                      props?.value[index]?.technologies[1]?.name
+                        ? ` ${props?.value[index]?.technologies[1]?.name},`
                         : ""
                     }}{{
-                      props?.value[index]?.technology[2]?.name
-                        ? ` ${props?.value[index]?.technology[2]?.name},`
+                      props?.value[index]?.technologies[2]?.name
+                        ? ` ${props?.value[index]?.technologies[2]?.name},`
                         : ""
                     }}...
                   </span>

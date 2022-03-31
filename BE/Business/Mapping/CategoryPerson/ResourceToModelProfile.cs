@@ -9,10 +9,10 @@ namespace Business.Mapping.CategoryPerson
         public ResourceToModelProfile()
         {
             CreateMap<CreateCategoryPersonResource, Domain.Models.CategoryPerson>()
-                .ForMember(x => x.Technology, opt => opt.MapFrom(src => src.Technology.ConcatenateWithComma()));
+                .ForMember(x => x.Technology, opt => opt.MapFrom(src => src.Technologies.ConcatenateWithComma()));
 
             CreateMap<UpdateCategoryPersonResource, Domain.Models.CategoryPerson>()
-                .ForMember(x => x.Technology, opt => opt.MapFrom(src => src.Technology.ConcatenateWithComma()));
+                .ForMember(x => x.Technology, opt => opt.MapFrom(src => src.Technologies.ConcatenateWithComma()));
         }
     }
 }

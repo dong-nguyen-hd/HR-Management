@@ -8,7 +8,7 @@ namespace Business.Mapping.Group
         public ModelToResourceProfile()
         {
             CreateMap<Domain.Models.Group, GroupResource>()
-                .ForMember(x => x.Technology, opt => opt.Ignore());
+                .ForMember(x => x.Technologies, opt => opt.Ignore());
         }
     }
 }

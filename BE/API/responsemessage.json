@@ -50,6 +50,12 @@
       "Project_Swapping_Error": "An error occurred when swapping the Project",
       "Project_NoData": "Project is not existent",
 
+      "Group_Saving_Error": "An error occurred when saving the Group",
+      "Group_Deleting_Error": "An error occurred when deleting the Group",
+      "Group_Updating_Error": "An error occurred when updating the Group",
+      "Group_Swapping_Error": "An error occurred when swapping the Group",
+      "Group_NoData": "Group is not existent",
+
       "CategoryPerson_Saving_Error": "An error occurred when saving the CategoryPerson",
       "CategoryPerson_Updating_Error": "An error occurred when updating the CategoryPerson",
       "CategoryPerson_Swapping_Error": "An error occurred when swapping the CategoryPerson",

@@ -53,7 +53,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetByIdAsync(int id)
         {
-            Log.Information($"{User.Identity?.Name}: get a office with Id is {id}.");
+            Log.Information($"{User.Identity?.Name}: get a category with Id is {id}.");
 
             return await base.GetByIdAsync(id);
         }

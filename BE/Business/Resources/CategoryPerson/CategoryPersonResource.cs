@@ -22,6 +22,6 @@ namespace Business.Resources.CategoryPerson
         public string CategoryName { get; set; }
 
         [Required]
-        public List<TechnologyResource> Technology { get; set; } = new List<TechnologyResource>();
+        public List<TechnologyResource> Technologies { get; set; } = new ();
     }
 }

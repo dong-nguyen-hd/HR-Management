@@ -1,6 +1,5 @@
 ﻿using Business.Extensions.Validation;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Project
@@ -9,23 +8,11 @@ namespace Business.Resources.Project
     {
         [Required]
         [MaxLength(250)]
-        public string Name { get; set; }
-
-        [Required]
-        [MaxLength(250)]
-        public string Description { get; set; }
-
-        [Required]
-        [MaxLength(250)]
         public string Position { get; set; }
 
         [Required]
         [MaxLength(250)]
         public string Responsibilities { get; set; }
-
-        [Required]
-        [Display(Name = "Team Size")]
-        public int TeamSize { get; set; }
 
         [Required]
         [StartDate("EndDate")]
@@ -38,7 +25,7 @@ namespace Business.Resources.Project
         public DateTime? EndDate { get; set; }
 
         [Required]
-        [MaxLength(50)]
-        public List<int> Technology { get; set; }
+        [Display(Name = "Group Id")]
+        public int GroupId { get; set; }
     }
 }

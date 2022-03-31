@@ -147,7 +147,7 @@ namespace Business.Services
                 var countCategoryPerson = listCategoryPerson.Count;
                 for (int i = 0; i < countCategoryPerson; i++)
                     if (!string.IsNullOrEmpty(listCategoryPerson?[i].Technology))
-                        tempPersonResource.CategoryPerson[i].Technology = totalTechnology.IntersectTechnology(listCategoryPerson[i].Technology);
+                        tempPersonResource.CategoryPerson[i].Technologies = totalTechnology.IntersectTechnology(listCategoryPerson[i].Technology);
 
                 listPersonResource.Add(tempPersonResource);
             }

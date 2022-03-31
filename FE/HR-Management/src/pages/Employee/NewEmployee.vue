@@ -348,10 +348,10 @@
                                   Edit
                                 </q-tooltip></q-fab-action
                               >
-                              <q-fab-action 
-                              @click="deleteSkill(category)"
-                              color="negative"
-                              icon="delete"
+                              <q-fab-action
+                                @click="deleteSkill(category)"
+                                color="negative"
+                                icon="delete"
                                 ><q-tooltip
                                   anchor="top middle"
                                   self="center middle"
@@ -534,23 +534,385 @@
                   </q-dialog>
                 </q-tab-panel>
 
-                <q-tab-panel name="2">
-                  <div class="tab-skill flex flex-center">
+                <q-tab-panel name="2" class="tab-project flex flex-center">
+                  <div class="full-width relative-position flex flex-center">
                     <q-btn-group rounded flat unelevated>
                       <q-btn
                         color="primary"
                         label="<"
                         @click="orderTabPrev()"
+                        size="md"
                       />
-                      <q-btn color="primary" label="Project" disable />
+                      <q-btn
+                        :color="booleanTab(2) ? 'primary' : 'grey'"
+                        label="Project"
+                        @click="toggleTab(2)"
+                        size="md"
+                      >
+                        <q-tooltip anchor="top middle" self="center middle">
+                          {{ booleanTab(2) ? "Hide" : "Show" }}
+                        </q-tooltip></q-btn
+                      >
                       <q-btn
                         color="primary"
                         label=">"
                         @click="orderTabNext()"
+                        size="md"
                       />
                     </q-btn-group>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+
+                    <q-btn
+                      size="12px"
+                      class="absolute-top-right"
+                      icon="add"
+                      color="primary"
+                      round
+                      unelevated
+                      @click="openDialog(2)"
+                    />
                   </div>
+
+                  <div class="fit">
+                    <q-scroll-area class="q-mt-md" style="height: 378px">
+                      <q-card
+                        v-for="(project, index) in listTempProject"
+                        :key="index"
+                        bordered
+                        class="project-inside"
+                      >
+                        <q-card-section horizontal class="row">
+                          <q-card-section class="col-10">
+                            <div class="q-mb-sm">
+                              <q-badge
+                                class="text-subtitle2"
+                                :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              >
+                                <span>{{ project?.groupName }}:</span>
+                              </q-badge>
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Position:</q-badge
+                              > {{ project.position }}
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Responsibilities:</q-badge
+                              >
+                                {{ project.responsibilities }}
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Start Date:</q-badge
+                              > {{ project.startDate }}
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >End Date:</q-badge
+                              > {{ project.endDate }}
+                            </div>
+                          </q-card-section>
+
+                          <q-card-actions vertical class="col-2 justify-around">
+                            <q-btn
+                              @click="orderProjectPrev(project)"
+                              flat
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_up"
+                            />
+
+                            <q-fab
+                              class="q-my-sm"
+                              icon="more_horiz"
+                              direction="left"
+                              padding="sm"
+                              unelevated
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                            >
+                              <q-fab-action
+                                @click="editProject(project)"
+                                color="info"
+                                icon="edit"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Edit
+                                </q-tooltip></q-fab-action
+                              >
+                              <q-fab-action
+                                @click="deleteProject(project)"
+                                color="negative"
+                                icon="delete"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Delete
+                                </q-tooltip></q-fab-action
+                              >
+                            </q-fab>
+
+                            <q-btn
+                              flat
+                              @click="orderProjectNext(project)"
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_down"
+                            />
+                          </q-card-actions>
+                        </q-card-section>
+                      </q-card>
+                    </q-scroll-area>
+                  </div>
+
+                  <q-dialog v-model="dialogToggle[2]" persistent>
+                    <q-card style="width: 400px">
+                      <q-card-section class="row items-center">
+                        <span class="text-h6">{{
+                          showEditBtn ? "Edit Project" : "Add Project"
+                        }}</span>
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <div class="q-mt-sm">
+                          <q-select
+                            standout
+                            ref="projectOneRef"
+                            v-model="tempProjectResource.groupId"
+                            :options="tempListGroup"
+                            :label="labelNameFocusProject[0]"
+                            option-value="id"
+                            option-label="name"
+                            emit-value
+                            map-options
+                            options-selected-class="text-accent"
+                            @filter="filterProject"
+                            fill-input
+                            input-debounce="200"
+                            hide-selected
+                            use-input
+                            :rules="[(val) => !!val || 'Project is required']"
+                            hide-bottom-space
+                            :label-color="colorFocusProject[0]"
+                            @focus="
+                              colorFocusProject[0] = 'white';
+                              labelNameFocusProject[0] = 'Search by project';
+                            "
+                            @blur="
+                              colorFocusProject[0] = '';
+                              labelNameFocusProject[0] = 'Project:';
+                            "
+                            ><template v-slot:no-option>
+                              <q-item>
+                                <q-item-section class="text-grey">
+                                  No results
+                                </q-item-section>
+                              </q-item>
+                            </template>
+                          </q-select>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="projectTwoRef"
+                            standout
+                            clearable
+                            maxlength="500"
+                            v-model="tempProjectResource.position"
+                            type="text"
+                            label="Position:"
+                            :label-color="colorFocusProject[1]"
+                            @focus="colorFocusProject[1] = 'white'"
+                            @blur="colorFocusProject[1] = ''"
+                            hide-bottom-space
+                            :rules="[(val) => !!val || 'Position is required']"
+                          >
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="projectThreeRef"
+                            standout
+                            clearable
+                            maxlength="500"
+                            autogrow
+                            v-model="tempProjectResource.responsibilities"
+                            type="text"
+                            label="Responsibilities:"
+                            :label-color="colorFocusProject[2]"
+                            @focus="colorFocusProject[2] = 'white'"
+                            @blur="colorFocusProject[2] = ''"
+                            :rules="[
+                              (val) => !!val || 'Responsibilities is required',
+                            ]"
+                            hide-bottom-space
+                          >
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="projectFourRef"
+                            standout
+                            maxlength="500"
+                            v-model="tempProjectResource.startDate"
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            mask="##/##/####"
+                            stack-label
+                            label="Start Date:"
+                            :label-color="colorFocusProject[3]"
+                            @focus="colorFocusProject[3] = 'white'"
+                            @blur="colorFocusProject[3] = ''"
+                            :rules="[
+                              (val) => !!val || 'Start Date is required',
+                            ]"
+                            hide-bottom-space
+                          >
+                            <template v-slot:append>
+                              <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy
+                                  cover
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-date
+                                    v-model="tempProjectResource.startDate"
+                                    mask="MM/DD/YYYY"
+                                  >
+                                    <div class="row items-center justify-end">
+                                      <q-btn
+                                        v-close-popup
+                                        label="Close"
+                                        color="primary"
+                                        flat
+                                      />
+                                    </div>
+                                  </q-date>
+                                </q-popup-proxy>
+                              </q-icon>
+                            </template>
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="projectFiveRef"
+                            standout
+                            maxlength="500"
+                            v-model="tempProjectResource.endDate"
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            mask="##/##/####"
+                            stack-label
+                            label="End Date:"
+                            :label-color="colorFocusProject[4]"
+                            @focus="colorFocusProject[4] = 'white'"
+                            @blur="colorFocusProject[4] = ''"
+                            :rules="[(val) => !!val || 'End Date is required']"
+                            hide-bottom-space
+                          >
+                            <template v-slot:append>
+                              <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy
+                                  cover
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-date
+                                    v-model="tempProjectResource.endDate"
+                                    mask="MM/DD/YYYY"
+                                  >
+                                    <div class="row items-center justify-end">
+                                      <q-btn
+                                        v-close-popup
+                                        label="Close"
+                                        color="primary"
+                                        flat
+                                      />
+                                    </div>
+                                  </q-date>
+                                </q-popup-proxy>
+                              </q-icon>
+                            </template>
+                          </q-input>
+                        </div>
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          label="Cancel"
+                          color="primary"
+                          v-close-popup
+                        />
+                        <q-btn
+                          flat
+                          label="Add"
+                          color="info"
+                          @click="addProject"
+                          v-show="!showEditBtn"
+                        />
+                        <q-btn
+                          flat
+                          label="Save"
+                          color="info"
+                          @click="saveProject"
+                          v-show="showEditBtn"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
+
+                  <q-dialog v-model="deleteToggle[2]" persistent>
+                    <q-card>
+                      <q-card-section class="row items-center">
+                        <span class="text-h6"
+                          >Delete {{ tempDeleteProject.groupName }} project?</span
+                        >
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <span
+                          >This can’t be undone and it will be removed.</span
+                        >
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          v-close-popup
+                          label="Cancel"
+                          color="primary"
+                        />
+                        <q-btn
+                          flat
+                          label="Delete"
+                          color="negative"
+                          @click="saveDeleteProject"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
                 </q-tab-panel>
 
                 <q-tab-panel name="3">
@@ -639,7 +1001,7 @@ export default defineComponent({
 
   data() {
     return {
-      tab: "1",
+      tab: "2",
       tabModel: [
         { id: "1", name: "Skill" },
         { id: "2", name: "Project" },
@@ -677,13 +1039,27 @@ export default defineComponent({
       },
       listTempCategory: [],
 
+      tempProjectResource: {
+        position: "",
+        responsibilities: "",
+        startDate: "",
+        endDate: null,
+        personId: 0,
+        groupId: 0,
+        tempId: null
+      },
+      listTempProject: [],
+
       tempDeleteSkill: null,
+      tempDeleteProject: null,
 
       loadingSave: false,
 
       labelColorFocus: [],
       colorFocusSkill: [],
+      colorFocusProject: [],
       labelNameFocusSkill: ["Category:", "Skill:"],
+      labelNameFocusProject: ["Project:"],
       showEditBtn: false,
 
       listGender: [
@@ -708,6 +1084,8 @@ export default defineComponent({
       listCategory: [],
       tempListOffice: [],
       listOffice: [],
+      tempListGroup: [],
+      listGroup: [],
     };
   },
   methods: {
@@ -747,6 +1125,40 @@ export default defineComponent({
         });
       }
     },
+    async findGroup(keyword, seedValue) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .get(
+          `/api/v1/group/search?filterName=${!keyword ? "" : keyword.trim()}`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.tempListGroup = result.resource;
+        if (seedValue) this.listGroup = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+    },
     async getByCategoryId(id) {
       let isValid = await this.validateToken();
       if (!isValid) this.$router.replace("/login");
@@ -773,6 +1185,38 @@ export default defineComponent({
         let category = result.resource;
         this.tempListCategory = [];
         this.tempListCategory.unshift(category);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+    },
+    async getByGroupId(id) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .get(`/api/v1/group/${id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.tempListGroup = [];
+        this.tempListGroup.unshift(result.resource);
       } else {
         this.$q.notify({
           type: "negative",
@@ -864,6 +1308,13 @@ export default defineComponent({
         if (val.length >= 2) await this.findCategory(val, false);
       });
     },
+    filterProject(val, update, abort) {
+      update(async () => {
+        if (val.length > 0 && val.length < 2)
+          this.tempListProject = this.listProject;
+        if (val.length >= 2) await this.findGroup(val, false);
+      });
+    },
     filterSkillBelongWithCategory(val, update, abort) {
       update(() => {
         let temp = this.getSkillBelongWithCategory();
@@ -888,6 +1339,14 @@ export default defineComponent({
       if (index == 1) {
         this.tempCategoryPersonResource.categoryId = 0;
         this.tempCategoryPersonResource.technologies = [];
+      }
+
+      if (index == 2) {
+        this.tempProjectResource.position = "";
+        this.tempProjectResource.responsibilities = "";
+        this.tempProjectResource.startDate = "";
+        this.tempProjectResource.endDate = null;
+        this.tempProjectResource.groupId = 0;
       }
 
       this.dialogToggle[index] = true;
@@ -961,7 +1420,6 @@ export default defineComponent({
       }
 
       // List for send to server
-      Object.assign({}, this.getInformation);
       this.employeeInfor.categoryPersonResource.unshift(
         Object.assign({}, this.tempCategoryPersonResource)
       );
@@ -1014,11 +1472,11 @@ export default defineComponent({
       this.showEditBtn = false;
       this.dialogToggle[1] = false;
     },
-    deleteSkill(item){
+    deleteSkill(item) {
       this.tempDeleteSkill = item;
       this.deleteToggle[1] = true;
     },
-    saveDeleteSkill(){
+    saveDeleteSkill() {
       // Set list API
       let index = this.employeeInfor.categoryPersonResource.findIndex(
         (x) => x.categoryId == this.tempDeleteSkill.id
@@ -1030,7 +1488,7 @@ export default defineComponent({
 
       this.deleteToggle[1] = false;
     },
-    orderSkillNext(item){
+    orderSkillNext(item) {
       let count = this.employeeInfor.categoryPersonResource.length;
       // Set list API
       let index = this.employeeInfor.categoryPersonResource.findIndex(
@@ -1049,7 +1507,8 @@ export default defineComponent({
         for (let i = 0; i < count; i++) {
           if (i == index) {
             let tempOne = this.employeeInfor.categoryPersonResource[i];
-            this.employeeInfor.categoryPersonResource[i] = this.employeeInfor.categoryPersonResource[i + 1];
+            this.employeeInfor.categoryPersonResource[i] =
+              this.employeeInfor.categoryPersonResource[i + 1];
             this.employeeInfor.categoryPersonResource[i + 1] = tempOne;
 
             let tempTwo = this.listTempCategory[i];
@@ -1061,7 +1520,7 @@ export default defineComponent({
         }
       }
     },
-    orderSkillPrev(item){
+    orderSkillPrev(item) {
       let count = this.employeeInfor.categoryPersonResource.length;
       // Set list API
       let index = this.employeeInfor.categoryPersonResource.findIndex(
@@ -1080,7 +1539,8 @@ export default defineComponent({
         for (let i = 0; i < count; i++) {
           if (i == index) {
             let tempOne = this.employeeInfor.categoryPersonResource[i];
-            this.employeeInfor.categoryPersonResource[i] = this.employeeInfor.categoryPersonResource[i - 1];
+            this.employeeInfor.categoryPersonResource[i] =
+              this.employeeInfor.categoryPersonResource[i - 1];
             this.employeeInfor.categoryPersonResource[i - 1] = tempOne;
 
             let tempTwo = this.listTempCategory[i];
@@ -1091,7 +1551,142 @@ export default defineComponent({
           }
         }
       }
-    }
+    },
+    addProject() {
+      if (
+        !this.$refs.projectOneRef.validate() ||
+        !this.$refs.projectTwoRef.validate() ||
+        !this.$refs.projectThreeRef.validate() ||
+        !this.$refs.projectFourRef.validate()
+      ) {
+        return null;
+      }
+      this.tempProjectResource.tempId = Date.now();
+
+      // List for send to server
+      this.employeeInfor.projectResource.unshift(
+        Object.assign({}, this.tempProjectResource)
+      );
+
+      // List for print
+      let temp = Object.assign({}, this.tempProjectResource);
+      let group = this.tempListGroup.find(
+        (x) => x.id == this.tempProjectResource.groupId
+      );
+      temp.groupName = group.name;
+      this.listTempProject.unshift(temp);
+
+      this.dialogToggle[2] = false;
+    },
+    saveProject() {
+      // Set list API
+      let index = this.employeeInfor.projectResource.findIndex(
+        (x) => x.tempId == this.tempProjectResource.tempId
+      );
+      this.employeeInfor.projectResource[index] = Object.assign(
+        {},
+        this.tempProjectResource
+      );
+
+      // Mapping with print-list
+      let temp = Object.assign({}, this.tempProjectResource);
+      let group = this.tempListGroup.find(
+        (x) => x.id == this.tempProjectResource.groupId
+      );
+      temp.groupName = group.name;
+      this.listTempProject[index] = temp;
+
+      this.showEditBtn = false;
+      this.dialogToggle[2] = false;
+    },
+    async editProject(item){
+      await this.getByGroupId(item.groupId);
+
+      this.tempProjectResource = item;
+
+      this.showEditBtn = true;
+      this.dialogToggle[2] = true;
+    },
+    deleteProject(item) {
+      this.tempDeleteProject = item;
+      this.deleteToggle[2] = true;
+    },
+    saveDeleteProject() {
+      // Set list API
+      let index = this.employeeInfor.projectResource.findIndex(
+        (x) => x.tempId == this.tempDeleteProject.tempId
+      );
+      this.employeeInfor.projectResource.splice(index, 1);
+
+      // Set list temp print
+      this.listTempProject.splice(index, 1);
+
+      this.deleteToggle[2] = false;
+    },
+    orderProjectNext(item) {
+      let count = this.employeeInfor.projectResource.length;
+      // Set list API
+      let index = this.employeeInfor.projectResource.findIndex(
+        (x) => x.tempId == item.tempId
+      );
+
+      if (index == count - 1) {
+        let tempOne = this.employeeInfor.projectResource.slice(0, index);
+        tempOne.unshift(this.employeeInfor.projectResource[index]);
+        this.employeeInfor.projectResource = tempOne;
+
+        let tempTwo = this.listTempProject.slice(0, index);
+        tempTwo.unshift(this.listTempProject[index]);
+        this.listTempProject = tempTwo;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.projectResource[i];
+            this.employeeInfor.projectResource[i] =
+              this.employeeInfor.projectResource[i + 1];
+            this.employeeInfor.projectResource[i + 1] = tempOne;
+
+            let tempTwo = this.listTempProject[i];
+            this.listTempProject[i] = this.listTempProject[i + 1];
+            this.listTempProject[i + 1] = tempTwo;
+
+            break;
+          }
+        }
+      }
+    },
+    orderProjectPrev(item) {
+      let count = this.employeeInfor.projectResource.length;
+      // Set list API
+      let index = this.employeeInfor.projectResource.findIndex(
+        (x) => x.tempId == item.tempId
+      );
+
+      if (index == 0) {
+        let tempOne = this.employeeInfor.projectResource.slice(1);
+        tempOne.push(this.employeeInfor.projectResource[index]);
+        this.employeeInfor.projectResource = tempOne;
+
+        let tempTwo = this.listTempProject.slice(1);
+        tempTwo.push(this.listTempProject[index]);
+        this.listTempProject = tempTwo;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.projectResource[i];
+            this.employeeInfor.projectResource[i] =
+              this.employeeInfor.projectResource[i - 1];
+            this.employeeInfor.projectResource[i - 1] = tempOne;
+
+            let tempTwo = this.listTempProject[i];
+            this.listTempProject[i] = this.listTempProject[i - 1];
+            this.listTempProject[i - 1] = tempTwo;
+
+            break;
+          }
+        }
+      }
+    },
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
@@ -1113,6 +1708,7 @@ export default defineComponent({
 
     await Promise.all([
       this.findCategory(false, true),
+      this.findGroup(false, true),
       this.getOffice(),
       this.getAvatarUrl(),
     ]);
@@ -1152,7 +1748,8 @@ export default defineComponent({
   }
 }
 
-.skill-inside {
+.skill-inside,
+.project-inside {
   margin: 16px;
   &:last-child {
     margin: 16px 16px 0 16px;

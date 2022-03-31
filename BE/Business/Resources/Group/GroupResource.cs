@@ -34,6 +34,6 @@ namespace Business.Resources.Group
         public DateTime? EndDate { get; set; }
 
         [Required]
-        public List<TechnologyResource> Technology { get; set; }
+        public List<TechnologyResource> Technologies { get; set; }
     }
 }

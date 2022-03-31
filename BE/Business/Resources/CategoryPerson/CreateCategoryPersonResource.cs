@@ -15,6 +15,6 @@ namespace Business.Resources.CategoryPerson
 
         [Required]
         [MaxLength(50)]
-        public List<int> Technology { get; set; }
+        public List<int> Technologies { get; set; }
     }
 }

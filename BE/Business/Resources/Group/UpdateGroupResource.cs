@@ -31,6 +31,6 @@ namespace Business.Resources.Group
 
         [Required]
         [MaxLength(50)]
-        public List<int> Technology { get; set; }
+        public List<int> Technologies { get; set; }
     }
 }
