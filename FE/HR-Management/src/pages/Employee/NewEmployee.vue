@@ -221,6 +221,38 @@
                 >
                 </q-input>
               </div>
+
+              <div class="work q-mt-sm q-px-lg">
+                <q-select
+                  standout
+                  ref="workRef"
+                  tabindex="10"
+                  v-model="employeeInfor.groupId"
+                  :options="tempListWork"
+                  label="Work:"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  @filter="filterWork"
+                  fill-input
+                  hide-selected
+                  use-input
+                  :rules="[(val) => !!val || 'Work is required']"
+                  hide-bottom-space
+                  :label-color="labelColorFocus[8]"
+                  @focus="labelColorFocus[8] = 'white'"
+                  @blur="labelColorFocus[8] = ''"
+                  ><template v-slot:no-option>
+                    <q-item>
+                      <q-item-section class="text-grey">
+                        No results
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
             </q-scroll-area>
           </div>
         </div>
@@ -293,7 +325,7 @@
                         v-for="(category, index) in listTempCategory"
                         :key="index"
                         bordered
-                        class="skill-inside"
+                        class="inside"
                       >
                         <q-card-section horizontal class="row">
                           <q-card-section class="col-10">
@@ -578,7 +610,7 @@
                         v-for="(project, index) in listTempProject"
                         :key="index"
                         bordered
-                        class="project-inside"
+                        class="inside"
                       >
                         <q-card-section horizontal class="row">
                           <q-card-section class="col-10">
@@ -596,7 +628,8 @@
                                 :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
                                 style="font-size: 14px"
                                 >Position:</q-badge
-                              > {{ project.position }}
+                              >
+                              {{ project.position }}
                             </div>
 
                             <div>
@@ -605,7 +638,7 @@
                                 style="font-size: 14px"
                                 >Responsibilities:</q-badge
                               >
-                                {{ project.responsibilities }}
+                              {{ project.responsibilities }}
                             </div>
 
                             <div>
@@ -613,15 +646,17 @@
                                 :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
                                 style="font-size: 14px"
                                 >Start Date:</q-badge
-                              > {{ project.startDate }}
+                              >
+                              {{ project.startDate }}
                             </div>
 
-                            <div>
+                            <div v-show="project.endDate">
                               <q-badge
                                 :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
                                 style="font-size: 14px"
                                 >End Date:</q-badge
-                              > {{ project.endDate }}
+                              >
+                              {{ project.endDate }}
                             </div>
                           </q-card-section>
 
@@ -885,7 +920,8 @@
                     <q-card>
                       <q-card-section class="row items-center">
                         <span class="text-h6"
-                          >Delete {{ tempDeleteProject.groupName }} project?</span
+                          >Delete
+                          {{ tempDeleteProject.groupName }} project?</span
                         >
                       </q-card-section>
 
@@ -915,61 +951,1016 @@
                   </q-dialog>
                 </q-tab-panel>
 
-                <q-tab-panel name="3">
-                  <div class="tab-skill flex flex-center">
+                <q-tab-panel name="3" class="tab-project flex flex-center">
+                  <div class="full-width relative-position flex flex-center">
                     <q-btn-group rounded flat unelevated>
                       <q-btn
                         color="primary"
                         label="<"
                         @click="orderTabPrev()"
+                        size="md"
                       />
-                      <q-btn color="primary" label="Work History" disable />
+                      <q-btn
+                        :color="booleanTab(3) ? 'primary' : 'grey'"
+                        label="Work History"
+                        @click="toggleTab(3)"
+                        size="md"
+                      >
+                        <q-tooltip anchor="top middle" self="center middle">
+                          {{ booleanTab(3) ? "Hide" : "Show" }}
+                        </q-tooltip></q-btn
+                      >
                       <q-btn
                         color="primary"
                         label=">"
                         @click="orderTabNext()"
+                        size="md"
                       />
                     </q-btn-group>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+
+                    <q-btn
+                      size="12px"
+                      class="absolute-top-right"
+                      icon="add"
+                      color="primary"
+                      round
+                      unelevated
+                      @click="openDialog(3)"
+                    />
                   </div>
+
+                  <div class="fit">
+                    <q-scroll-area class="q-mt-md" style="height: 378px">
+                      <q-card
+                        v-for="(
+                          workHistory, index
+                        ) in employeeInfor.workHistoryResource"
+                        :key="index"
+                        bordered
+                        class="inside"
+                      >
+                        <q-card-section horizontal class="row">
+                          <q-card-section class="col-10">
+                            <div class="q-mb-sm">
+                              <q-badge
+                                class="text-subtitle2"
+                                :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              >
+                                <span>{{ workHistory.companyName }}:</span>
+                              </q-badge>
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Position:</q-badge
+                              >
+                              {{ workHistory.position }}
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Start Date:</q-badge
+                              >
+                              {{ workHistory.startDate }}
+                            </div>
+
+                            <div v-show="workHistory.endDate">
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >End Date:</q-badge
+                              >
+                              {{ workHistory.endDate }}
+                            </div>
+                          </q-card-section>
+
+                          <q-card-actions vertical class="col-2 justify-around">
+                            <q-btn
+                              @click="orderWorkHistoryPrev(workHistory)"
+                              flat
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_up"
+                            />
+
+                            <q-fab
+                              class="q-my-sm"
+                              icon="more_horiz"
+                              direction="left"
+                              padding="sm"
+                              unelevated
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                            >
+                              <q-fab-action
+                                @click="editWorkHistory(workHistory)"
+                                color="info"
+                                icon="edit"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Edit
+                                </q-tooltip></q-fab-action
+                              >
+                              <q-fab-action
+                                @click="deleteWorkHistory(workHistory)"
+                                color="negative"
+                                icon="delete"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Delete
+                                </q-tooltip></q-fab-action
+                              >
+                            </q-fab>
+
+                            <q-btn
+                              flat
+                              @click="orderWorkHistoryNext(workHistory)"
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_down"
+                            />
+                          </q-card-actions>
+                        </q-card-section>
+                      </q-card>
+                    </q-scroll-area>
+                  </div>
+
+                  <q-dialog v-model="dialogToggle[3]" persistent>
+                    <q-card style="width: 400px">
+                      <q-card-section class="row items-center">
+                        <span class="text-h6">{{
+                          showEditBtn ? "Edit Work History" : "Add History"
+                        }}</span>
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="workHistoryOneRef"
+                            standout
+                            clearable
+                            maxlength="250"
+                            v-model="tempWorkHistoryResource.companyName"
+                            type="text"
+                            label="Company Name:"
+                            :label-color="colorFocusWorkHistory[0]"
+                            @focus="colorFocusWorkHistory[0] = 'white'"
+                            @blur="colorFocusWorkHistory[0] = ''"
+                            :rules="[
+                              (val) => !!val || 'Company Name is required',
+                            ]"
+                            hide-bottom-space
+                          >
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="workHistoryTwoRef"
+                            standout
+                            clearable
+                            maxlength="250"
+                            v-model="tempWorkHistoryResource.position"
+                            type="text"
+                            label="Position:"
+                            :label-color="colorFocusWorkHistory[1]"
+                            @focus="colorFocusWorkHistory[1] = 'white'"
+                            @blur="colorFocusWorkHistory[1] = ''"
+                            hide-bottom-space
+                            :rules="[(val) => !!val || 'Position is required']"
+                          >
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="workHistoryThreeRef"
+                            standout
+                            maxlength="250"
+                            v-model="tempWorkHistoryResource.startDate"
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            mask="##/##/####"
+                            stack-label
+                            label="Start Date:"
+                            :label-color="colorFocusWorkHistory[2]"
+                            @focus="colorFocusWorkHistory[2] = 'white'"
+                            @blur="colorFocusWorkHistory[2] = ''"
+                            :rules="[
+                              (val) => !!val || 'Start Date is required',
+                            ]"
+                            hide-bottom-space
+                          >
+                            <template v-slot:append>
+                              <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy
+                                  cover
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-date
+                                    v-model="tempWorkHistoryResource.startDate"
+                                    mask="MM/DD/YYYY"
+                                  >
+                                    <div class="row items-center justify-end">
+                                      <q-btn
+                                        v-close-popup
+                                        label="Close"
+                                        color="primary"
+                                        flat
+                                      />
+                                    </div>
+                                  </q-date>
+                                </q-popup-proxy>
+                              </q-icon>
+                            </template>
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="workHistoryFourRef"
+                            standout
+                            maxlength="250"
+                            v-model="tempWorkHistoryResource.endDate"
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            mask="##/##/####"
+                            stack-label
+                            label="End Date:"
+                            :label-color="colorFocusWorkHistory[3]"
+                            @focus="colorFocusWorkHistory[3] = 'white'"
+                            @blur="colorFocusWorkHistory[3] = ''"
+                            hide-bottom-space
+                          >
+                            <template v-slot:append>
+                              <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy
+                                  cover
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-date
+                                    v-model="tempWorkHistoryResource.endDate"
+                                    mask="MM/DD/YYYY"
+                                  >
+                                    <div class="row items-center justify-end">
+                                      <q-btn
+                                        v-close-popup
+                                        label="Close"
+                                        color="primary"
+                                        flat
+                                      />
+                                    </div>
+                                  </q-date>
+                                </q-popup-proxy>
+                              </q-icon>
+                            </template>
+                          </q-input>
+                        </div>
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          label="Cancel"
+                          color="primary"
+                          v-close-popup
+                        />
+                        <q-btn
+                          flat
+                          label="Add"
+                          color="info"
+                          @click="addWorkHistory"
+                          v-show="!showEditBtn"
+                        />
+                        <q-btn
+                          flat
+                          label="Save"
+                          color="info"
+                          @click="saveWorkHistory"
+                          v-show="showEditBtn"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
+
+                  <q-dialog v-model="deleteToggle[3]" persistent>
+                    <q-card>
+                      <q-card-section class="row items-center">
+                        <span class="text-h6"
+                          >Delete {{ tempDeleteWorkHistory.companyName }} work
+                          history?</span
+                        >
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <span
+                          >This can’t be undone and it will be removed.</span
+                        >
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          v-close-popup
+                          label="Cancel"
+                          color="primary"
+                        />
+                        <q-btn
+                          flat
+                          label="Delete"
+                          color="negative"
+                          @click="saveDeleteWorkHistory"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
                 </q-tab-panel>
 
-                <q-tab-panel name="4">
-                  <div class="tab-skill flex flex-center">
+                <q-tab-panel name="4" class="tab-project flex flex-center">
+                  <div class="full-width relative-position flex flex-center">
                     <q-btn-group rounded flat unelevated>
                       <q-btn
                         color="primary"
                         label="<"
                         @click="orderTabPrev()"
+                        size="md"
                       />
-                      <q-btn color="primary" label="Education" disable />
+                      <q-btn
+                        :color="booleanTab(4) ? 'primary' : 'grey'"
+                        label="Education"
+                        @click="toggleTab(4)"
+                        size="md"
+                      >
+                        <q-tooltip anchor="top middle" self="center middle">
+                          {{ booleanTab(4) ? "Hide" : "Show" }}
+                        </q-tooltip></q-btn
+                      >
                       <q-btn
                         color="primary"
                         label=">"
                         @click="orderTabNext()"
+                        size="md"
                       />
                     </q-btn-group>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+
+                    <q-btn
+                      size="12px"
+                      class="absolute-top-right"
+                      icon="add"
+                      color="primary"
+                      round
+                      unelevated
+                      @click="openDialog(4)"
+                    />
                   </div>
+
+                  <div class="fit">
+                    <q-scroll-area class="q-mt-md" style="height: 378px">
+                      <q-card
+                        v-for="(
+                          education, index
+                        ) in employeeInfor.educationResource"
+                        :key="index"
+                        bordered
+                        class="inside"
+                      >
+                        <q-card-section horizontal class="row">
+                          <q-card-section class="col-10">
+                            <div class="q-mb-sm">
+                              <q-badge
+                                class="text-subtitle2"
+                                :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              >
+                                <span>{{ education.collegeName }}:</span>
+                              </q-badge>
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Position:</q-badge
+                              >
+                              {{ education.major }}
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Start Date:</q-badge
+                              >
+                              {{ education.startDate }}
+                            </div>
+
+                            <div v-show="education.endDate">
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >End Date:</q-badge
+                              >
+                              {{ education.endDate }}
+                            </div>
+                          </q-card-section>
+
+                          <q-card-actions vertical class="col-2 justify-around">
+                            <q-btn
+                              @click="orderEducationPrev(education)"
+                              flat
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_up"
+                            />
+
+                            <q-fab
+                              class="q-my-sm"
+                              icon="more_horiz"
+                              direction="left"
+                              padding="sm"
+                              unelevated
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                            >
+                              <q-fab-action
+                                @click="editEducation(education)"
+                                color="info"
+                                icon="edit"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Edit
+                                </q-tooltip></q-fab-action
+                              >
+                              <q-fab-action
+                                @click="deleteEducation(education)"
+                                color="negative"
+                                icon="delete"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Delete
+                                </q-tooltip></q-fab-action
+                              >
+                            </q-fab>
+
+                            <q-btn
+                              flat
+                              @click="orderEducationNext(education)"
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_down"
+                            />
+                          </q-card-actions>
+                        </q-card-section>
+                      </q-card>
+                    </q-scroll-area>
+                  </div>
+
+                  <q-dialog v-model="dialogToggle[4]" persistent>
+                    <q-card style="width: 400px">
+                      <q-card-section class="row items-center">
+                        <span class="text-h6">{{
+                          showEditBtn ? "Edit Education" : "Add Education"
+                        }}</span>
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="educationOneRef"
+                            standout
+                            clearable
+                            maxlength="250"
+                            v-model="tempEducationResource.collegeName"
+                            type="text"
+                            label="College Name:"
+                            :label-color="colorFocusEducation[0]"
+                            @focus="colorFocusEducation[0] = 'white'"
+                            @blur="colorFocusEducation[0] = ''"
+                            :rules="[
+                              (val) => !!val || 'College Name is required',
+                            ]"
+                            hide-bottom-space
+                          >
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="educationTwoRef"
+                            standout
+                            clearable
+                            maxlength="250"
+                            v-model="tempEducationResource.major"
+                            type="text"
+                            label="Major:"
+                            :label-color="colorFocusEducation[1]"
+                            @focus="colorFocusEducation[1] = 'white'"
+                            @blur="colorFocusEducation[1] = ''"
+                            hide-bottom-space
+                            :rules="[(val) => !!val || 'Major is required']"
+                          >
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="educationThreeRef"
+                            standout
+                            maxlength="250"
+                            v-model="tempEducationResource.startDate"
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            mask="##/##/####"
+                            stack-label
+                            label="Start Date:"
+                            :label-color="colorFocusEducation[2]"
+                            @focus="colorFocusEducation[2] = 'white'"
+                            @blur="colorFocusEducation[2] = ''"
+                            :rules="[
+                              (val) => !!val || 'Start Date is required',
+                            ]"
+                            hide-bottom-space
+                          >
+                            <template v-slot:append>
+                              <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy
+                                  cover
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-date
+                                    v-model="tempEducationResource.startDate"
+                                    mask="MM/DD/YYYY"
+                                  >
+                                    <div class="row items-center justify-end">
+                                      <q-btn
+                                        v-close-popup
+                                        label="Close"
+                                        color="primary"
+                                        flat
+                                      />
+                                    </div>
+                                  </q-date>
+                                </q-popup-proxy>
+                              </q-icon>
+                            </template>
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="workHistoryFourRef"
+                            standout
+                            maxlength="250"
+                            v-model="tempEducationResource.endDate"
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            mask="##/##/####"
+                            stack-label
+                            label="End Date:"
+                            :label-color="colorFocusEducation[3]"
+                            @focus="colorFocusEducation[3] = 'white'"
+                            @blur="colorFocusEducation[3] = ''"
+                            hide-bottom-space
+                          >
+                            <template v-slot:append>
+                              <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy
+                                  cover
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-date
+                                    v-model="tempEducationResource.endDate"
+                                    mask="MM/DD/YYYY"
+                                  >
+                                    <div class="row items-center justify-end">
+                                      <q-btn
+                                        v-close-popup
+                                        label="Close"
+                                        color="primary"
+                                        flat
+                                      />
+                                    </div>
+                                  </q-date>
+                                </q-popup-proxy>
+                              </q-icon>
+                            </template>
+                          </q-input>
+                        </div>
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          label="Cancel"
+                          color="primary"
+                          v-close-popup
+                        />
+                        <q-btn
+                          flat
+                          label="Add"
+                          color="info"
+                          @click="addEducation"
+                          v-show="!showEditBtn"
+                        />
+                        <q-btn
+                          flat
+                          label="Save"
+                          color="info"
+                          @click="saveEducation"
+                          v-show="showEditBtn"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
+
+                  <q-dialog v-model="deleteToggle[4]" persistent>
+                    <q-card>
+                      <q-card-section class="row items-center">
+                        <span class="text-h6"
+                          >Delete
+                          {{ tempDeleteEducation.collegeName }} education?</span
+                        >
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <span
+                          >This can’t be undone and it will be removed.</span
+                        >
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          v-close-popup
+                          label="Cancel"
+                          color="primary"
+                        />
+                        <q-btn
+                          flat
+                          label="Delete"
+                          color="negative"
+                          @click="saveDeleteEducation"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
                 </q-tab-panel>
 
-                <q-tab-panel name="5">
-                  <div class="tab-skill flex flex-center">
+                <q-tab-panel name="5" class="tab-project flex flex-center">
+                  <div class="full-width relative-position flex flex-center">
                     <q-btn-group rounded flat unelevated>
                       <q-btn
                         color="primary"
                         label="<"
                         @click="orderTabPrev()"
+                        size="md"
                       />
-                      <q-btn color="primary" label="Certificate" disable />
+                      <q-btn
+                        :color="booleanTab(5) ? 'primary' : 'grey'"
+                        label="Certificate"
+                        @click="toggleTab(5)"
+                        size="md"
+                      >
+                        <q-tooltip anchor="top middle" self="center middle">
+                          {{ booleanTab(5) ? "Hide" : "Show" }}
+                        </q-tooltip></q-btn
+                      >
                       <q-btn
                         color="primary"
                         label=">"
                         @click="orderTabNext()"
+                        size="md"
                       />
                     </q-btn-group>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+
+                    <q-btn
+                      size="12px"
+                      class="absolute-top-right"
+                      icon="add"
+                      color="primary"
+                      round
+                      unelevated
+                      @click="openDialog(5)"
+                    />
                   </div>
+
+                  <div class="fit">
+                    <q-scroll-area class="q-mt-md" style="height: 378px">
+                      <q-card
+                        v-for="(
+                          certificate, index
+                        ) in employeeInfor.certificateResource"
+                        :key="index"
+                        bordered
+                        class="inside"
+                      >
+                        <q-card-section horizontal class="row">
+                          <q-card-section class="col-10">
+                            <div class="q-mb-sm">
+                              <q-badge
+                                class="text-subtitle2"
+                                :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              >
+                                <span>{{ certificate.name }}:</span>
+                              </q-badge>
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Position:</q-badge
+                              >
+                              {{ certificate.provider }}
+                            </div>
+
+                            <div>
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >Start Date:</q-badge
+                              >
+                              {{ certificate.startDate }}
+                            </div>
+
+                            <div v-show="certificate.endDate">
+                              <q-badge
+                                :color="index % 2 == 0 ? 'blue-4' : 'teal-4'"
+                                style="font-size: 14px"
+                                >End Date:</q-badge
+                              >
+                              {{ certificate.endDate }}
+                            </div>
+                          </q-card-section>
+
+                          <q-card-actions vertical class="col-2 justify-around">
+                            <q-btn
+                              @click="orderCertificatePrev(certificate)"
+                              flat
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_up"
+                            />
+
+                            <q-fab
+                              class="q-my-sm"
+                              icon="more_horiz"
+                              direction="left"
+                              padding="sm"
+                              unelevated
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                            >
+                              <q-fab-action
+                                @click="editCertificate(certificate)"
+                                color="info"
+                                icon="edit"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Edit
+                                </q-tooltip></q-fab-action
+                              >
+                              <q-fab-action
+                                @click="deleteCertificate(certificate)"
+                                color="negative"
+                                icon="delete"
+                                ><q-tooltip
+                                  anchor="top middle"
+                                  self="center middle"
+                                >
+                                  Delete
+                                </q-tooltip></q-fab-action
+                              >
+                            </q-fab>
+
+                            <q-btn
+                              flat
+                              @click="orderCertificateNext(certificate)"
+                              round
+                              :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
+                              icon="keyboard_arrow_down"
+                            />
+                          </q-card-actions>
+                        </q-card-section>
+                      </q-card>
+                    </q-scroll-area>
+                  </div>
+
+                  <q-dialog v-model="dialogToggle[5]" persistent>
+                    <q-card style="width: 400px">
+                      <q-card-section class="row items-center">
+                        <span class="text-h6">{{
+                          showEditBtn ? "Edit Certificate" : "Add Certificate"
+                        }}</span>
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="certificateOneRef"
+                            standout
+                            clearable
+                            maxlength="250"
+                            v-model="tempCertificateResource.name"
+                            type="text"
+                            label="Name:"
+                            :label-color="colorFocusCertificate[0]"
+                            @focus="colorFocusCertificate[0] = 'white'"
+                            @blur="colorFocusCertificate[0] = ''"
+                            :rules="[(val) => !!val || 'Name is required']"
+                            hide-bottom-space
+                          >
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="certificateTwoRef"
+                            standout
+                            clearable
+                            maxlength="250"
+                            v-model="tempCertificateResource.provider"
+                            type="text"
+                            label="Provider:"
+                            :label-color="colorFocusCertificate[1]"
+                            @focus="colorFocusCertificate[1] = 'white'"
+                            @blur="colorFocusCertificate[1] = ''"
+                            hide-bottom-space
+                            :rules="[(val) => !!val || 'Provider is required']"
+                          >
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="certificateThreeRef"
+                            standout
+                            maxlength="250"
+                            v-model="tempCertificateResource.startDate"
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            mask="##/##/####"
+                            stack-label
+                            label="Start Date:"
+                            :label-color="colorFocusCertificate[2]"
+                            @focus="colorFocusCertificate[2] = 'white'"
+                            @blur="colorFocusCertificate[2] = ''"
+                            :rules="[
+                              (val) => !!val || 'Start Date is required',
+                            ]"
+                            hide-bottom-space
+                          >
+                            <template v-slot:append>
+                              <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy
+                                  cover
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-date
+                                    v-model="tempCertificateResource.startDate"
+                                    mask="MM/DD/YYYY"
+                                  >
+                                    <div class="row items-center justify-end">
+                                      <q-btn
+                                        v-close-popup
+                                        label="Close"
+                                        color="primary"
+                                        flat
+                                      />
+                                    </div>
+                                  </q-date>
+                                </q-popup-proxy>
+                              </q-icon>
+                            </template>
+                          </q-input>
+                        </div>
+
+                        <div class="q-mt-sm">
+                          <q-input
+                            ref="workHistoryFourRef"
+                            standout
+                            maxlength="250"
+                            v-model="tempCertificateResource.endDate"
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            mask="##/##/####"
+                            stack-label
+                            label="End Date:"
+                            :label-color="colorFocusCertificate[3]"
+                            @focus="colorFocusCertificate[3] = 'white'"
+                            @blur="colorFocusCertificate[3] = ''"
+                            hide-bottom-space
+                          >
+                            <template v-slot:append>
+                              <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy
+                                  cover
+                                  transition-show="scale"
+                                  transition-hide="scale"
+                                >
+                                  <q-date
+                                    v-model="tempCertificateResource.endDate"
+                                    mask="MM/DD/YYYY"
+                                  >
+                                    <div class="row items-center justify-end">
+                                      <q-btn
+                                        v-close-popup
+                                        label="Close"
+                                        color="primary"
+                                        flat
+                                      />
+                                    </div>
+                                  </q-date>
+                                </q-popup-proxy>
+                              </q-icon>
+                            </template>
+                          </q-input>
+                        </div>
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          label="Cancel"
+                          color="primary"
+                          v-close-popup
+                        />
+                        <q-btn
+                          flat
+                          label="Add"
+                          color="info"
+                          @click="addCertificate"
+                          v-show="!showEditBtn"
+                        />
+                        <q-btn
+                          flat
+                          label="Save"
+                          color="info"
+                          @click="saveCertificate"
+                          v-show="showEditBtn"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
+
+                  <q-dialog v-model="deleteToggle[5]" persistent>
+                    <q-card>
+                      <q-card-section class="row items-center">
+                        <span class="text-h6"
+                          >Delete
+                          {{ tempDeleteCertificate.name }} certificate?</span
+                        >
+                      </q-card-section>
+
+                      <q-separator />
+
+                      <q-card-section>
+                        <span
+                          >This can’t be undone and it will be removed.</span
+                        >
+                      </q-card-section>
+
+                      <q-card-actions align="right">
+                        <q-btn
+                          flat
+                          v-close-popup
+                          label="Cancel"
+                          color="primary"
+                        />
+                        <q-btn
+                          flat
+                          label="Delete"
+                          color="negative"
+                          @click="saveDeleteCertificate"
+                        />
+                      </q-card-actions>
+                    </q-card>
+                  </q-dialog>
                 </q-tab-panel>
               </q-tab-panels>
             </q-card>
@@ -978,7 +1969,7 @@
       </div>
       <div class="bottom-side flex flex-center">
         <q-btn
-          tabindex="10"
+          tabindex="11"
           :loading="loadingSave"
           :disable="loadingSave"
           color="primary"
@@ -1001,7 +1992,7 @@ export default defineComponent({
 
   data() {
     return {
-      tab: "2",
+      tab: "1",
       tabModel: [
         { id: "1", name: "Skill" },
         { id: "2", name: "Project" },
@@ -1022,6 +2013,7 @@ export default defineComponent({
         phone: "",
         yearOfBirth: "",
         officeId: "",
+        groupId: "",
         gender: "",
         orderIndex: [1, 2, 3, 4, 5],
 
@@ -1046,18 +2038,51 @@ export default defineComponent({
         endDate: null,
         personId: 0,
         groupId: 0,
-        tempId: null
+        tempId: null,
       },
       listTempProject: [],
 
+      tempWorkHistoryResource: {
+        companyName: "",
+        position: "",
+        startDate: null,
+        endDate: null,
+        personId: 0,
+        tempId: null,
+      },
+
+      tempEducationResource: {
+        collegeName: "",
+        major: "",
+        startDate: "",
+        endDate: null,
+        personId: 0,
+        tempId: null,
+      },
+
+      tempCertificateResource: {
+        name: "",
+        provider: "",
+        startDate: "",
+        endDate: null,
+        personId: 0,
+        tempId: null,
+      },
+
       tempDeleteSkill: null,
       tempDeleteProject: null,
+      tempDeleteWorkHistory: null,
+      tempDeleteEducation: null,
+      tempDeleteCertificate: null,
 
       loadingSave: false,
 
       labelColorFocus: [],
       colorFocusSkill: [],
       colorFocusProject: [],
+      colorFocusWorkHistory: [],
+      colorFocusEducation: [],
+      colorFocusCertificate: [],
       labelNameFocusSkill: ["Category:", "Skill:"],
       labelNameFocusProject: ["Project:"],
       showEditBtn: false,
@@ -1085,6 +2110,7 @@ export default defineComponent({
       tempListOffice: [],
       listOffice: [],
       tempListGroup: [],
+      tempListWork: [],
       listGroup: [],
     };
   },
@@ -1125,7 +2151,7 @@ export default defineComponent({
         });
       }
     },
-    async findGroup(keyword, seedValue) {
+    async findGroup(keyword, seedValue, component) {
       let isValid = await this.validateToken();
       if (!isValid) this.$router.replace("/login");
 
@@ -1150,7 +2176,8 @@ export default defineComponent({
         });
 
       if (result.success) {
-        this.tempListGroup = result.resource;
+        if (component == "project") this.tempListGroup = result.resource;
+        if (component == "work") this.tempListWork = result.resource;
         if (seedValue) this.listGroup = result.resource;
       } else {
         this.$q.notify({
@@ -1311,8 +2338,15 @@ export default defineComponent({
     filterProject(val, update, abort) {
       update(async () => {
         if (val.length > 0 && val.length < 2)
-          this.tempListProject = this.listProject;
-        if (val.length >= 2) await this.findGroup(val, false);
+          this.tempListGroup = this.listGroup;
+        if (val.length >= 2) await this.findGroup(val, false, "project");
+      });
+    },
+    filterWork(val, update, abort) {
+      update(async () => {
+        if (val.length > 0 && val.length < 2)
+          this.tempListWork = this.listGroup;
+        if (val.length >= 2) await this.findGroup(val, false, "work");
       });
     },
     filterSkillBelongWithCategory(val, update, abort) {
@@ -1347,6 +2381,27 @@ export default defineComponent({
         this.tempProjectResource.startDate = "";
         this.tempProjectResource.endDate = null;
         this.tempProjectResource.groupId = 0;
+      }
+
+      if (index == 3) {
+        this.tempWorkHistoryResource.companyName = "";
+        this.tempWorkHistoryResource.position = "";
+        this.tempWorkHistoryResource.startDate = null;
+        this.tempWorkHistoryResource.endDate = null;
+      }
+
+      if (index == 4) {
+        this.tempEducationResource.collegeName = "";
+        this.tempEducationResource.major = "";
+        this.tempEducationResource.startDate = null;
+        this.tempEducationResource.endDate = null;
+      }
+
+      if (index == 5) {
+        this.tempCertificateResource.name = "";
+        this.tempCertificateResource.provider = "";
+        this.tempCertificateResource.startDate = null;
+        this.tempCertificateResource.endDate = null;
       }
 
       this.dialogToggle[index] = true;
@@ -1599,7 +2654,7 @@ export default defineComponent({
       this.showEditBtn = false;
       this.dialogToggle[2] = false;
     },
-    async editProject(item){
+    async editProject(item) {
       await this.getByGroupId(item.groupId);
 
       this.tempProjectResource = item;
@@ -1687,6 +2742,300 @@ export default defineComponent({
         }
       }
     },
+    orderWorkHistoryNext(item) {
+      let count = this.employeeInfor.workHistoryResource.length;
+      // Set list API
+      let index = this.employeeInfor.workHistoryResource.findIndex(
+        (x) => x.tempId == item.tempId
+      );
+
+      if (index == count - 1) {
+        let tempOne = this.employeeInfor.workHistoryResource.slice(0, index);
+        tempOne.unshift(this.employeeInfor.workHistoryResource[index]);
+        this.employeeInfor.workHistoryResource = tempOne;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.workHistoryResource[i];
+            this.employeeInfor.workHistoryResource[i] =
+              this.employeeInfor.workHistoryResource[i + 1];
+            this.employeeInfor.workHistoryResource[i + 1] = tempOne;
+
+            break;
+          }
+        }
+      }
+    },
+    orderWorkHistoryPrev(item) {
+      let count = this.employeeInfor.workHistoryResource.length;
+      // Set list API
+      let index = this.employeeInfor.workHistoryResource.findIndex(
+        (x) => x.tempId == item.tempId
+      );
+
+      if (index == 0) {
+        let tempOne = this.employeeInfor.workHistoryResource.slice(1);
+        tempOne.push(this.employeeInfor.workHistoryResource[index]);
+        this.employeeInfor.workHistoryResource = tempOne;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.workHistoryResource[i];
+            this.employeeInfor.workHistoryResource[i] =
+              this.employeeInfor.workHistoryResource[i - 1];
+            this.employeeInfor.workHistoryResource[i - 1] = tempOne;
+
+            break;
+          }
+        }
+      }
+    },
+    addWorkHistory() {
+      if (
+        !this.$refs.workHistoryOneRef.validate() ||
+        !this.$refs.workHistoryTwoRef.validate() ||
+        !this.$refs.workHistoryThreeRef.validate()
+      ) {
+        return null;
+      }
+      this.tempWorkHistoryResource.tempId = Date.now();
+
+      // List for send to server
+      this.employeeInfor.workHistoryResource.unshift(
+        Object.assign({}, this.tempWorkHistoryResource)
+      );
+
+      this.dialogToggle[3] = false;
+    },
+    saveWorkHistory() {
+      // Set list API
+      let index = this.employeeInfor.workHistoryResource.findIndex(
+        (x) => x.tempId == this.tempWorkHistoryResource.tempId
+      );
+
+      this.employeeInfor.workHistoryResource[index] = Object.assign(
+        {},
+        this.tempWorkHistoryResource
+      );
+
+      this.showEditBtn = false;
+      this.dialogToggle[3] = false;
+    },
+    editWorkHistory(item) {
+      this.tempWorkHistoryResource = item;
+
+      this.showEditBtn = true;
+      this.dialogToggle[3] = true;
+    },
+    deleteWorkHistory(item) {
+      this.tempDeleteWorkHistory = item;
+      this.deleteToggle[3] = true;
+    },
+    saveDeleteWorkHistory() {
+      // Set list API
+      let index = this.employeeInfor.workHistoryResource.findIndex(
+        (x) => x.tempId == this.tempDeleteWorkHistory.tempId
+      );
+      this.employeeInfor.workHistoryResource.splice(index, 1);
+
+      this.deleteToggle[3] = false;
+    },
+    addEducation() {
+      if (
+        !this.$refs.educationOneRef.validate() ||
+        !this.$refs.educationTwoRef.validate() ||
+        !this.$refs.educationThreeRef.validate()
+      ) {
+        return null;
+      }
+      this.tempEducationResource.tempId = Date.now();
+
+      // List for send to server
+      this.employeeInfor.educationResource.unshift(
+        Object.assign({}, this.tempEducationResource)
+      );
+
+      this.dialogToggle[4] = false;
+    },
+    saveEducation() {
+      // Set list API
+      let index = this.employeeInfor.educationResource.findIndex(
+        (x) => x.tempId == this.tempEducationResource.tempId
+      );
+
+      this.employeeInfor.educationResource[index] = Object.assign(
+        {},
+        this.tempEducationResource
+      );
+
+      this.showEditBtn = false;
+      this.dialogToggle[4] = false;
+    },
+    editEducation(item) {
+      this.tempEducationResource = item;
+
+      this.showEditBtn = true;
+      this.dialogToggle[4] = true;
+    },
+    deleteEducation(item) {
+      this.tempDeleteEducation = item;
+      this.deleteToggle[4] = true;
+    },
+    saveDeleteEducation() {
+      // Set list API
+      let index = this.employeeInfor.educationResource.findIndex(
+        (x) => x.tempId == this.tempDeleteEducation.tempId
+      );
+      this.employeeInfor.educationResource.splice(index, 1);
+
+      this.deleteToggle[4] = false;
+    },
+    orderEducationNext(item) {
+      let count = this.employeeInfor.educationResource.length;
+      // Set list API
+      let index = this.employeeInfor.educationResource.findIndex(
+        (x) => x.tempId == item.tempId
+      );
+
+      if (index == count - 1) {
+        let tempOne = this.employeeInfor.educationResource.slice(0, index);
+        tempOne.unshift(this.employeeInfor.educationResource[index]);
+        this.employeeInfor.educationResource = tempOne;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.educationResource[i];
+            this.employeeInfor.educationResource[i] =
+              this.employeeInfor.educationResource[i + 1];
+            this.employeeInfor.educationResource[i + 1] = tempOne;
+
+            break;
+          }
+        }
+      }
+    },
+    orderEducationPrev(item) {
+      let count = this.employeeInfor.educationResource.length;
+      // Set list API
+      let index = this.employeeInfor.educationResource.findIndex(
+        (x) => x.tempId == item.tempId
+      );
+
+      if (index == 0) {
+        let tempOne = this.employeeInfor.educationResource.slice(1);
+        tempOne.push(this.employeeInfor.educationResource[index]);
+        this.employeeInfor.educationResource = tempOne;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.educationResource[i];
+            this.employeeInfor.educationResource[i] =
+              this.employeeInfor.educationResource[i - 1];
+            this.employeeInfor.educationResource[i - 1] = tempOne;
+
+            break;
+          }
+        }
+      }
+    },
+    addCertificate() {
+      if (
+        !this.$refs.certificateOneRef.validate() ||
+        !this.$refs.certificateTwoRef.validate() ||
+        !this.$refs.certificateThreeRef.validate()
+      ) {
+        return null;
+      }
+      this.tempCertificateResource.tempId = Date.now();
+
+      // List for send to server
+      this.employeeInfor.certificateResource.unshift(
+        Object.assign({}, this.tempCertificateResource)
+      );
+
+      this.dialogToggle[5] = false;
+    },
+    saveCertificate() {
+      // Set list API
+      let index = this.employeeInfor.certificateResource.findIndex(
+        (x) => x.tempId == this.tempCertificateResource.tempId
+      );
+
+      this.employeeInfor.certificateResource[index] = Object.assign(
+        {},
+        this.tempCertificateResource
+      );
+
+      this.showEditBtn = false;
+      this.dialogToggle[5] = false;
+    },
+    editCertificate(item) {
+      this.tempCertificateResource = item;
+
+      this.showEditBtn = true;
+      this.dialogToggle[5] = true;
+    },
+    deleteCertificate(item) {
+      this.tempDeleteCertificate = item;
+      this.deleteToggle[5] = true;
+    },
+    saveDeleteCertificate() {
+      // Set list API
+      let index = this.employeeInfor.certificateResource.findIndex(
+        (x) => x.tempId == this.tempDeleteCertificate.tempId
+      );
+      this.employeeInfor.certificateResource.splice(index, 1);
+
+      this.deleteToggle[5] = false;
+    },
+    orderCertificateNext(item) {
+      let count = this.employeeInfor.certificateResource.length;
+      // Set list API
+      let index = this.employeeInfor.certificateResource.findIndex(
+        (x) => x.tempId == item.tempId
+      );
+
+      if (index == count - 1) {
+        let tempOne = this.employeeInfor.certificateResource.slice(0, index);
+        tempOne.unshift(this.employeeInfor.certificateResource[index]);
+        this.employeeInfor.certificateResource = tempOne;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.certificateResource[i];
+            this.employeeInfor.certificateResource[i] =
+              this.employeeInfor.certificateResource[i + 1];
+            this.employeeInfor.certificateResource[i + 1] = tempOne;
+
+            break;
+          }
+        }
+      }
+    },
+    orderCertificatePrev(item) {
+      let count = this.employeeInfor.certificateResource.length;
+      // Set list API
+      let index = this.employeeInfor.certificateResource.findIndex(
+        (x) => x.tempId == item.tempId
+      );
+
+      if (index == 0) {
+        let tempOne = this.employeeInfor.certificateResource.slice(1);
+        tempOne.push(this.employeeInfor.certificateResource[index]);
+        this.employeeInfor.certificateResource = tempOne;
+      } else {
+        for (let i = 0; i < count; i++) {
+          if (i == index) {
+            let tempOne = this.employeeInfor.certificateResource[i];
+            this.employeeInfor.certificateResource[i] =
+              this.employeeInfor.certificateResource[i - 1];
+            this.employeeInfor.certificateResource[i - 1] = tempOne;
+
+            break;
+          }
+        }
+      }
+    },
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
@@ -1748,8 +3097,7 @@ export default defineComponent({
   }
 }
 
-.skill-inside,
-.project-inside {
+.inside {
   margin: 16px;
   &:last-child {
     margin: 16px 16px 0 16px;

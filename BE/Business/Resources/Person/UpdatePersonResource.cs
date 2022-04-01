@@ -37,7 +37,11 @@ namespace Business.Resources.Person
         [Gender]
         public eGender Gender { get; set; }
 
+        [Required]
         [Display(Name = "Location Id")]
         public int OfficeId { get; set; }
+
+        [Display(Name = "Group Id")]
+        public int GroupId { get; set; }
     }
 }

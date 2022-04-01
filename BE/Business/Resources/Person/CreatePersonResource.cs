@@ -49,6 +49,9 @@ namespace Business.Resources.Person
         [Display(Name = "Location Id")]
         public int OfficeId { get; set; }
 
+        [Display(Name = "Group Id")]
+        public int GroupId { get; set; }
+
         [MaxLength(50)]
         [ComponentOrder]
         [Display(Name = "Order Index")]
