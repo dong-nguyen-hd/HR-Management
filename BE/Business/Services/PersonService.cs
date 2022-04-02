@@ -22,12 +22,14 @@ namespace Business.Services
         public PersonService(IPersonRepository personRepository,
             ITechnologyService technologyService,
             IOfficeRepository officeRepository,
+            IGroupRepository groupRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(personRepository, mapper, unitOfWork, responseMessage)
         {
             this._personRepository = personRepository;
             this._officeRepository = officeRepository;
+            this._groupRepository = groupRepository;
             this._technologyService = technologyService;
         }
         #endregion
@@ -35,6 +37,7 @@ namespace Business.Services
         #region Property
         private readonly IPersonRepository _personRepository;
         private readonly IOfficeRepository _officeRepository;
+        private readonly IGroupRepository _groupRepository;
         private readonly ITechnologyService _technologyService;
         #endregion
 
@@ -48,13 +51,25 @@ namespace Business.Services
                 if (tempOffice is null)
                     return new BaseResponse<PersonResource>(ResponseMessage.Values["Office_NoData"]);
 
+                // Validate Group is existent?
+                if(createPersonResource.GroupId != null)
+                {
+                    var tempGroup = await _groupRepository.GetByIdAsync((int)createPersonResource.GroupId);
+                    if (tempOffice is null)
+                        return new BaseResponse<PersonResource>(ResponseMessage.Values["Group_NoData"]);
+                }
+
                 // Mapping Resource to Person
                 var person = Mapper.Map<CreatePersonResource, Person>(createPersonResource);
 
                 await _personRepository.InsertAsync(person);
                 await UnitOfWork.CompleteAsync();
 
-                return new BaseResponse<PersonResource>(Mapper.Map<Person, PersonResource>(person));
+                // Mappping response
+                var technologyResource = await _technologyService.GetAllAsync();
+                var personResource = ConvertPersonResource(technologyResource.Resource, person);
+
+                return new BaseResponse<PersonResource>(personResource);
             }
             catch (Exception ex)
             {
@@ -127,33 +142,43 @@ namespace Business.Services
             return resource;
         }
 
+        #region Private work
         private IEnumerable<PersonResource> ConvertPersonResource(IEnumerable<TechnologyResource> totalTechnology, IEnumerable<Person> totalPerson)
         {
             List<PersonResource> listPersonResource = new List<PersonResource>(totalPerson.Count());
 
             foreach (var person in totalPerson)
             {
-                var tempPersonResource = Mapper.Map<Person, PersonResource>(person);
-
-                // Project mapping
-                var listProject = person.Projects.ToList();
-                var countProject = listProject.Count;
-                for (int i = 0; i < countProject; i++)
-                    if (!string.IsNullOrEmpty(listProject?[i]?.Group.Technology))
-                        tempPersonResource.Project[i].Technology = totalTechnology.IntersectTechnology(listProject[i]?.Group.Technology);
-
-                // Category-Person mapping
-                var listCategoryPerson = person.CategoryPersons.ToList();
-                var countCategoryPerson = listCategoryPerson.Count;
-                for (int i = 0; i < countCategoryPerson; i++)
-                    if (!string.IsNullOrEmpty(listCategoryPerson?[i].Technology))
-                        tempPersonResource.CategoryPerson[i].Technologies = totalTechnology.IntersectTechnology(listCategoryPerson[i].Technology);
+                var tempPersonResource = ConvertPersonResource(totalTechnology, person);
 
                 listPersonResource.Add(tempPersonResource);
             }
 
             return listPersonResource;
         }
+
+        private PersonResource ConvertPersonResource(IEnumerable<TechnologyResource> totalTechnology, Person person)
+        {
+            var tempPersonResource = Mapper.Map<Person, PersonResource>(person);
+
+            // Project mapping
+            var listProject = person.Projects.ToList();
+            var countProject = listProject.Count;
+            for (int i = 0; i < countProject; i++)
+                if (!string.IsNullOrEmpty(listProject?[i]?.Group?.Technology))
+                    tempPersonResource.Project[i].Technology = totalTechnology.IntersectTechnology(listProject[i]?.Group.Technology);
+
+            // Category-Person mapping
+            var listCategoryPerson = person.CategoryPersons.ToList();
+            var countCategoryPerson = listCategoryPerson.Count;
+            for (int i = 0; i < countCategoryPerson; i++)
+                if (!string.IsNullOrEmpty(listCategoryPerson?[i].Technology))
+                    tempPersonResource.CategoryPerson[i].Technologies = totalTechnology.IntersectTechnology(listCategoryPerson[i].Technology);
+
+            return tempPersonResource;
+        }
+        #endregion
+
         #endregion
     }
 }

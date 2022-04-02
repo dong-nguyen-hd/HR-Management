@@ -108,7 +108,7 @@ namespace Infrastructure.Repositories
         }
 
         public override async Task<Person> GetByIdAsync(int id) =>
-            await Context.People.AsNoTracking()
+            await Context.People
                 .AsSplitQuery()
                 .Include(y => y.Office)
                 .Include(y => y.WorkHistories)

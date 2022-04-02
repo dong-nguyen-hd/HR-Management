@@ -80,9 +80,9 @@ namespace Business.Resources.Person
         public List<WorkHistoryResource> WorkHistory { get; set; }
 
         [Display(Name = "Category-Person")]
-        public List<CategoryPersonResource> CategoryPerson { get; set; }
+        public List<CategoryPersonResource> CategoryPerson { get; set; } = new();
         public List<EducationResource> Education { get; set; }
         public List<CertificateResource> Certificate { get; set; }
-        public List<ProjectResource> Project { get; set; }
+        public List<ProjectResource> Project { get; set; } = new();
     }
 }

@@ -13,10 +13,10 @@ namespace Business.Extensions.Validation
             try
             {
                 DateTime date = Convert.ToDateTime(value);
-                var min = DateTime.Now.AddYears(-15);
-                var max = DateTime.Now.AddYears(-100);
-                var msg = string.Format($"Please enter a value between {max:MM/dd/yyyy} and {min:MM/dd/yyyy}");
-                if (date > min || date < max)
+                var max = DateTime.Now.AddYears(-15);
+                var min = DateTime.Now.AddYears(-100);
+                var msg = string.Format($"Please enter a value between {min:MM/dd/yyyy} and {max:MM/dd/yyyy}");
+                if (date < min || date > max)
                     return new ValidationResult(msg);
                 else
                     return ValidationResult.Success;

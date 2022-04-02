@@ -122,31 +122,16 @@ namespace API.Controllers
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateAsync([FromForm] IFormFile image, [FromBody] CreatePersonResource resource)
+        public new async Task<IActionResult> CreateAsync([FromBody] CreatePersonResource resource)
         {
             Log.Information($"{User.Identity?.Name}: create a person.");
 
             resource.CreatedBy = User.Identity?.Name;
 
             var insertResult = await _personService.InsertAsync(resource);
+
             if(!insertResult.Success)
                 return BadRequest(insertResult);
-
-            var filePath = Path.GetTempFileName();
-
-            var stream = new FileStream(filePath, FileMode.Create);
-            await image.CopyToAsync(stream);
-            stream.Position = 0;
-
-            var result = await _imageService.SaveImagePersonAsync(insertResult.Resource.Id, stream);
-            stream.Dispose();
-
-            // Clean temp-file
-            if (System.IO.File.Exists(filePath))
-                System.IO.File.Delete(filePath);
-
-            if (!result.Success)
-                return BadRequest(result);
 
             return StatusCode(201, insertResult);
         }
@@ -155,7 +140,7 @@ namespace API.Controllers
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdatePersonAsync(int id, [FromBody] UpdatePersonResource resource)
+        public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdatePersonResource resource)
         {
             Log.Information($"{User.Identity?.Name}: update a person with Id is {id}.");
 

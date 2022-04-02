@@ -69,22 +69,23 @@
                 ></q-input>
               </div>
 
-              <div class="yob q-mt-sm q-px-lg">
+              <div class="dob q-mt-sm q-px-lg">
                 <q-input
-                  ref="yobRef"
+                  ref="dobRef"
                   tabindex="4"
                   standout
                   maxlength="500"
-                  v-model="employeeInfor.yearOfBirth"
+                  v-model="employeeInfor.dateOfBirth"
                   type="text"
-                  placeholder="MM/DD/YYYY"
-                  mask="##/##/####"
+                  placeholder="YYYY-MM-DD"
+                  mask="####-##-##"
                   stack-label
-                  label="Year Of Birth:"
+                  label="Date Of Birth:"
                   :label-color="labelColorFocus[2]"
                   @focus="labelColorFocus[2] = 'white'"
                   @blur="labelColorFocus[2] = ''"
-                  :rules="[(val) => !!val || 'YOB is required']"
+                  :rules="[(val) => !!val || 'DoB is required',
+                  (val) => validateDoB(val) || 'DoB is invalid']"
                   hide-bottom-space
                 >
                   <template v-slot:append>
@@ -95,8 +96,8 @@
                         transition-hide="scale"
                       >
                         <q-date
-                          v-model="employeeInfor.yearOfBirth"
-                          mask="MM/DD/YYYY"
+                          v-model="employeeInfor.dateOfBirth"
+                          mask="YYYY-MM-DD"
                         >
                           <div class="row items-center justify-end">
                             <q-btn
@@ -227,6 +228,7 @@
                   standout
                   ref="workRef"
                   tabindex="10"
+                  clearable
                   v-model="employeeInfor.groupId"
                   :options="tempListWork"
                   label="Work:"
@@ -239,7 +241,6 @@
                   fill-input
                   hide-selected
                   use-input
-                  :rules="[(val) => !!val || 'Work is required']"
                   hide-bottom-space
                   :label-color="labelColorFocus[8]"
                   @focus="labelColorFocus[8] = 'white'"
@@ -809,8 +810,8 @@
                             maxlength="500"
                             v-model="tempProjectResource.startDate"
                             type="text"
-                            placeholder="MM/DD/YYYY"
-                            mask="##/##/####"
+                            placeholder="YYYY-MM-DD"
+                            mask="####-##-##"
                             stack-label
                             label="Start Date:"
                             :label-color="colorFocusProject[3]"
@@ -818,6 +819,7 @@
                             @blur="colorFocusProject[3] = ''"
                             :rules="[
                               (val) => !!val || 'Start Date is required',
+                              (val) => validateDate(val) || 'DoB is invalid'
                             ]"
                             hide-bottom-space
                           >
@@ -830,7 +832,7 @@
                                 >
                                   <q-date
                                     v-model="tempProjectResource.startDate"
-                                    mask="MM/DD/YYYY"
+                                    mask="YYYY-MM-DD"
                                   >
                                     <div class="row items-center justify-end">
                                       <q-btn
@@ -854,14 +856,15 @@
                             maxlength="500"
                             v-model="tempProjectResource.endDate"
                             type="text"
-                            placeholder="MM/DD/YYYY"
-                            mask="##/##/####"
+                            placeholder="YYYY-MM-DD"
+                            mask="####-##-##"
                             stack-label
                             label="End Date:"
                             :label-color="colorFocusProject[4]"
                             @focus="colorFocusProject[4] = 'white'"
                             @blur="colorFocusProject[4] = ''"
-                            :rules="[(val) => !!val || 'End Date is required']"
+                            :rules="[(val) => !!val || 'End Date is required',
+                            (val) => validateDate(val) || 'DoB is invalid']"
                             hide-bottom-space
                           >
                             <template v-slot:append>
@@ -873,7 +876,7 @@
                                 >
                                   <q-date
                                     v-model="tempProjectResource.endDate"
-                                    mask="MM/DD/YYYY"
+                                    mask="YYYY-MM-DD"
                                   >
                                     <div class="row items-center justify-end">
                                       <q-btn
@@ -1148,8 +1151,8 @@
                             maxlength="250"
                             v-model="tempWorkHistoryResource.startDate"
                             type="text"
-                            placeholder="MM/DD/YYYY"
-                            mask="##/##/####"
+                            placeholder="YYYY-MM-DD"
+                            mask="####-##-##"
                             stack-label
                             label="Start Date:"
                             :label-color="colorFocusWorkHistory[2]"
@@ -1157,6 +1160,7 @@
                             @blur="colorFocusWorkHistory[2] = ''"
                             :rules="[
                               (val) => !!val || 'Start Date is required',
+                              (val) => validateDate(val) || 'DoB is invalid'
                             ]"
                             hide-bottom-space
                           >
@@ -1169,7 +1173,7 @@
                                 >
                                   <q-date
                                     v-model="tempWorkHistoryResource.startDate"
-                                    mask="MM/DD/YYYY"
+                                    mask="YYYY-MM-DD"
                                   >
                                     <div class="row items-center justify-end">
                                       <q-btn
@@ -1193,14 +1197,15 @@
                             maxlength="250"
                             v-model="tempWorkHistoryResource.endDate"
                             type="text"
-                            placeholder="MM/DD/YYYY"
-                            mask="##/##/####"
+                            placeholder="YYYY-MM-DD"
+                            mask="####-##-##"
                             stack-label
                             label="End Date:"
                             :label-color="colorFocusWorkHistory[3]"
                             @focus="colorFocusWorkHistory[3] = 'white'"
                             @blur="colorFocusWorkHistory[3] = ''"
                             hide-bottom-space
+                            :rules="[(val) => validateDate(val) || 'DoB is invalid']"
                           >
                             <template v-slot:append>
                               <q-icon name="event" class="cursor-pointer">
@@ -1211,7 +1216,7 @@
                                 >
                                   <q-date
                                     v-model="tempWorkHistoryResource.endDate"
-                                    mask="MM/DD/YYYY"
+                                    mask="YYYY-MM-DD"
                                   >
                                     <div class="row items-center justify-end">
                                       <q-btn
@@ -1486,8 +1491,8 @@
                             maxlength="250"
                             v-model="tempEducationResource.startDate"
                             type="text"
-                            placeholder="MM/DD/YYYY"
-                            mask="##/##/####"
+                            placeholder="YYYY-MM-DD"
+                            mask="####-##-##"
                             stack-label
                             label="Start Date:"
                             :label-color="colorFocusEducation[2]"
@@ -1495,6 +1500,7 @@
                             @blur="colorFocusEducation[2] = ''"
                             :rules="[
                               (val) => !!val || 'Start Date is required',
+                              (val) => validateDate(val) || 'DoB is invalid'
                             ]"
                             hide-bottom-space
                           >
@@ -1507,7 +1513,7 @@
                                 >
                                   <q-date
                                     v-model="tempEducationResource.startDate"
-                                    mask="MM/DD/YYYY"
+                                    mask="YYYY-MM-DD"
                                   >
                                     <div class="row items-center justify-end">
                                       <q-btn
@@ -1531,14 +1537,15 @@
                             maxlength="250"
                             v-model="tempEducationResource.endDate"
                             type="text"
-                            placeholder="MM/DD/YYYY"
-                            mask="##/##/####"
+                            placeholder="YYYY-MM-DD"
+                            mask="####-##-##"
                             stack-label
                             label="End Date:"
                             :label-color="colorFocusEducation[3]"
                             @focus="colorFocusEducation[3] = 'white'"
                             @blur="colorFocusEducation[3] = ''"
                             hide-bottom-space
+                            :rules="[(val) => validateDate(val) || 'DoB is invalid']"
                           >
                             <template v-slot:append>
                               <q-icon name="event" class="cursor-pointer">
@@ -1549,7 +1556,7 @@
                                 >
                                   <q-date
                                     v-model="tempEducationResource.endDate"
-                                    mask="MM/DD/YYYY"
+                                    mask="YYYY-MM-DD"
                                   >
                                     <div class="row items-center justify-end">
                                       <q-btn
@@ -1822,8 +1829,8 @@
                             maxlength="250"
                             v-model="tempCertificateResource.startDate"
                             type="text"
-                            placeholder="MM/DD/YYYY"
-                            mask="##/##/####"
+                            placeholder="YYYY-MM-DD"
+                            mask="####-##-##"
                             stack-label
                             label="Start Date:"
                             :label-color="colorFocusCertificate[2]"
@@ -1831,6 +1838,7 @@
                             @blur="colorFocusCertificate[2] = ''"
                             :rules="[
                               (val) => !!val || 'Start Date is required',
+                              (val) => validateDate(val) || 'DoB is invalid'
                             ]"
                             hide-bottom-space
                           >
@@ -1843,7 +1851,7 @@
                                 >
                                   <q-date
                                     v-model="tempCertificateResource.startDate"
-                                    mask="MM/DD/YYYY"
+                                    mask="YYYY-MM-DD"
                                   >
                                     <div class="row items-center justify-end">
                                       <q-btn
@@ -1867,14 +1875,15 @@
                             maxlength="250"
                             v-model="tempCertificateResource.endDate"
                             type="text"
-                            placeholder="MM/DD/YYYY"
-                            mask="##/##/####"
+                            placeholder="YYYY-MM-DD"
+                            mask="####-##-##"
                             stack-label
                             label="End Date:"
                             :label-color="colorFocusCertificate[3]"
                             @focus="colorFocusCertificate[3] = 'white'"
                             @blur="colorFocusCertificate[3] = ''"
                             hide-bottom-space
+                            :rules="[(val) => validateDate(val) || 'DoB is invalid']"
                           >
                             <template v-slot:append>
                               <q-icon name="event" class="cursor-pointer">
@@ -1885,7 +1894,7 @@
                                 >
                                   <q-date
                                     v-model="tempCertificateResource.endDate"
-                                    mask="MM/DD/YYYY"
+                                    mask="YYYY-MM-DD"
                                   >
                                     <div class="row items-center justify-end">
                                       <q-btn
@@ -1975,6 +1984,7 @@
           color="primary"
           label="Save"
           style="width: 100px"
+          @click="saveAll"
         />
       </div>
     </div>
@@ -1984,7 +1994,7 @@
 <script>
 import { defineComponent } from "vue";
 import { mapGetters, mapActions } from "vuex";
-import { useQuasar } from "quasar";
+import { useQuasar, date } from "quasar";
 import { api } from "src/boot/axios";
 
 export default defineComponent({
@@ -2008,12 +2018,12 @@ export default defineComponent({
       employeeInfor: {
         firstName: "",
         lastName: "",
-        email: "",
+        email: null,
         description: "",
-        phone: "",
-        yearOfBirth: "",
-        officeId: "",
-        groupId: "",
+        phone: null,
+        dateOfBirth: "",
+        officeId: null,
+        groupId: null,
         gender: "",
         orderIndex: [1, 2, 3, 4, 5],
 
@@ -2076,6 +2086,7 @@ export default defineComponent({
       tempDeleteCertificate: null,
 
       loadingSave: false,
+      componentKey: 0,
 
       labelColorFocus: [],
       colorFocusSkill: [],
@@ -2115,7 +2126,7 @@ export default defineComponent({
     };
   },
   methods: {
-    ...mapActions("auth", ["useRefreshToken", "validateToken"]),
+    ...mapActions("auth", ["validateToken"]),
 
     async findCategory(keyword, seedValue) {
       let isValid = await this.validateToken();
@@ -2337,6 +2348,7 @@ export default defineComponent({
     },
     filterProject(val, update, abort) {
       update(async () => {
+        if (!this.tempListGroup?.length) this.tempListGroup = this.listGroup;
         if (val.length > 0 && val.length < 2)
           this.tempListGroup = this.listGroup;
         if (val.length >= 2) await this.findGroup(val, false, "project");
@@ -2344,6 +2356,7 @@ export default defineComponent({
     },
     filterWork(val, update, abort) {
       update(async () => {
+        if (!this.tempListWork?.length) this.tempListWork = this.listGroup;
         if (val.length > 0 && val.length < 2)
           this.tempListWork = this.listGroup;
         if (val.length >= 2) await this.findGroup(val, false, "work");
@@ -3036,6 +3049,114 @@ export default defineComponent({
         }
       }
     },
+    async requestPostEmployee(payload) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .post(`/api/v1/person`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        return result;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+
+        return result;
+      }
+    },
+    async requestUpdateImage(id) {
+      let fd = new FormData();
+      fd.append("image", this.imageFile);
+
+      // Request API update image
+      return api
+        .put(`/api/v1/person/image/${id}`, fd)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+    },
+    async saveAll() {
+      try {
+        this.loadingSave = true;
+
+        let result = await this.requestPostEmployee(this.employeeInfor);
+        if (result.success) {
+          if(this.imageFile) await this.requestUpdateImage(result?.resource?.id);
+        }else return null;
+
+        this.$q.notify({
+          type: "positive",
+          message: "Successfully added",
+        });
+
+        this.employeeInfor.firstName = '';
+        this.employeeInfor.lastName = '';
+        this.employeeInfor.email = null;
+        this.employeeInfor.description = '';
+        this.employeeInfor.phone = null;
+        this.employeeInfor.dateOfBirth = '';
+        this.employeeInfor.officeId = null;
+        this.employeeInfor.groupId = null;
+        this.employeeInfor.gender = '';
+        this.employeeInfor.orderIndex = [1, 2, 3, 4, 5];
+        this.employeeInfor.categoryPersonResource = [];
+        this.employeeInfor.certificateResource = [];
+        this.employeeInfor.educationResource = [];
+        this.employeeInfor.projectResource = [];
+        this.employeeInfor.workHistoryResource = [];
+
+        this.imageURL = this.avatarDefault;
+        this.imageFile = null;
+
+        this.listTempCategory = [];
+        this.listTempProject = [];
+
+      } finally {
+        this.loadingSave = false;
+      }
+    },
+    validateDoB(dateTarget){
+      if(!date.isValid(dateTarget)) return false
+
+      let now = new Date(Date.now());
+
+      let dateFrom = date.subtractFromDate(now, { years: 100  })
+      let dateTo = date.addToDate(now, { years: 15 })
+
+      return date.isBetweenDates(dateTarget, dateFrom, dateTo, { onlyDate: true })
+    },
+    validateDate(dateTarget){
+      return date.isValid(dateTarget);
+    }
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
