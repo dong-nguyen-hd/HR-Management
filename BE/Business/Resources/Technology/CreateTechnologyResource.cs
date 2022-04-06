@@ -6,6 +6,7 @@ namespace Business.Resources.Technology
     {
         [Required]
         [MaxLength(250)]
+        [MinLength(1)]
         public string Name { get; set; }
 
         [Required]

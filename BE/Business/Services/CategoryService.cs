@@ -4,11 +4,14 @@ using Business.CustomException;
 using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
+using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Category;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Business.Services
 {
@@ -33,6 +36,11 @@ namespace Business.Services
         {
             try
             {
+                // Validate category name is existent?
+                var hasValue = await _categoryRepository.FindByNameAsync(createCategoryResource.Name, true);
+                if(hasValue.GetEnumerator().MoveNext())
+                    return new BaseResponse<CategoryResource>(ResponseMessage.Values["Category_Existent"]);
+
                 var tempCategory = Mapper.Map<CreateCategoryResource, Category>(createCategoryResource);
 
                 await _categoryRepository.InsertAsync(tempCategory);
@@ -44,6 +52,49 @@ namespace Business.Services
             {
                 throw new MessageResultException(ResponseMessage.Values["Category_Saving_Error"], ex);
             }
+        }
+
+        public override async Task<BaseResponse<CategoryResource>> UpdateAsync(int id, UpdateCategoryResource updateCategoryResource)
+        {
+            try
+            {
+                // Validate Id is existent?
+                var tempCategory = await _categoryRepository.GetByIdAsync(id);
+                if (tempCategory is null)
+                    return new BaseResponse<CategoryResource>(ResponseMessage.Values["Category_NoData"]);
+
+                // Validate category name is existent?
+                var hasValue = await _categoryRepository.FindByNameAsync(updateCategoryResource.Name, true);
+                if (hasValue.ToList().Count != 1)
+                    return new BaseResponse<CategoryResource>(ResponseMessage.Values["Category_Existent"]);
+
+                // Update infomation
+                Mapper.Map(updateCategoryResource, tempCategory);
+
+                _categoryRepository.Update(tempCategory);
+                await UnitOfWork.CompleteAsync();
+
+                return new BaseResponse<CategoryResource>(Mapper.Map<Category, CategoryResource>(tempCategory));
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["Category_Saving_Error"], ex);
+            }
+        }
+
+        public async Task<PaginationResponse<IEnumerable<CategoryResource>>> GetPaginationAsync(QueryResource pagination, FilterCategoryResource filterResource)
+        {
+            var paginationCategory = await _categoryRepository.GetPaginationAsync(pagination, filterResource);
+
+            // Mapping
+            var tempResource = Mapper.Map<IEnumerable<Category>, IEnumerable<CategoryResource>>(paginationCategory.records);
+
+            var resource = new PaginationResponse<IEnumerable<CategoryResource>>(tempResource);
+
+            // Using extension-method for pagination
+            resource.CreatePaginationResponse(pagination, paginationCategory.total);
+
+            return resource;
         }
         #endregion
     }

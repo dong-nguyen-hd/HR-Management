@@ -3198,9 +3198,9 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .container {
-  min-height: inherit - 50px;
-  height: calc(100% - 50px);
-  width: calc(100% - 50px);
+  min-height: inherit - 32px;
+  height: calc(100% - 32px);
+  width: calc(100% - 32px);
   background-color: $accent;
   border-radius: 10px;
   .top-side {

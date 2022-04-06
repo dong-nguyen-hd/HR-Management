@@ -88,24 +88,39 @@
               class="q-pl-lg"
             >
               <q-item-section avatar>
-                <q-icon name="fas fa-list" />
+                <q-icon name="summarize" />
               </q-item-section>
-              <q-item-section>List employee</q-item-section>
+              <q-item-section>List Employee</q-item-section>
             </q-item>
 
             <q-item
               @click="isShowInfor = false"
               clickable
               v-ripple
-              to="/change-password"
+              to="/category"
               exact
               active-class="isActive"
               class="q-pl-lg"
             >
               <q-item-section avatar>
-                <q-icon name="fas fa-key" />
+                <q-icon name="category" />
               </q-item-section>
-              <q-item-section>Change password</q-item-section>
+              <q-item-section>Category</q-item-section>
+            </q-item>
+
+            <q-item
+              @click="isShowInfor = false"
+              clickable
+              v-ripple
+              to="/office"
+              exact
+              active-class="isActive"
+              class="q-pl-lg"
+            >
+              <q-item-section avatar>
+                <q-icon name="apartment" />
+              </q-item-section>
+              <q-item-section>Office</q-item-section>
             </q-item>
 
           </q-list>

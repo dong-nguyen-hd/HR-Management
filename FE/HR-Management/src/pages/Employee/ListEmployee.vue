@@ -35,12 +35,12 @@
       </q-dialog>
 
       <div class="table-component full-height full-width flex flex-center">
-        <div class="new-item q-mb-md flex justify-end" style="width: 96%">
+        <div class="new-item q-mb-md q-pr-md flex justify-end full-width">
           <q-btn to="/new-employee" color="primary" label="New employee" />
         </div>
 
         <q-table
-          class="table-content"
+          class="table-content q-mx-md"
           :rows="listEmployee"
           :columns="headerTable"
           row-key="id"
@@ -645,7 +645,7 @@ export default defineComponent({
 
           this.$q.notify({
             type: "positive",
-            message: "Deleted successfully!",
+            message: "Successfully deleted!",
           });
         } else {
           this.$q.notify({
@@ -692,7 +692,7 @@ export default defineComponent({
     .table-content {
       /* height or max-height is important */
       height: 600px;
-      width: 96%;
+      width: 100%;
     }
   }
 }

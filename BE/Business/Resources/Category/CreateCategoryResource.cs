@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Business.Resources.Technology;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Category
 {
@@ -6,6 +8,10 @@ namespace Business.Resources.Category
     {
         [Required]
         [MaxLength(250)]
+        [MinLength(1)]
         public string Name { get; set; }
+
+        [MaxLength(50)]
+        public List<CreateTechnologyResource> Technologies { get; set; }
     }
 }

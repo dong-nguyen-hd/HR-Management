@@ -29,6 +29,16 @@ const routes = [
         path: "/change-password",
         component: () => import("pages/Account/ChangePassword.vue"),
       },
+      {
+        name: "Category",
+        path: "/category",
+        component: () => import("pages/Category/Category.vue"),
+      },
+      {
+        name: "Office",
+        path: "/office",
+        component: () => import("pages/Office/Office.vue"),
+      },
     ],
   },
 

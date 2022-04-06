@@ -25,11 +25,13 @@ namespace API.Controllers
             IMapper mapper,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(categoryService, mapper, responseMessage)
         {
+            this._categoryService = categoryService;
             this._categoryRepository = categoryRepository;
         }
         #endregion
 
         #region Property
+        private readonly ICategoryService _categoryService;
         private readonly ICategoryRepository _categoryRepository;
         #endregion
 
@@ -44,6 +46,28 @@ namespace API.Controllers
             Log.Information($"{User.Identity?.Name}: get all category data.");
 
             return await base.GetAllAsync();
+        }
+
+        [HttpPost("pagination")]
+        [Authorize(Roles = "viewer, editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetPaginationWithFilterAsync([FromQuery] int page, [FromQuery] int pageSize, [FromBody] FilterCategoryResource filterResource)
+        {
+            Log.Information($"{User.Identity?.Name}: get pagination category.");
+
+            QueryResource pagintation = new QueryResource(page, pageSize);
+
+            var result = await _categoryService.GetPaginationAsync(pagintation, filterResource);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            if (result.Resource is null)
+                return NoContent();
+
+            return Ok(result);
         }
 
         [HttpGet("{id:int}")]

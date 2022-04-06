@@ -35,6 +35,7 @@
 
       "Category_Id_Invalid": "Category-Id is invalid",
       "Category_NoData": "Category is not existent",
+      "Category_Existent": "Category is existent",
       "Category_Saving_Error": "An error occurred when saving the Category",
       "Category_Updating_Error": "An error occurred when updating the Category",
       "Category_Deleting_Error": "An error occurred when deleting the Category",

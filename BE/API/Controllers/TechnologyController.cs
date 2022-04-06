@@ -34,18 +34,6 @@ namespace API.Controllers
         #endregion
 
         #region Action
-        [HttpGet]
-        [Authorize(Roles = "viewer, editor, admin")]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status400BadRequest)]
-        public new async Task<IActionResult> GetAllAsync()
-        {
-            Log.Information($"{User.Identity?.Name}: get all technology data.");
-
-            return await base.GetAllAsync();
-        }
-
         [HttpGet("search")]
         [Authorize(Roles = "viewer, editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status200OK)]
