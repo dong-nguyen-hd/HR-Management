@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Business.Domain.Models
+﻿namespace Business.Domain.Models
 {
     public class Person
     {

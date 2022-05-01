@@ -1,8 +1,6 @@
 ﻿using Business.Extensions;
 using Business.Resources.Technology;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Project

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Business.Communication
+﻿namespace Business.Communication
 {
     public class BaseResponse<T>
     {

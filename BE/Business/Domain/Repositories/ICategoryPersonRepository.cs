@@ -1,5 +1,4 @@
 ﻿using Business.Domain.Models;
-using System.Threading.Tasks;
 
 namespace Business.Domain.Repositories
 {

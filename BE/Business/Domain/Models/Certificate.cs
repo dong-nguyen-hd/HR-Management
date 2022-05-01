@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Business.Domain.Models
+﻿namespace Business.Domain.Models
 {
     public class Certificate
     {

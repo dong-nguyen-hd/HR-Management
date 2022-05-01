@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Business.Resources
+﻿namespace Business.Resources
 {
     public sealed class ResponseMessage
     {

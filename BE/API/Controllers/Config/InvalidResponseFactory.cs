@@ -1,8 +1,6 @@
 ﻿using Business.Communication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace API.Controllers.Config
 {

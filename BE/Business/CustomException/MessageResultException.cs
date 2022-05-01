@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Business.CustomException
+﻿namespace Business.CustomException
 {
     public class MessageResultException : Exception
     {

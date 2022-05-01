@@ -134,12 +134,11 @@
             <q-th :props="props">
               <div :style="`min-width: ${widthName}`">
                 <q-input
-                  @update:model-value="filterOffice"
+                  @update:model-value="filterNameOffice"
                   dark
                   dense
                   standout
                   v-model="filterModel.name"
-                  debounce="300"
                   input-class="text-right"
                   :label="labelNameFocus[0]"
                   :label-color="labelColorFocus[0]"
@@ -162,7 +161,7 @@
                       class="cursor-pointer"
                       @click="
                         filterModel.name = '';
-                        filterOffice();
+                        filterNameOffice();
                       "
                     />
                   </template>
@@ -175,12 +174,11 @@
             <q-th :props="props">
               <div :style="`min-width: ${widthAddress}`">
                 <q-input
-                  @update:model-value="filterOffice"
+                  @update:model-value="filterAddressOffice"
                   dark
                   dense
                   standout
                   v-model="filterModel.address"
-                  debounce="300"
                   input-class="text-right"
                   :label="labelNameFocus[1]"
                   :label-color="labelColorFocus[1]"
@@ -203,7 +201,7 @@
                       class="cursor-pointer"
                       @click="
                         filterModel.address = '';
-                        filterOffice;
+                        filterAddressOffice();
                       "
                     />
                   </template>
@@ -352,13 +350,13 @@ export default defineComponent({
           });
 
         if (result.success) {
-          this.listOffice = result.resource;
+          this.listOffice = [...result.resource];
 
           this.listOffice.forEach((row, index) => {
             row.index = index + 1;
           });
 
-          this.tempListOffice = this.listOffice;
+          this.tempListOffice = [...this.listOffice];
         } else {
           this.$q.notify({
             type: "negative",
@@ -369,25 +367,52 @@ export default defineComponent({
         this.loadingData = false;
       }
     },
-    filterOffice(val) {
-      console.log("TEST filter: " + JSON.stringify(this.filterModel));
-      console.log("TEST func: " + JSON.stringify(val));
-      if (this.filterModel.name && this.filterModel.address) {
+    filterNameOffice(val) {
+      let nameOfficeSearch = val ? val?.trim().toUpperCase() : null;
+      let addressOfficeSearch = this.filterModel?.address?.trim().toUpperCase();
+
+      if (nameOfficeSearch && addressOfficeSearch) {
         this.tempListOffice = this.listOffice.filter(
           (x) =>
-            x.name.includes(this.filterModel.name.trim()) ||
-            x.address.includes(this.filterModel.address.trim())
+            x.name?.toUpperCase().includes(nameOfficeSearch) &&
+            x.address?.toUpperCase().includes(addressOfficeSearch)
         );
-      } else if (this.filterModel.name) {
+      } else if (nameOfficeSearch) {
         this.tempListOffice = this.listOffice.filter((x) =>
-          x.name.includes(this.filterModel.name.trim())
+          x.name?.toUpperCase().includes(nameOfficeSearch)
         );
-      } else if (this.filterModel.address) {
+      } else if (addressOfficeSearch) {
         this.tempListOffice = this.listOffice.filter((x) =>
-          x.address.includes(this.filterModel.address.trim())
+          x.address?.toUpperCase().includes(addressOfficeSearch)
         );
-      } else if (!this.filterModel.name && !this.filterModel.address) {
-        this.tempListOffice = this.listOffice;
+      } else if (!nameOfficeSearch && !addressOfficeSearch) {
+        this.tempListOffice = [...this.listOffice];
+      }
+
+      this.tempListOffice.forEach((row, index) => {
+        row.index = index + 1;
+      });
+    },
+    filterAddressOffice(val) {
+      let addressOfficeSearch = val ? val?.trim().toUpperCase() : null;
+      let nameOfficeSearch = this.filterModel?.name?.trim().toUpperCase();
+
+      if (nameOfficeSearch && addressOfficeSearch) {
+        this.tempListOffice = this.listOffice.filter(
+          (x) =>
+            x.name?.toUpperCase().includes(nameOfficeSearch) &&
+            x.address?.toUpperCase().includes(addressOfficeSearch)
+        );
+      } else if (addressOfficeSearch) {
+        this.tempListOffice = this.listOffice.filter((x) =>
+          x.address?.toUpperCase().includes(addressOfficeSearch)
+        );
+      } else if (nameOfficeSearch) {
+        this.tempListOffice = this.listOffice.filter((x) =>
+          x.name?.toUpperCase().includes(nameOfficeSearch)
+        );
+      } else if (!nameOfficeSearch && !addressOfficeSearch) {
+        this.tempListOffice = [...this.listOffice];
       }
 
       this.tempListOffice.forEach((row, index) => {
@@ -420,7 +445,21 @@ export default defineComponent({
           });
 
         if (result.success) {
-          await this.getAllOffice();
+          let index = this.listOffice.findIndex((x) => x.id == this.idDelete);
+          let indexTemp = this.tempListOffice.findIndex(
+            (x) => x.id == this.idDelete
+          );
+
+          // Original object
+          this.listOffice.splice(index, 1);
+          // Temp object
+          this.tempListOffice.splice(indexTemp, 1);
+
+          this.tempListOffice.forEach((row, index) => {
+            row.index = index + 1;
+          });
+
+          this.showDelete = false;
 
           this.$q.notify({
             type: "positive",
@@ -470,14 +509,14 @@ export default defineComponent({
 
         if (result.success) {
           this.tempListOffice.unshift(result.resource);
-          this.listOffice.unshift(result.resource);
+          this.listOffice.push(result.resource);
 
           this.tempListOffice.forEach((row, index) => {
             row.index = index + 1;
           });
 
           this.tempOfficeResource.name = "";
-          this.tempOfficeResource.address = [];
+          this.tempOfficeResource.address = "";
 
           this.$q.notify({
             type: "positive",
@@ -576,9 +615,7 @@ export default defineComponent({
     getNameDelete() {
       let tempCategory = this.listOffice.filter((x) => x.id == this.idDelete);
 
-      let name = tempCategory[0]?.name;
-
-      return name ? this.showName(name) : "";
+      return tempCategory[0]?.name;
     },
     getPersistentOffice() {
       return this.tempOfficeResource.name || this.tempOfficeResource.address

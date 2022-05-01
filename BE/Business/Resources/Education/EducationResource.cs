@@ -1,6 +1,5 @@
 ﻿using Business.Extensions;
 using Newtonsoft.Json;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Education

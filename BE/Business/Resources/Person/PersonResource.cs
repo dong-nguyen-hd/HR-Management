@@ -8,8 +8,6 @@ using Business.Resources.Office;
 using Business.Resources.Project;
 using Business.Resources.WorkHistory;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Person

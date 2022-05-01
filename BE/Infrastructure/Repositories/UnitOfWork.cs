@@ -1,7 +1,5 @@
 ﻿using Business.Domain.Repositories;
 using Infrastructure.Contexts;
-using System;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {

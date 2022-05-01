@@ -3,7 +3,6 @@ using Business.Domain.Models;
 using Business.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
 namespace Infrastructure.Contexts.Config
 {

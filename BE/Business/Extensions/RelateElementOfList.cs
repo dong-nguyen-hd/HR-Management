@@ -1,7 +1,4 @@
 ﻿using Business.Resources.Technology;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Business.Extensions
 {

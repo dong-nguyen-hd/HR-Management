@@ -4,10 +4,6 @@ using Business.Extensions;
 using Business.Resources.Authentication;
 using Infrastructure.Contexts;
 using Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UnitTest.Tool;
 using Xunit;
 

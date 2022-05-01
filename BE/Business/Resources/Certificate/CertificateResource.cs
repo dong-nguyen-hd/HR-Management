@@ -1,7 +1,6 @@
 ﻿using Business.Extensions;
 using Business.Extensions.Validation;
 using Newtonsoft.Json;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Certificate

@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <StartupObject>API.Program</StartupObject>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>

@@ -5,10 +5,6 @@ using Business.Resources;
 using Business.Resources.Person;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {

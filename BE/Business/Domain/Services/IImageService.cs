@@ -1,8 +1,6 @@
 ﻿using Business.Communication;
 using Business.Resources.Account;
 using Business.Resources.Person;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Business.Domain.Services
 {

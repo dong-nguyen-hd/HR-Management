@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Business.Domain.Services
+﻿namespace Business.Domain.Services
 {
     public interface IUriService
     {

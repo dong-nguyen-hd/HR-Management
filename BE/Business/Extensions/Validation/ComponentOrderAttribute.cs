@@ -1,6 +1,4 @@
 ﻿using Business.Data;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Extensions.Validation

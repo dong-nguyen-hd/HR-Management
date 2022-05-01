@@ -1,13 +1,11 @@
 ﻿using Business.Domain.Repositories;
 using Business.Domain.Services;
-using Business.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Infrastructure.Repositories;
 using Business.Mapping.Account;
-using System;
 using Business.Resources;
+using Business.Services;
+using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 
 namespace API.Extensions
 {

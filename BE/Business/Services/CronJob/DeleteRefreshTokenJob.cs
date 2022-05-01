@@ -3,9 +3,6 @@ using Business.Domain.Services;
 using Business.Resources;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Business.Services.CronJob
 {

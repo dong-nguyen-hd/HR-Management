@@ -1,5 +1,4 @@
 ﻿using Business.Extensions.Validation;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Account

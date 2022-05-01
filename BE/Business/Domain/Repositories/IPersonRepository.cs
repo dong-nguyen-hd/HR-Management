@@ -1,8 +1,6 @@
 ﻿using Business.Domain.Models;
 using Business.Resources;
 using Business.Resources.Person;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Business.Domain.Repositories
 {

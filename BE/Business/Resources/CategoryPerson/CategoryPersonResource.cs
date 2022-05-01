@@ -1,5 +1,4 @@
 ﻿using Business.Resources.Technology;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.CategoryPerson

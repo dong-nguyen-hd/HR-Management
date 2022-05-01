@@ -9,10 +9,6 @@ using Business.Resources;
 using Business.Resources.Person;
 using Business.Resources.Technology;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Business.Services
 {

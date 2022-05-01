@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Business.Resources
+﻿namespace Business.Resources
 {
     public interface IScheduleConfig<T>
     {

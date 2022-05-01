@@ -8,10 +8,6 @@ using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Category;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace Business.Services
 {
@@ -38,8 +34,9 @@ namespace Business.Services
             {
                 // Validate category name is existent?
                 var hasValue = await _categoryRepository.FindByNameAsync(createCategoryResource.Name, true);
-                if(hasValue.GetEnumerator().MoveNext())
-                    return new BaseResponse<CategoryResource>(ResponseMessage.Values["Category_Existent"]);
+                using (hasValue.GetEnumerator())
+                    if (hasValue.GetEnumerator().MoveNext())
+                        return new BaseResponse<CategoryResource>(ResponseMessage.Values["Category_Existent"]);
 
                 var tempCategory = Mapper.Map<CreateCategoryResource, Category>(createCategoryResource);
 

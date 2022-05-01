@@ -1,6 +1,5 @@
 ﻿using Business.Communication;
 using Business.Resources;
-using System;
 
 namespace Business.Extensions
 {

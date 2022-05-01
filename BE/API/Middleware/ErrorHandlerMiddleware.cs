@@ -1,11 +1,8 @@
 ﻿using Business.Communication;
 using Business.CustomException;
-using Microsoft.AspNetCore.Http;
 using Serilog;
-using System;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 public class ErrorHandlerMiddleware
 {

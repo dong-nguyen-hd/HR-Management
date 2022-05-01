@@ -5,8 +5,6 @@ using Business.Resources.Certificate;
 using Business.Resources.Education;
 using Business.Resources.Project;
 using Business.Resources.WorkHistory;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 

@@ -7,8 +7,6 @@ using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.CategoryPerson;
 using Microsoft.Extensions.Options;
-using System;
-using System.Threading.Tasks;
 
 namespace Business.Services
 {

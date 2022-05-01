@@ -10,14 +10,9 @@ using Business.Resources.Information;
 using Business.Resources.Person;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Business.Services
 {

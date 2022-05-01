@@ -2,7 +2,6 @@
 using Business.Domain.Services;
 using Business.Resources.Information;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
