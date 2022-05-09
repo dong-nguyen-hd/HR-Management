@@ -27,12 +27,13 @@ namespace Infrastructure.Repositories
                 .Skip((pagination.Page - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .Include(y => y.Office)
-                .Include(y => y.WorkHistories)
-                .Include(y => y.CategoryPersons)
+                .Include(y => y.WorkHistories.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.CategoryPersons.OrderByDescending(z => z.OrderIndex))
                 .ThenInclude(z => z.Category)
-                .Include(y => y.Educations)
-                .Include(y => y.Certificates)
-                .Include(y => y.Projects)
+                .Include(y => y.Educations.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.Certificates.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.Group)
+                .Include(y => y.Projects.OrderByDescending(z => z.OrderIndex))
                 .ThenInclude(z => z.Group)
                 .ToListAsync();
 
@@ -107,12 +108,13 @@ namespace Infrastructure.Repositories
             await Context.People
                 .AsSplitQuery()
                 .Include(y => y.Office)
-                .Include(y => y.WorkHistories)
-                .Include(y => y.CategoryPersons)
+                .Include(y => y.WorkHistories.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.CategoryPersons.OrderByDescending(z => z.OrderIndex))
                 .ThenInclude(z => z.Category)
-                .Include(y => y.Educations)
-                .Include(y => y.Certificates)
-                .Include(y => y.Projects)
+                .Include(y => y.Educations.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.Certificates.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.Group)
+                .Include(y => y.Projects.OrderByDescending(z => z.OrderIndex))
                 .ThenInclude(z => z.Group)
                 .SingleOrDefaultAsync(x => x.Id == id);
 

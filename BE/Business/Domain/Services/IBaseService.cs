@@ -11,6 +11,6 @@ namespace Business.Domain.Services
         Task<BaseResponse<Response>> UpdateAsync(int id, Update updateResource);
         Task<BaseResponse<Response>> RemoveAsync(int id);
         Task<DeleteResponse<IEnumerable<Response>>> RemoveRangeAsync(List<int> ids);
-        Task<BaseResponse<Response>> SwapAsync(SwapResource swapResource);
+        Task<BaseResponse<Response>> ChangeOrderIndexAsync(List<int> ids);
     }
 }

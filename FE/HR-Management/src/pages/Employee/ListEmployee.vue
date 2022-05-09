@@ -34,6 +34,29 @@
         </q-card>
       </q-dialog>
 
+      <q-dialog v-model="showEdit" persistent full-width full-height>
+        <q-layout view="hHh lpR fFf" container class="bg-white">
+          <q-header class="bg-accent">
+            <q-toolbar>
+              <q-toolbar-title></q-toolbar-title>
+              <q-btn flat v-close-popup round dense icon="close" />
+            </q-toolbar>
+          </q-header>
+
+          <q-page-container>
+            <q-page>
+              <edit-employee :statusUpdateTransfer="statusUpdate" :employeeTransfer="editObj" />
+            </q-page>
+          </q-page-container>
+
+          <q-footer class="bg-accent text-white">
+            <q-toolbar class="flex flex-center">
+              <q-btn dense color="primary" label="Save" class="q-px-lg" @click="saveUpdate"/>
+            </q-toolbar>
+          </q-footer>
+        </q-layout>
+      </q-dialog>
+
       <div class="table-component full-height full-width flex flex-center">
         <div class="new-item q-mb-md q-pr-md flex justify-end full-width">
           <q-btn to="/new-employee" color="primary" label="New employee" />
@@ -226,7 +249,9 @@
                   @blur="
                     labelColorFocus[3] = 'white';
                     labelNameFocus[3] = props.col.label;
-                    widthOfSkill = !filter?.technologyId?.length ? '150px' : '250px';
+                    widthOfSkill = !filter?.technologyId?.length
+                      ? '150px'
+                      : '250px';
                   "
                   ><template v-slot:no-option>
                     <q-item>
@@ -257,6 +282,7 @@
                   color="white"
                   text-color="black"
                   label="Edit"
+                  @click="openEdit(props.value)"
                 />
               </div>
               <div class="q-mt-sm">
@@ -294,7 +320,7 @@
           <template v-slot:body-cell-skill="props">
             <q-td :props="props">
               <div v-if="props.value?.length">
-                <div v-for="(item, index) in props.value" :key="index">
+                <div v-for="(item, index) in props.value.slice(0, 3)" :key="index">
                   <q-badge :color="index % 2 == 0 ? 'blue-10' : 'teal-8'">
                     <span style="font-size: 14px"
                       >{{ props?.value[index].categoryName }}:</span
@@ -313,7 +339,10 @@
                       props?.value[index]?.technologies[2]?.name
                         ? ` ${props?.value[index]?.technologies[2]?.name},`
                         : ""
-                    }}...
+                    }}
+                    <span v-show="props?.value[index]?.technologies.length"
+                      >...</span
+                    >
                   </span>
                 </div>
               </div>
@@ -334,14 +363,21 @@ import { defineComponent } from "vue";
 import { mapActions } from "vuex";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
+import EditEmployee from 'src/pages/Employee/EditEmployee.vue'
 
 export default defineComponent({
   name: "List Employee",
+  
+  components: {
+    'edit-employee': EditEmployee,
+  },
 
   data() {
     return {
+      statusUpdate: false,
+      
       labelColorFocus: ["white", "white", "white", "white"],
-      labelNameFocus: ['Staff ID', '', 'Full Name', 'Skills'],
+      labelNameFocus: ["Staff ID", "", "Full Name", "Skills"],
 
       widthOfStaffId: "110px",
       widthOfOffice: "100px",
@@ -353,6 +389,9 @@ export default defineComponent({
       showDelete: false,
       idDelete: null,
       deleteProcess: false,
+
+      showEdit: false,
+      editObj: null,
 
       filter: {
         staffId: null,
@@ -434,6 +473,10 @@ export default defineComponent({
   methods: {
     ...mapActions("auth", ["useRefreshToken", "validateToken"]),
 
+    openEdit(id) {
+      this.editObj = this.listEmployee.find((x) => x.id == id);
+      this.showEdit = true;
+    },
     async getEmployee() {
       try {
         this.loadingData = true;
@@ -548,7 +591,7 @@ export default defineComponent({
       let result = await api
         .get(
           `/api/v1/technology/search?filterName=${
-            !keyword ? '' : keyword.trim()
+            !keyword ? "" : keyword.trim()
           }`
         )
         .then((response) => {
@@ -658,6 +701,9 @@ export default defineComponent({
         this.showDelete = false;
       }
     },
+    saveUpdate(){
+      this.statusUpdate = true;
+    }
   },
   computed: {
     getNameDelete() {

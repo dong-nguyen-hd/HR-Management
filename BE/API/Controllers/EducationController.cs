@@ -49,11 +49,11 @@ namespace API.Controllers
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<EducationResource>), StatusCodes.Status400BadRequest)]
-        public new async Task<IActionResult> SwapAsync([FromBody] SwapResource resource)
+        public new async Task<IActionResult> ChangeOrderIndexAsync([FromBody] List<int> ids)
         {
-            Log.Information($"{User.Identity?.Name}: swap a education.");
+            Log.Information($"{User.Identity?.Name}: change order-index a education.");
 
-            return await base.SwapAsync(resource);
+            return await base.ChangeOrderIndexAsync(ids);
         }
 
         [HttpDelete("{id:int}")]

@@ -31,6 +31,11 @@ namespace Business.Services
         {
             try
             {
+                // Validate category name is existent?
+                var hasValue = await _officeRepository.FindByNameAsync(createLocationResource.Name, true);
+                if (hasValue.Count > 0)
+                    return new BaseResponse<OfficeResource>(ResponseMessage.Values["Office_Existent"]);
+
                 // Mapping Resource to Office
                 var office = Mapper.Map<CreateOfficeResource, Office>(createLocationResource);
 

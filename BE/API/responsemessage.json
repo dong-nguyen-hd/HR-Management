@@ -8,7 +8,6 @@
       "Updating_Error": "An error occurred when updating",
       "Deleting_Error": "An error occurred when deleting",
       "Swapping_Error": "An error occurred when swapping",
-      "Swap_Id_Invalid": "Current-Id/Turned-Id is invalid",
 
       "Token_Invalid": "User name or password is incorrect",
       "Token_Not_Permitted": "Refresh Token not permitted",
@@ -80,6 +79,7 @@
       "Office_Deleting_Error": "An error occurred when deleting the Office",
       "Office_Updating_Error": "An error occurred when updating the Office",
       "Office_NoData": "Office is not existent.",
+      "Office_Existent": "Office is existent",
 
       "WorkHistory_Saving_Error": "An error occurred when saving the Work-History",
       "WorkHistory_Deleting_Error": "An error occurred when deleting the Work-History",

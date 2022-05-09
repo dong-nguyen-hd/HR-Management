@@ -42,5 +42,10 @@ namespace Business.Resources.Person
 
         [Display(Name = "Group Id")]
         public int GroupId { get; set; }
+
+        [MaxLength(50)]
+        [ComponentOrder]
+        [Display(Name = "Order Index")]
+        public List<int> OrderIndex { get; set; }
     }
 }

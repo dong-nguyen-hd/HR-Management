@@ -94,8 +94,8 @@ namespace Business.Services
         {
             try
             {
-                var tempEntity = await _baseRepository.GetWithPrimaryKeyAsync(ids);
-                var totalDeleted = _baseRepository.RemoveRange(tempEntity);
+                var tempEntities = await _baseRepository.GetWithPrimaryKeyAsync(ids);
+                var totalDeleted = _baseRepository.RemoveRange(tempEntities);
 
                 if (totalDeleted == 0 && ids.Count > 0)
                     return new DeleteResponse<IEnumerable<Response>>(ResponseMessage.Values["Deleting_Error"]);
@@ -103,7 +103,7 @@ namespace Business.Services
                 await UnitOfWork.CompleteAsync();
 
                 // Mapping
-                var resource = Mapper.Map<IEnumerable<Entity>, IEnumerable<Response>>(tempEntity);
+                var resource = Mapper.Map<IEnumerable<Entity>, IEnumerable<Response>>(tempEntities);
 
                 return new DeleteResponse<IEnumerable<Response>>(ids.Count, totalDeleted, resource);
             }
@@ -136,31 +136,15 @@ namespace Business.Services
             }
         }
 
-        public virtual async Task<BaseResponse<Response>> SwapAsync(SwapResource swapResource)
+        public virtual async Task<BaseResponse<Response>> ChangeOrderIndexAsync(List<int> ids)
         {
             try
             {
-                // Validate Id duplicate
-                if (swapResource.CurrentId == swapResource.TurnedId)
-                    return new BaseResponse<Response>(ResponseMessage.Values["Swap_Id_Invalid"]);
-                // Validate Id is existent?
-                var currentEntity = await _baseRepository.GetByIdAsync(swapResource.CurrentId);
-                var turnedEntity = await _baseRepository.GetByIdAsync(swapResource.TurnedId);
-                if (currentEntity is null || turnedEntity is null)
-                    return new BaseResponse<Response>(ResponseMessage.Values["NoData"]);
+                var tempEntities = await _baseRepository.GetWithPrimaryKeyAsync(ids);
+                int i = 100;
 
-                var currentEntityValue = (int)currentEntity.GetType().GetProperty("PersonId").GetValue(currentEntity);
-                var turnedEntityValue = (int)turnedEntity.GetType().GetProperty("PersonId").GetValue(turnedEntity);
-
-                if (currentEntityValue != turnedEntityValue)
-                    return new BaseResponse<Response>(ResponseMessage.Values["Swap_Id_Invalid"]);
-
-                // Swap property OrderIndex
-                var currentOrderIndex = (int)currentEntity.GetType().GetProperty("OrderIndex").GetValue(currentEntity);
-                var turnedOrderIndex = (int)turnedEntity.GetType().GetProperty("OrderIndex").GetValue(turnedEntity);
-
-                currentEntity.GetType().GetProperty("OrderIndex").SetValue(currentEntity, turnedOrderIndex);
-                turnedEntity.GetType().GetProperty("OrderIndex").SetValue(turnedEntity, currentOrderIndex);
+                foreach (var item in tempEntities)
+                    item.GetType().GetProperty("OrderIndex").SetValue(item, i--);
 
                 await UnitOfWork.CompleteAsync();
 
@@ -168,7 +152,7 @@ namespace Business.Services
             }
             catch (Exception ex)
             {
-                throw new MessageResultException(ResponseMessage.Values["Swapping_Error"], ex);
+                throw new MessageResultException(ResponseMessage.Values["Saving_Error"], ex);
             }
         }
         #endregion

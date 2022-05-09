@@ -351,7 +351,7 @@
                               class="text-subtitle2"
                               :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
                             >
-                              <span>{{ category?.name }}:</span>
+                              <span>{{ category?.categoryName }}:</span>
                             </q-badge>
                           </div>
 
@@ -453,11 +453,13 @@
                           map-options
                           options-selected-class="text-accent"
                           @filter="filterCategory"
+                          @update:model-value="this.tempCategoryPersonResource.technologies = []"
                           fill-input
                           input-debounce="200"
                           hide-selected
                           use-input
                           :rules="[(val) => !!val || 'Office is required']"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                           :label-color="colorFocusSkill[0]"
                           @focus="
@@ -500,6 +502,7 @@
                           options-selected-class="text-accent"
                           :label-color="colorFocusSkill[1]"
                           :rules="[(val) => val?.length || 'Skill is required']"
+                          lazy-rules="ondemand"
                           @filter="filterSkillBelongWithCategory"
                           @focus="
                             colorFocusSkill[1] = 'white';
@@ -1995,7 +1998,7 @@ import { useQuasar, date } from "quasar";
 import { api } from "src/boot/axios";
 
 export default defineComponent({
-  name: "New Employee",
+  name: "Edit Employee",
 
   props: {
     employeeTransfer: Object,
@@ -2004,8 +2007,6 @@ export default defineComponent({
 
   data() {
     return {
-      statusMode: false, // false: create - true: update
-
       tab: "1",
       tabModel: [
         { id: "1", name: "Skill" },
@@ -2039,6 +2040,7 @@ export default defineComponent({
       },
 
       tempCategoryPersonResource: {
+        id: 0,
         personId: 0,
         categoryId: 0,
         technologies: [],
@@ -2487,7 +2489,7 @@ export default defineComponent({
     booleanTab(val) {
       return this.employeeInfor.orderIndex.some((x) => x == parseInt(val));
     },
-    addSkill() {
+    async addSkill() {
       if (
         !this.$refs.categoryRef.validate() ||
         !this.$refs.skillRef.validate()
@@ -2495,29 +2497,44 @@ export default defineComponent({
         return null;
       }
 
-      // List for send to server
-      this.employeeInfor.categoryPersonResource.unshift(
-        Object.assign({}, this.tempCategoryPersonResource)
-      );
+      // Request API
+        let result = await api
+          .post(`/api/v1/category-person`, this.tempCategoryPersonResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
 
-      // List for print
-      let category = this.tempListCategory.find(
-        (x) => x.id == this.tempCategoryPersonResource.categoryId
-      );
-      category.technologies = category.technologies.filter((x) =>
-        this.tempCategoryPersonResource.technologies.includes(x.id)
-      );
-      this.listTempCategory.unshift(category);
+        if (result.success) {
+          this.listTempCategory.unshift(result.resource);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.dialogToggle[1] = false;
     },
     async editSkill(item) {
-      await this.getByCategoryId(item.id);
-
+      await this.getByCategoryId(item.categoryId);
+     
       let temp = [];
+       
       item.technologies.forEach((x) => temp.push(x.id));
 
-      this.tempCategoryPersonResource.categoryId = item.id;
+      this.tempCategoryPersonResource.categoryId = item.categoryId;
+      this.tempCategoryPersonResource.id = item.id;
       this.tempCategoryPersonResource.technologies = temp;
 
       this.tempListSkillCategory = this.getSkillBelongWithCategory();
@@ -2525,26 +2542,45 @@ export default defineComponent({
       this.showEditBtn = true;
       this.dialogToggle[1] = true;
     },
-    saveSkill() {
-      // Set list API
-      let index = this.employeeInfor.categoryPersonResource.findIndex(
-        (x) => x.categoryId == this.tempCategoryPersonResource.categoryId
-      );
-      this.employeeInfor.categoryPersonResource[index] = Object.assign(
-        {},
-        this.tempCategoryPersonResource
-      );
+    async saveSkill() {
+      if (
+        !this.$refs.categoryRef.validate() ||
+        !this.$refs.skillRef.validate()
+      ) {
+        return null;
+      }
 
-      // Mapping with print-list
-      let category = this.tempListCategory.find(
-        (x) => x.id == this.tempCategoryPersonResource.categoryId
-      );
-      category.technologies = category.technologies.filter((x) =>
-        this.tempCategoryPersonResource.technologies.includes(x.id)
-      );
+      // Request API
+        let result = await api
+          .put(`/api/v1/category-person/${this.tempCategoryPersonResource.id}`, this.tempCategoryPersonResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
 
-      this.listTempCategory[index] = category;
+        if (result.success) {
+          let index  = this.listTempCategory.findIndex(
+            (x) => x.id == this.tempCategoryPersonResource.id
+          );
 
+          this.listTempCategory[index] = result.resource;
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      
       this.showEditBtn = false;
       this.dialogToggle[1] = false;
     },
@@ -2552,81 +2588,141 @@ export default defineComponent({
       this.tempDeleteSkill = item;
       this.deleteToggle[1] = true;
     },
-    saveDeleteSkill() {
-      // Set list API
-      let index = this.employeeInfor.categoryPersonResource.findIndex(
-        (x) => x.categoryId == this.tempDeleteSkill.id
-      );
-      this.employeeInfor.categoryPersonResource.splice(index, 1);
+    async saveDeleteSkill() {
+      // Request API
+        let result = await api
+          .delete(`/api/v1/category-person/${this.tempDeleteSkill.id}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
 
-      // Set list temp print
-      this.listTempCategory.splice(index, 1);
+        if (result.success) {
+          let index  = this.listTempCategory.findIndex(
+            (x) => x.id == this.tempDeleteSkill.id
+          );
+
+          this.listTempCategory.splice(index, 1);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.deleteToggle[1] = false;
     },
-    orderSkillNext(item) {
-      let count = this.employeeInfor.categoryPersonResource.length;
+    async orderSkillNext(item) {
+      let count = this.listTempCategory.length;
       // Set list API
-      let index = this.employeeInfor.categoryPersonResource.findIndex(
-        (x) => x.categoryId == item.id
+      let index = this.listTempCategory.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == count - 1) {
-        let tempOne = this.employeeInfor.categoryPersonResource.slice(0, index);
-        tempOne.unshift(this.employeeInfor.categoryPersonResource[index]);
-        this.employeeInfor.categoryPersonResource = tempOne;
-
-        let tempTwo = this.listTempCategory.slice(0, index);
-        tempTwo.unshift(this.listTempCategory[index]);
-        this.listTempCategory = tempTwo;
+        let temp = this.listTempCategory.slice(0, index);
+        temp.unshift(this.listTempCategory[index]);
+        this.listTempCategory = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.categoryPersonResource[i];
-            this.employeeInfor.categoryPersonResource[i] =
-              this.employeeInfor.categoryPersonResource[i + 1];
-            this.employeeInfor.categoryPersonResource[i + 1] = tempOne;
-
-            let tempTwo = this.listTempCategory[i];
+            let temp = this.listTempCategory[i];
             this.listTempCategory[i] = this.listTempCategory[i + 1];
-            this.listTempCategory[i + 1] = tempTwo;
+            this.listTempCategory[i + 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempCategory.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/category-person`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
-    orderSkillPrev(item) {
-      let count = this.employeeInfor.categoryPersonResource.length;
+    async orderSkillPrev(item) {
+      let count = this.listTempCategory.length;
       // Set list API
-      let index = this.employeeInfor.categoryPersonResource.findIndex(
-        (x) => x.categoryId == item.id
+      let index = this.listTempCategory.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == 0) {
-        let tempOne = this.employeeInfor.categoryPersonResource.slice(1);
-        tempOne.push(this.employeeInfor.categoryPersonResource[index]);
-        this.employeeInfor.categoryPersonResource = tempOne;
-
-        let tempTwo = this.listTempCategory.slice(1);
-        tempTwo.push(this.listTempCategory[index]);
-        this.listTempCategory = tempTwo;
+        let temp = this.listTempCategory.slice(1);
+        temp.push(this.listTempCategory[index]);
+        this.listTempCategory = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.categoryPersonResource[i];
-            this.employeeInfor.categoryPersonResource[i] =
-              this.employeeInfor.categoryPersonResource[i - 1];
-            this.employeeInfor.categoryPersonResource[i - 1] = tempOne;
-
-            let tempTwo = this.listTempCategory[i];
+            let temp = this.listTempCategory[i];
             this.listTempCategory[i] = this.listTempCategory[i - 1];
-            this.listTempCategory[i - 1] = tempTwo;
+            this.listTempCategory[i - 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempCategory.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/category-person`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
     addProject() {
       if (
@@ -3210,9 +3306,7 @@ export default defineComponent({
     validateDate(dateTarget) {
       return date.isValid(dateTarget);
     },
-    async mappingDataEdit(){
-      // Set status mode
-      this.statusMode = true;
+    async mappingDataUpdate(){
       // Set infor
      this.employeeInfor = Object.assign({}, this.employeeTransfer);
      // Set office
@@ -3223,27 +3317,20 @@ export default defineComponent({
      // Set image
      this.imageURL = this.employeeInfor.avatar.original;
      // Skill component
-
+     this.employeeInfor.categoryPersonResource = [];
+     this.listTempCategory = this.employeeInfor.categoryPerson;
+     this.tempCategoryPersonResource.personId = this.employeeInfor.id;
     },
-    mappingDataInsert(){
-      // Set status mode
-      this.statusMode = false;
-      // Set image
-      this.imageURL = this.avatarDefault;
-    }
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
     getDisableCategory() {
       let temp = [];
-      this.employeeInfor.categoryPersonResource.forEach((x) =>
+      this.listTempCategory.forEach((x) =>
         temp.push(x.categoryId)
       );
 
       return temp;
-    },
-    getCategoryId() {
-      return this.tempCategoryPersonResource.categoryId;
     },
   },
   async created() {
@@ -3258,15 +3345,11 @@ export default defineComponent({
     ]);
   },
   watch: {
-    getCategoryId: function (newVal, oldVal) {
-      if (oldVal && newVal) this.tempCategoryPersonResource.technologies = [];
-    },
     employeeTransfer: {
       immediate: true,
       deep: true,
       handler(newValue, oldValue) {
-        if(newValue) this.mappingDataEdit();
-        else this.mappingDataInsert();
+        if(newValue) this.mappingDataUpdate();
       }
     },
     statusUpdateTransfer: {

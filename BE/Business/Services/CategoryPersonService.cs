@@ -6,6 +6,7 @@ using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.CategoryPerson;
+using Business.Resources.Technology;
 using Microsoft.Extensions.Options;
 
 namespace Business.Services
@@ -31,7 +32,7 @@ namespace Business.Services
         {
             try
             {
-                // Validate CategoryPerson
+                // Validate Category-Id isexistent?
                 if (await _categoryPersonRepository.ValidateExistent(createCategoryPersonResource.PersonId, createCategoryPersonResource.CategoryId))
                     return new BaseResponse<CategoryPersonResource>(ResponseMessage.Values["CategoryPerson_Id_Invalid"]);
 
@@ -41,7 +42,44 @@ namespace Business.Services
                 await _categoryPersonRepository.InsertAsync(tempCategoryPerson);
                 await UnitOfWork.CompleteAsync();
 
-                return new BaseResponse<CategoryPersonResource>(Mapper.Map<CategoryPerson, CategoryPersonResource>(tempCategoryPerson));
+                // Mapping response
+                var categoryPerson = await _categoryPersonRepository.GetByIdAsync(tempCategoryPerson.Id);
+                var technologies = categoryPerson.Category.Technologies.Where(x => createCategoryPersonResource.Technologies.Contains(x.Id));
+                var categoryPersonResource = Mapper.Map<CategoryPerson, CategoryPersonResource>(categoryPerson);
+                categoryPersonResource.Technologies = Mapper.Map<IEnumerable<Technology>, IEnumerable<TechnologyResource>>(technologies).ToList();
+
+                return new BaseResponse<CategoryPersonResource>(categoryPersonResource);
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["CategoryPerson_Saving_Error"], ex);
+            }
+        }
+
+        public async override Task<BaseResponse<CategoryPersonResource>> UpdateAsync(int id, UpdateCategoryPersonResource updateCategoryPersonResource)
+        {
+            try
+            {
+                // Validate Id is existent?
+                var categoryPerson = await _categoryPersonRepository.GetByIdAsync(id);
+                if (categoryPerson is null)
+                    return new BaseResponse<CategoryPersonResource>(ResponseMessage.Values["CategoryPerson_NoData"]);
+                // Validate Category-Id isexistent?
+                if (await _categoryPersonRepository.ValidateExistent(categoryPerson.PersonId, updateCategoryPersonResource.CategoryId))
+                    return new BaseResponse<CategoryPersonResource>(ResponseMessage.Values["CategoryPerson_Id_Invalid"]);
+
+                // Mapping
+                Mapper.Map(updateCategoryPersonResource, categoryPerson);
+
+                await UnitOfWork.CompleteAsync();
+
+                // Mapping response
+                categoryPerson = await _categoryPersonRepository.GetByIdAsync(id);
+                var technologies = categoryPerson.Category.Technologies.Where(x => updateCategoryPersonResource.Technologies.Contains(x.Id));
+                var categoryPersonResource = Mapper.Map<CategoryPerson, CategoryPersonResource>(categoryPerson);
+                categoryPersonResource.Technologies = Mapper.Map<IEnumerable<Technology>, IEnumerable<TechnologyResource>>(technologies).ToList();
+
+                return new BaseResponse<CategoryPersonResource>(categoryPersonResource);
             }
             catch (Exception ex)
             {

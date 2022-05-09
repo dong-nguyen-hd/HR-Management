@@ -5,7 +5,7 @@
         <q-avatar size="200px">
           <img :src="imageURL" />
         </q-avatar>
-        <div class="flex row no-wrap">
+        <div class="flex row no-wrap" style="width: 300px">
           <div class="flex flex-center q-mr-md q-pt-sm">
             <q-btn
               round

@@ -49,11 +49,11 @@ namespace API.Controllers
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status400BadRequest)]
-        public new async Task<IActionResult> SwapAsync([FromBody] SwapResource resource)
+        public new async Task<IActionResult> ChangeOrderIndexAsync([FromBody] List<int> ids)
         {
-            Log.Information($"{User.Identity?.Name}: swap a certificate.");
+            Log.Information($"{User.Identity?.Name}: chnage order-index a certificate.");
 
-            return await base.SwapAsync(resource);
+            return await base.ChangeOrderIndexAsync(ids);
         }
 
         [HttpDelete("{id:int}")]

@@ -78,9 +78,9 @@ namespace API.Controllers
         }
 
         [NonAction]
-        public virtual async Task<IActionResult> SwapAsync([FromBody] SwapResource resource)
+        public virtual async Task<IActionResult> ChangeOrderIndexAsync([FromBody] List<int> ids)
         {
-            var result = await _baseService.SwapAsync(resource);
+            var result = await _baseService.ChangeOrderIndexAsync(ids);
 
             if (result.Success)
                 return Ok(result);
