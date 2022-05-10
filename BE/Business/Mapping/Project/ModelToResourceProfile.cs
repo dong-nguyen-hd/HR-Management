@@ -11,6 +11,7 @@ namespace Business.Mapping.Project
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Group.Name))
                 .ForMember(x => x.Description, opt => opt.MapFrom(src => src.Group.Description))
                 .ForMember(x => x.TeamSize, opt => opt.MapFrom(src => src.Group.TeamSize))
+                .ForMember(x => x.GroupId, opt => opt.MapFrom(src => src.Group.Id))
                 .ForMember(x => x.Technology, opt => opt.Ignore());
         }
     }

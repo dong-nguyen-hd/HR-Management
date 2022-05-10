@@ -34,7 +34,7 @@ namespace Business.Services
         {
             try
             {
-                // Validate Id is existent?
+                // Validate Group-Id is existent?
                 var tempGroup = await _groupRepository.GetByIdAsync(createProjectResource.GroupId);
                 if (tempGroup is null)
                     return new BaseResponse<ProjectResource>(ResponseMessage.Values["Project_NoData"]);
@@ -58,7 +58,7 @@ namespace Business.Services
         {
             try
             {
-                // Validate Id is existent?
+                // Validate Group-Id is existent?
                 var tempProject = await _projectRepository.GetByIdAsync(id);
                 if (tempProject is null)
                     return new BaseResponse<ProjectResource>(ResponseMessage.Values["Project_NoData"]);

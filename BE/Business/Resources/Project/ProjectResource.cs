@@ -45,5 +45,8 @@ namespace Business.Resources.Project
 
         [Required]
         public List<TechnologyResource> Technology { get; set; }
+
+        [Required]
+        public int GroupId { get; set; }
     }
 }

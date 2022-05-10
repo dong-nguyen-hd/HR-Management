@@ -633,7 +633,7 @@
                               class="text-subtitle2"
                               :color="index % 2 == 0 ? 'blue-10' : 'teal-8'"
                             >
-                              <span>{{ project?.groupName }}:</span>
+                              <span>{{ project?.name }}:</span>
                             </q-badge>
                           </div>
 
@@ -661,7 +661,7 @@
                               style="font-size: 14px"
                               >Start Date:</q-badge
                             >
-                            {{ project.startDate }}
+                            {{ convertDateTimeToDate(project.startDate) }}
                           </div>
 
                           <div v-show="project.endDate">
@@ -670,7 +670,7 @@
                               style="font-size: 14px"
                               >End Date:</q-badge
                             >
-                            {{ project.endDate }}
+                            {{ convertDateTimeToDate(project.endDate) }}
                           </div>
                         </q-card-section>
 
@@ -757,6 +757,7 @@
                           hide-selected
                           use-input
                           :rules="[(val) => !!val || 'Project is required']"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                           :label-color="colorFocusProject[0]"
                           @focus="
@@ -791,6 +792,7 @@
                           @blur="colorFocusProject[1] = ''"
                           hide-bottom-space
                           :rules="[(val) => !!val || 'Position is required']"
+                          lazy-rules="ondemand"
                         >
                         </q-input>
                       </div>
@@ -811,6 +813,7 @@
                           :rules="[
                             (val) => !!val || 'Responsibilities is required',
                           ]"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                         >
                         </q-input>
@@ -834,6 +837,7 @@
                             (val) => !!val || 'Start Date is required',
                             (val) => validateDate(val) || 'DoB is invalid',
                           ]"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                         >
                           <template v-slot:append>
@@ -880,6 +884,7 @@
                             (val) => !!val || 'End Date is required',
                             (val) => validateDate(val) || 'DoB is invalid',
                           ]"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                         >
                           <template v-slot:append>
@@ -938,7 +943,7 @@
                   <q-card>
                     <q-card-section class="row items-center">
                       <span class="text-h6"
-                        >Delete {{ tempDeleteProject.groupName }} project?</span
+                        >Delete {{ tempDeleteProject.name }} project?</span
                       >
                     </q-card-section>
 
@@ -1009,7 +1014,7 @@
                     <q-card
                       v-for="(
                         workHistory, index
-                      ) in employeeInfor.workHistoryResource"
+                      ) in listTempWorkHistory"
                       :key="index"
                       bordered
                       class="inside"
@@ -2007,7 +2012,7 @@ export default defineComponent({
 
   data() {
     return {
-      tab: "1",
+      tab: "3",
       tabModel: [
         { id: "1", name: "Skill" },
         { id: "2", name: "Project" },
@@ -2030,13 +2035,7 @@ export default defineComponent({
         officeId: null,
         groupId: null,
         gender: "",
-        orderIndex: [1, 2, 3, 4, 5],
-
-        categoryPersonResource: [],
-        certificateResource: [],
-        educationResource: [],
-        projectResource: [],
-        workHistoryResource: [],
+        orderIndex: [1, 2, 3, 4, 5]
       },
 
       tempCategoryPersonResource: {
@@ -2048,24 +2047,25 @@ export default defineComponent({
       listTempCategory: [],
 
       tempProjectResource: {
+        id: 0,
         position: "",
         responsibilities: "",
         startDate: "",
         endDate: null,
         personId: 0,
         groupId: 0,
-        tempId: null,
       },
       listTempProject: [],
 
       tempWorkHistoryResource: {
+        id: 0,
         companyName: "",
         position: "",
         startDate: null,
         endDate: null,
         personId: 0,
-        tempId: null,
       },
+      listTempWorkHistory: [],
 
       tempEducationResource: {
         collegeName: "",
@@ -2724,7 +2724,7 @@ export default defineComponent({
           });
         }
     },
-    addProject() {
+    async addProject() {
       if (
         !this.$refs.projectOneRef.validate() ||
         !this.$refs.projectTwoRef.validate() ||
@@ -2733,40 +2733,76 @@ export default defineComponent({
       ) {
         return null;
       }
-      this.tempProjectResource.tempId = Date.now();
 
-      // List for send to server
-      this.employeeInfor.projectResource.unshift(
-        Object.assign({}, this.tempProjectResource)
-      );
+      // Request API
+        let result = await api
+          .post(`/api/v1/project`, this.tempProjectResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
 
-      // List for print
-      let temp = Object.assign({}, this.tempProjectResource);
-      let group = this.tempListGroup.find(
-        (x) => x.id == this.tempProjectResource.groupId
-      );
-      temp.groupName = group.name;
-      this.listTempProject.unshift(temp);
+        if (result.success) {
+          this.listTempProject.unshift(result.resource);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.dialogToggle[2] = false;
     },
-    saveProject() {
-      // Set list API
-      let index = this.employeeInfor.projectResource.findIndex(
-        (x) => x.tempId == this.tempProjectResource.tempId
-      );
-      this.employeeInfor.projectResource[index] = Object.assign(
-        {},
-        this.tempProjectResource
-      );
+    async saveProject() {
+      if (
+        !this.$refs.projectOneRef.validate() ||
+        !this.$refs.projectTwoRef.validate() ||
+        !this.$refs.projectThreeRef.validate() ||
+        !this.$refs.projectFourRef.validate()
+      ) {
+        return null;
+      }
 
-      // Mapping with print-list
-      let temp = Object.assign({}, this.tempProjectResource);
-      let group = this.tempListGroup.find(
-        (x) => x.id == this.tempProjectResource.groupId
-      );
-      temp.groupName = group.name;
-      this.listTempProject[index] = temp;
+      // Request API
+        let result = await api
+          .put(`/api/v1/project/${this.tempProjectResource.id}`, this.tempProjectResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          let index  = this.listTempProject.findIndex(
+            (x) => x.id == this.tempProjectResource.id
+          );
+
+          this.listTempProject[index] = result.resource;
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.showEditBtn = false;
       this.dialogToggle[2] = false;
@@ -2777,7 +2813,7 @@ export default defineComponent({
       this.tempListGroup = [];
       this.tempListGroup.unshift(result);
 
-      this.tempProjectResource = item;
+      this.tempProjectResource = Object.assign({}, item);
 
       this.showEditBtn = true;
       this.dialogToggle[2] = true;
@@ -2786,81 +2822,139 @@ export default defineComponent({
       this.tempDeleteProject = item;
       this.deleteToggle[2] = true;
     },
-    saveDeleteProject() {
-      // Set list API
-      let index = this.employeeInfor.projectResource.findIndex(
-        (x) => x.tempId == this.tempDeleteProject.tempId
-      );
-      this.employeeInfor.projectResource.splice(index, 1);
+    async saveDeleteProject() {
+      // Request API
+        let result = await api
+          .delete(`/api/v1/project/${this.tempDeleteProject.id}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
 
-      // Set list temp print
-      this.listTempProject.splice(index, 1);
+        if (result.success) {
+          let index  = this.listTempProject.findIndex(
+            (x) => x.id == this.tempDeleteProject.id
+          );
+
+          this.listTempProject.splice(index, 1);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.deleteToggle[2] = false;
     },
-    orderProjectNext(item) {
-      let count = this.employeeInfor.projectResource.length;
-      // Set list API
-      let index = this.employeeInfor.projectResource.findIndex(
-        (x) => x.tempId == item.tempId
+    async orderProjectNext(item) {
+      let count = this.listTempProject.length;
+      let index = this.listTempProject.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == count - 1) {
-        let tempOne = this.employeeInfor.projectResource.slice(0, index);
-        tempOne.unshift(this.employeeInfor.projectResource[index]);
-        this.employeeInfor.projectResource = tempOne;
-
-        let tempTwo = this.listTempProject.slice(0, index);
-        tempTwo.unshift(this.listTempProject[index]);
-        this.listTempProject = tempTwo;
+        let temp = this.listTempProject.slice(0, index);
+        temp.unshift(this.listTempProject[index]);
+        this.listTempProject = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.projectResource[i];
-            this.employeeInfor.projectResource[i] =
-              this.employeeInfor.projectResource[i + 1];
-            this.employeeInfor.projectResource[i + 1] = tempOne;
-
-            let tempTwo = this.listTempProject[i];
+            let temp = this.listTempProject[i];
             this.listTempProject[i] = this.listTempProject[i + 1];
-            this.listTempProject[i + 1] = tempTwo;
+            this.listTempProject[i + 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempProject.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/project`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
-    orderProjectPrev(item) {
-      let count = this.employeeInfor.projectResource.length;
-      // Set list API
-      let index = this.employeeInfor.projectResource.findIndex(
-        (x) => x.tempId == item.tempId
+    async orderProjectPrev(item) {
+      let count = this.listTempProject.length;
+      let index = this.listTempProject.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == 0) {
-        let tempOne = this.employeeInfor.projectResource.slice(1);
-        tempOne.push(this.employeeInfor.projectResource[index]);
-        this.employeeInfor.projectResource = tempOne;
-
-        let tempTwo = this.listTempProject.slice(1);
-        tempTwo.push(this.listTempProject[index]);
-        this.listTempProject = tempTwo;
+        let temp = this.listTempProject.slice(1);
+        temp.push(this.listTempProject[index]);
+        this.listTempProject = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.projectResource[i];
-            this.employeeInfor.projectResource[i] =
-              this.employeeInfor.projectResource[i - 1];
-            this.employeeInfor.projectResource[i - 1] = tempOne;
-
-            let tempTwo = this.listTempProject[i];
+            let temp = this.listTempProject[i];
             this.listTempProject[i] = this.listTempProject[i - 1];
-            this.listTempProject[i - 1] = tempTwo;
+            this.listTempProject[i - 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempProject.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/project`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
     orderWorkHistoryNext(item) {
       let count = this.employeeInfor.workHistoryResource.length;
@@ -3236,11 +3330,6 @@ export default defineComponent({
         this.employeeInfor.groupId = null;
         this.employeeInfor.gender = "";
         this.employeeInfor.orderIndex = [1, 2, 3, 4, 5];
-        this.employeeInfor.categoryPersonResource = [];
-        this.employeeInfor.certificateResource = [];
-        this.employeeInfor.educationResource = [];
-        this.employeeInfor.projectResource = [];
-        this.employeeInfor.workHistoryResource = [];
 
         this.imageURL = this.avatarDefault;
         this.imageFile = null;
@@ -3306,6 +3395,9 @@ export default defineComponent({
     validateDate(dateTarget) {
       return date.isValid(dateTarget);
     },
+    convertDateTimeToDate(dateTime){
+      return date.formatDate(dateTime, 'YYYY-MM-DD');
+    },
     async mappingDataUpdate(){
       // Set infor
      this.employeeInfor = Object.assign({}, this.employeeTransfer);
@@ -3317,9 +3409,14 @@ export default defineComponent({
      // Set image
      this.imageURL = this.employeeInfor.avatar.original;
      // Skill component
-     this.employeeInfor.categoryPersonResource = [];
      this.listTempCategory = this.employeeInfor.categoryPerson;
      this.tempCategoryPersonResource.personId = this.employeeInfor.id;
+     // Project component
+     this.listTempProject = this.employeeInfor.project;
+     this.tempProjectResource.personId = this.employeeInfor.id;
+     // Work-History component
+     this.listTempWorkHistory = this.employeeInfor.workHistory;
+     this.listTempWorkHistory.personId = this.employeeInfor.id;
     },
   },
   computed: {

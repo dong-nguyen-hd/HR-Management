@@ -141,10 +141,15 @@ namespace Business.Services
             try
             {
                 var tempEntities = await _baseRepository.GetWithPrimaryKeyAsync(ids);
-                int i = 100;
 
                 foreach (var item in tempEntities)
-                    item.GetType().GetProperty("OrderIndex").SetValue(item, i--);
+                {
+                    int idValue = (int)item.GetType().GetProperty("Id").GetValue(item);
+
+                    for (int i = 0; i < ids.Count; i++)
+                        if (ids[i] == idValue)
+                            item.GetType().GetProperty("OrderIndex").SetValue(item, 99 - i);
+                }
 
                 await UnitOfWork.CompleteAsync();
 
