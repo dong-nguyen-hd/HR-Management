@@ -1045,7 +1045,7 @@
                               style="font-size: 14px"
                               >Start Date:</q-badge
                             >
-                            {{ workHistory.startDate }}
+                            {{ convertDateTimeToDate(workHistory.startDate) }}
                           </div>
 
                           <div v-show="workHistory.endDate">
@@ -1054,7 +1054,7 @@
                               style="font-size: 14px"
                               >End Date:</q-badge
                             >
-                            {{ workHistory.endDate }}
+                            {{ convertDateTimeToDate(workHistory.endDate) }}
                           </div>
                         </q-card-section>
 
@@ -1138,6 +1138,7 @@
                           :rules="[
                             (val) => !!val || 'Company Name is required',
                           ]"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                         >
                         </q-input>
@@ -1157,6 +1158,7 @@
                           @blur="colorFocusWorkHistory[1] = ''"
                           hide-bottom-space
                           :rules="[(val) => !!val || 'Position is required']"
+                          lazy-rules="ondemand"
                         >
                         </q-input>
                       </div>
@@ -1179,6 +1181,7 @@
                             (val) => !!val || 'Start Date is required',
                             (val) => validateDate(val) || 'DoB is invalid',
                           ]"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                         >
                           <template v-slot:append>
@@ -1225,6 +1228,7 @@
                           :rules="[
                             (val) => validateDate(val) || 'DoB is invalid',
                           ]"
+                          lazy-rules="ondemand"
                         >
                           <template v-slot:append>
                             <q-icon name="event" class="cursor-pointer">
@@ -1354,7 +1358,7 @@
                     <q-card
                       v-for="(
                         education, index
-                      ) in employeeInfor.educationResource"
+                      ) in listTempEducation"
                       :key="index"
                       bordered
                       class="inside"
@@ -1385,7 +1389,7 @@
                               style="font-size: 14px"
                               >Start Date:</q-badge
                             >
-                            {{ education.startDate }}
+                            {{ convertDateTimeToDate(education.startDate) }}
                           </div>
 
                           <div v-show="education.endDate">
@@ -1394,7 +1398,7 @@
                               style="font-size: 14px"
                               >End Date:</q-badge
                             >
-                            {{ education.endDate }}
+                            {{ convertDateTimeToDate(education.endDate) }}
                           </div>
                         </q-card-section>
 
@@ -1478,6 +1482,7 @@
                           :rules="[
                             (val) => !!val || 'College Name is required',
                           ]"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                         >
                         </q-input>
@@ -1497,6 +1502,7 @@
                           @blur="colorFocusEducation[1] = ''"
                           hide-bottom-space
                           :rules="[(val) => !!val || 'Major is required']"
+                          lazy-rules="ondemand"
                         >
                         </q-input>
                       </div>
@@ -1519,6 +1525,7 @@
                             (val) => !!val || 'Start Date is required',
                             (val) => validateDate(val) || 'DoB is invalid',
                           ]"
+                          lazy-rules="ondemand"
                           hide-bottom-space
                         >
                           <template v-slot:append>
@@ -1694,7 +1701,7 @@
                     <q-card
                       v-for="(
                         certificate, index
-                      ) in employeeInfor.certificateResource"
+                      ) in listTempCertificate"
                       :key="index"
                       bordered
                       class="inside"
@@ -1725,7 +1732,7 @@
                               style="font-size: 14px"
                               >Start Date:</q-badge
                             >
-                            {{ certificate.startDate }}
+                            {{ convertDateTimeToDate(certificate.startDate) }}
                           </div>
 
                           <div v-show="certificate.endDate">
@@ -1734,7 +1741,7 @@
                               style="font-size: 14px"
                               >End Date:</q-badge
                             >
-                            {{ certificate.endDate }}
+                            {{ convertDateTimeToDate(certificate.endDate) }}
                           </div>
                         </q-card-section>
 
@@ -2012,7 +2019,7 @@ export default defineComponent({
 
   data() {
     return {
-      tab: "3",
+      tab: "4",
       tabModel: [
         { id: "1", name: "Skill" },
         { id: "2", name: "Project" },
@@ -2068,22 +2075,24 @@ export default defineComponent({
       listTempWorkHistory: [],
 
       tempEducationResource: {
+        id: 0,
         collegeName: "",
         major: "",
         startDate: "",
         endDate: null,
         personId: 0,
-        tempId: null,
       },
+      listTempEducation: [],
 
       tempCertificateResource: {
+        id: 0,
         name: "",
         provider: "",
         startDate: "",
         endDate: null,
         personId: 0,
-        tempId: null,
       },
+      listTempCertificate: [],
 
       tempDeleteSkill: null,
       tempDeleteProject: null,
@@ -2956,87 +2965,191 @@ export default defineComponent({
           });
         }
     },
-    orderWorkHistoryNext(item) {
-      let count = this.employeeInfor.workHistoryResource.length;
-      // Set list API
-      let index = this.employeeInfor.workHistoryResource.findIndex(
-        (x) => x.tempId == item.tempId
+    async orderWorkHistoryNext(item) {
+      let count = this.listTempWorkHistory.length;
+      let index = this.listTempWorkHistory.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == count - 1) {
-        let tempOne = this.employeeInfor.workHistoryResource.slice(0, index);
-        tempOne.unshift(this.employeeInfor.workHistoryResource[index]);
-        this.employeeInfor.workHistoryResource = tempOne;
+        let temp = this.listTempWorkHistory.slice(0, index);
+        temp.unshift(this.listTempWorkHistory[index]);
+        this.listTempWorkHistory = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.workHistoryResource[i];
-            this.employeeInfor.workHistoryResource[i] =
-              this.employeeInfor.workHistoryResource[i + 1];
-            this.employeeInfor.workHistoryResource[i + 1] = tempOne;
+            let temp = this.listTempWorkHistory[i];
+            this.listTempWorkHistory[i] = this.listTempWorkHistory[i + 1];
+            this.listTempWorkHistory[i + 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempWorkHistory.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/work-history`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
-    orderWorkHistoryPrev(item) {
-      let count = this.employeeInfor.workHistoryResource.length;
-      // Set list API
-      let index = this.employeeInfor.workHistoryResource.findIndex(
-        (x) => x.tempId == item.tempId
+    async orderWorkHistoryPrev(item) {
+      let count = this.listTempWorkHistory.length;
+      let index = this.listTempWorkHistory.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == 0) {
-        let tempOne = this.employeeInfor.workHistoryResource.slice(1);
-        tempOne.push(this.employeeInfor.workHistoryResource[index]);
-        this.employeeInfor.workHistoryResource = tempOne;
+        let temp = this.listTempWorkHistory.slice(1);
+        temp.push(this.listTempWorkHistory[index]);
+        this.listTempWorkHistory = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.workHistoryResource[i];
-            this.employeeInfor.workHistoryResource[i] =
-              this.employeeInfor.workHistoryResource[i - 1];
-            this.employeeInfor.workHistoryResource[i - 1] = tempOne;
+            let temp = this.listTempWorkHistory[i];
+            this.listTempWorkHistory[i] = this.listTempWorkHistory[i - 1];
+            this.listTempWorkHistory[i - 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempWorkHistory.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/work-history`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
-    addWorkHistory() {
+    async addWorkHistory() {
       if (
         !this.$refs.workHistoryOneRef.validate() ||
         !this.$refs.workHistoryTwoRef.validate() ||
-        !this.$refs.workHistoryThreeRef.validate()
+        !this.$refs.workHistoryThreeRef.validate() ||
+        !this.$refs.workHistoryFourRef.validate()
       ) {
         return null;
       }
-      this.tempWorkHistoryResource.tempId = Date.now();
 
-      // List for send to server
-      this.employeeInfor.workHistoryResource.unshift(
-        Object.assign({}, this.tempWorkHistoryResource)
-      );
+      // Request API
+        let result = await api
+          .post(`/api/v1/work-history`, this.tempWorkHistoryResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          this.listTempWorkHistory.unshift(result.resource);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.dialogToggle[3] = false;
     },
-    saveWorkHistory() {
-      // Set list API
-      let index = this.employeeInfor.workHistoryResource.findIndex(
-        (x) => x.tempId == this.tempWorkHistoryResource.tempId
-      );
+    async saveWorkHistory() {
+      if (
+        !this.$refs.workHistoryOneRef.validate() ||
+        !this.$refs.workHistoryTwoRef.validate() ||
+        !this.$refs.workHistoryThreeRef.validate() ||
+        !this.$refs.workHistoryFourRef.validate()
+      ) {
+        return null;
+      }
 
-      this.employeeInfor.workHistoryResource[index] = Object.assign(
-        {},
-        this.tempWorkHistoryResource
-      );
+      // Request API
+        let result = await api
+          .put(`/api/v1/work-history/${this.tempWorkHistoryResource.id}`, this.tempWorkHistoryResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          let index  = this.listTempWorkHistory.findIndex(
+            (x) => x.id == this.tempWorkHistoryResource.id
+          );
+
+          this.listTempWorkHistory[index] = result.resource;
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.showEditBtn = false;
       this.dialogToggle[3] = false;
     },
     editWorkHistory(item) {
-      this.tempWorkHistoryResource = item;
+      this.tempWorkHistoryResource = Object.assign({}, item);
 
       this.showEditBtn = true;
       this.dialogToggle[3] = true;
@@ -3045,16 +3158,41 @@ export default defineComponent({
       this.tempDeleteWorkHistory = item;
       this.deleteToggle[3] = true;
     },
-    saveDeleteWorkHistory() {
-      // Set list API
-      let index = this.employeeInfor.workHistoryResource.findIndex(
-        (x) => x.tempId == this.tempDeleteWorkHistory.tempId
-      );
-      this.employeeInfor.workHistoryResource.splice(index, 1);
+    async saveDeleteWorkHistory() {
+      // Request API
+        let result = await api
+          .delete(`/api/v1/work-history/${this.tempDeleteWorkHistory.id}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          let index  = this.listTempWorkHistory.findIndex(
+            (x) => x.id == this.tempDeleteWorkHistory.id
+          );
+
+          this.listTempWorkHistory.splice(index, 1);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.deleteToggle[3] = false;
     },
-    addEducation() {
+    async addEducation() {
       if (
         !this.$refs.educationOneRef.validate() ||
         !this.$refs.educationTwoRef.validate() ||
@@ -3062,31 +3200,81 @@ export default defineComponent({
       ) {
         return null;
       }
-      this.tempEducationResource.tempId = Date.now();
+      
+      // Request API
+        let result = await api
+          .post(`/api/v1/education`, this.tempEducationResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
 
-      // List for send to server
-      this.employeeInfor.educationResource.unshift(
-        Object.assign({}, this.tempEducationResource)
-      );
+        if (result.success) {
+          this.listTempEducation.unshift(result.resource);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.dialogToggle[4] = false;
     },
-    saveEducation() {
-      // Set list API
-      let index = this.employeeInfor.educationResource.findIndex(
-        (x) => x.tempId == this.tempEducationResource.tempId
-      );
+    async saveEducation() {
+      if (
+        !this.$refs.educationOneRef.validate() ||
+        !this.$refs.educationTwoRef.validate() ||
+        !this.$refs.educationThreeRef.validate()
+      ) {
+        return null;
+      }
 
-      this.employeeInfor.educationResource[index] = Object.assign(
-        {},
-        this.tempEducationResource
-      );
+      // Request API
+        let result = await api
+          .put(`/api/v1/education/${this.tempEducationResource.id}`, this.tempEducationResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          let index  = this.listTempEducation.findIndex(
+            (x) => x.id == this.tempEducationResource.id
+          );
+
+          this.listTempEducation[index] = result.resource;
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.showEditBtn = false;
       this.dialogToggle[4] = false;
     },
     editEducation(item) {
-      this.tempEducationResource = item;
+      this.tempEducationResource = Object.assign({}, item);
 
       this.showEditBtn = true;
       this.dialogToggle[4] = true;
@@ -3095,64 +3283,141 @@ export default defineComponent({
       this.tempDeleteEducation = item;
       this.deleteToggle[4] = true;
     },
-    saveDeleteEducation() {
-      // Set list API
-      let index = this.employeeInfor.educationResource.findIndex(
-        (x) => x.tempId == this.tempDeleteEducation.tempId
-      );
-      this.employeeInfor.educationResource.splice(index, 1);
+    async saveDeleteEducation() {
+      // Request API
+        let result = await api
+          .delete(`/api/v1/education/${this.tempDeleteEducation.id}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          let index  = this.listTempEducation.findIndex(
+            (x) => x.id == this.tempDeleteEducation.id
+          );
+
+          this.listTempProject.splice(index, 1);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.deleteToggle[4] = false;
     },
-    orderEducationNext(item) {
-      let count = this.employeeInfor.educationResource.length;
-      // Set list API
-      let index = this.employeeInfor.educationResource.findIndex(
-        (x) => x.tempId == item.tempId
+    async orderEducationNext(item) {
+      let count = this.listTempEducation.length;
+      let index = this.listTempEducation.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == count - 1) {
-        let tempOne = this.employeeInfor.educationResource.slice(0, index);
-        tempOne.unshift(this.employeeInfor.educationResource[index]);
-        this.employeeInfor.educationResource = tempOne;
+        let temp = this.listTempEducation.slice(0, index);
+        temp.unshift(this.listTempEducation[index]);
+        this.listTempEducation = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.educationResource[i];
-            this.employeeInfor.educationResource[i] =
-              this.employeeInfor.educationResource[i + 1];
-            this.employeeInfor.educationResource[i + 1] = tempOne;
+            let temp = this.listTempEducation[i];
+            this.listTempEducation[i] = this.listTempEducation[i + 1];
+            this.listTempEducation[i + 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempEducation.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/education`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
-    orderEducationPrev(item) {
-      let count = this.employeeInfor.educationResource.length;
-      // Set list API
-      let index = this.employeeInfor.educationResource.findIndex(
-        (x) => x.tempId == item.tempId
+    async orderEducationPrev(item) {
+      let count = this.listTempEducation.length;
+      let index = this.listTempEducation.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == 0) {
-        let tempOne = this.employeeInfor.educationResource.slice(1);
-        tempOne.push(this.employeeInfor.educationResource[index]);
-        this.employeeInfor.educationResource = tempOne;
+        let temp = this.listTempEducation.slice(1);
+        temp.push(this.listTempEducation[index]);
+        this.listTempEducation = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.educationResource[i];
-            this.employeeInfor.educationResource[i] =
-              this.employeeInfor.educationResource[i - 1];
-            this.employeeInfor.educationResource[i - 1] = tempOne;
+            let temp = this.listTempEducation[i];
+            this.listTempEducation[i] = this.listTempEducation[i - 1];
+            this.listTempEducation[i - 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempEducation.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/education`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
-    addCertificate() {
+    async addCertificate() {
       if (
         !this.$refs.certificateOneRef.validate() ||
         !this.$refs.certificateTwoRef.validate() ||
@@ -3160,31 +3425,81 @@ export default defineComponent({
       ) {
         return null;
       }
-      this.tempCertificateResource.tempId = Date.now();
 
-      // List for send to server
-      this.employeeInfor.certificateResource.unshift(
-        Object.assign({}, this.tempCertificateResource)
-      );
+      // Request API
+        let result = await api
+          .post(`/api/v1/certificate`, this.tempCertificateResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          this.listTempCertificate.unshift(result.resource);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.dialogToggle[5] = false;
     },
-    saveCertificate() {
-      // Set list API
-      let index = this.employeeInfor.certificateResource.findIndex(
-        (x) => x.tempId == this.tempCertificateResource.tempId
-      );
+    async saveCertificate() {
+      if (
+        !this.$refs.certificateOneRef.validate() ||
+        !this.$refs.certificateTwoRef.validate() ||
+        !this.$refs.certificateThreeRef.validate()
+      ) {
+        return null;
+      }
 
-      this.employeeInfor.certificateResource[index] = Object.assign(
-        {},
-        this.tempCertificateResource
-      );
+      // Request API
+        let result = await api
+          .put(`/api/v1/certificate/${this.tempCertificateResource.id}`, this.tempCertificateResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          let index  = this.listTempCertificate.findIndex(
+            (x) => x.id == this.tempCertificateResource.id
+          );
+
+          this.listTempCertificate[index] = result.resource;
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.showEditBtn = false;
       this.dialogToggle[5] = false;
     },
     editCertificate(item) {
-      this.tempCertificateResource = item;
+      this.tempCertificateResource = Object.assign({}, item);
 
       this.showEditBtn = true;
       this.dialogToggle[5] = true;
@@ -3193,62 +3508,139 @@ export default defineComponent({
       this.tempDeleteCertificate = item;
       this.deleteToggle[5] = true;
     },
-    saveDeleteCertificate() {
-      // Set list API
-      let index = this.employeeInfor.certificateResource.findIndex(
-        (x) => x.tempId == this.tempDeleteCertificate.tempId
-      );
-      this.employeeInfor.certificateResource.splice(index, 1);
+    async saveDeleteCertificate() {
+      // Request API
+        let result = await api
+          .delete(`/api/v1/certificate/${this.tempDeleteCertificate.id}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          let index  = this.listTempCertificate.findIndex(
+            (x) => x.id == this.tempDeleteCertificate.id
+          );
+
+          this.listTempCertificate.splice(index, 1);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
 
       this.deleteToggle[5] = false;
     },
-    orderCertificateNext(item) {
-      let count = this.employeeInfor.certificateResource.length;
-      // Set list API
-      let index = this.employeeInfor.certificateResource.findIndex(
+    async orderCertificateNext(item) {
+      let count = this.listTempCertificate.length;
+      let index = this.listTempCertificate.findIndex(
         (x) => x.tempId == item.tempId
       );
 
       if (index == count - 1) {
-        let tempOne = this.employeeInfor.certificateResource.slice(0, index);
-        tempOne.unshift(this.employeeInfor.certificateResource[index]);
-        this.employeeInfor.certificateResource = tempOne;
+        let temp = this.listTempCertificate.slice(0, index);
+        temp.unshift(this.listTempCertificate[index]);
+        this.listTempCertificate = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.certificateResource[i];
-            this.employeeInfor.certificateResource[i] =
-              this.employeeInfor.certificateResource[i + 1];
-            this.employeeInfor.certificateResource[i + 1] = tempOne;
+            let temp = this.listTempCertificate[i];
+            this.listTempCertificate[i] = this.listTempCertificate[i + 1];
+            this.listTempCertificate[i + 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempCertificate.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/certificate`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
-    orderCertificatePrev(item) {
-      let count = this.employeeInfor.certificateResource.length;
-      // Set list API
-      let index = this.employeeInfor.certificateResource.findIndex(
-        (x) => x.tempId == item.tempId
+    async orderCertificatePrev(item) {
+      let count = this.listTempCertificate.length;
+      let index = this.listTempCertificate.findIndex(
+        (x) => x.id == item.id
       );
 
       if (index == 0) {
-        let tempOne = this.employeeInfor.certificateResource.slice(1);
-        tempOne.push(this.employeeInfor.certificateResource[index]);
-        this.employeeInfor.certificateResource = tempOne;
+        let temp = this.listTempCertificate.slice(1);
+        temp.push(this.listTempCertificate[index]);
+        this.listTempCertificate = temp;
       } else {
         for (let i = 0; i < count; i++) {
           if (i == index) {
-            let tempOne = this.employeeInfor.certificateResource[i];
-            this.employeeInfor.certificateResource[i] =
-              this.employeeInfor.certificateResource[i - 1];
-            this.employeeInfor.certificateResource[i - 1] = tempOne;
+            let temp = this.listTempCertificate[i];
+            this.listTempCertificate[i] = this.listTempCertificate[i - 1];
+            this.listTempCertificate[i - 1] = temp;
 
             break;
           }
         }
       }
+
+      let payload = [];
+      this.listTempCertificate.forEach(x => payload.push(x.id));
+
+      // Request API
+        let result = await api
+          .put(`/api/v1/certificate`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (!result.success) {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
     },
     async requestPostEmployee(payload) {
       let isValid = await this.validateToken();
@@ -3416,7 +3808,13 @@ export default defineComponent({
      this.tempProjectResource.personId = this.employeeInfor.id;
      // Work-History component
      this.listTempWorkHistory = this.employeeInfor.workHistory;
-     this.listTempWorkHistory.personId = this.employeeInfor.id;
+     this.tempWorkHistoryResource.personId = this.employeeInfor.id;
+     // Education component
+     this.listTempEducation = this.employeeInfor.education;
+     this.tempEducationResource.personId = this.employeeInfor.id;
+     // Certificate component
+     this.listTempCertificate = this.employeeInfor.certificate;
+     this.tempCertificateResource.personId = this.employeeInfor.id;
     },
   },
   computed: {
