@@ -2372,9 +2372,7 @@ export default defineComponent({
     },
     filterWork(val, update, abort) {
       update(async () => {
-        if (!this.tempListWork?.length) this.tempListWork = this.listGroup;
-        if (val.length > 0 && val.length < 2)
-          this.tempListWork = this.listGroup;
+        if (!val || val.length < 2) this.tempListWork = this.listGroup;
         if (val.length >= 2) await this.findGroup(val, false, "work");
       });
     },
@@ -3843,22 +3841,20 @@ export default defineComponent({
       // Order Component
       let tempTab = [];
       
-      for (let i = 0; i < this.employeeInfor.orderIndex.length; i++)
-        this.tempTab.push(
-          this.tabModel.find(
-            (x) => parseInt(x.id) == this.employeeInfor.orderIndex[i]
-          )
-        );
+      for (let i = 0; i < this.employeeInfor.orderIndex.length; i++){
+        let element = this.employeeInfor.orderIndex[i];
+        let temp = this.tabModel.find(x => parseInt(x.id) == element);
 
-      for (let i = 0; i < this.tabModel.length; i++) {
-        if (
-          this.employeeInfor.orderIndex[i].some(
-            (x) => x != parseInt(this.tabModel[i].id)
-          )
-        )
-          this.tempTab.push(this.tabModel[i]);
+        if(temp) tempTab.push(temp);
       }
 
+      for (let i = 0; i < this.tabModel.length; i++){
+        let element = this.tabModel[i];
+        let isSuccess = this.employeeInfor.orderIndex.includes(parseInt(element.id));
+
+        if(!isSuccess) tempTab.push(element);
+      }
+        
       this.tabModel = tempTab;
       this.tab = this.tabModel[0].id;
     },

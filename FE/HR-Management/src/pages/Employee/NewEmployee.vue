@@ -8,42 +8,27 @@
               <q-avatar size="100px">
                 <img :src="imageURL" />
               </q-avatar>
-              <div class="flex row no-wrap" style="width: 300px">
-                <div class="flex flex-center q-mr-md q-pt-sm">
-                  <q-btn
-                    round
-                    unelevated
-                    color="primary"
-                    size="10px"
-                    icon="restart_alt"
-                    @click="resetAvatar"
-                    ><q-tooltip anchor="top middle" self="bottom middle"
-                      >Reset Avatar</q-tooltip
-                    >
-                  </q-btn>
-                </div>
-                <q-file
-                  class="q-mt-sm cursor-pointer"
-                  dense
-                  tabindex="1"
-                  clearable
-                  standout
-                  input-style="width: 150px;"
-                  max-total-size="5242880"
-                  :display-value="
-                    imageFile ? 'Image is uploaded' : 'Upload image here!'
-                  "
-                  v-model="imageFile"
-                  accept=".jpg, .png, .gif, .bmp, image/*"
-                  @update:model-value="previewImage"
-                  @clear="clearTempImage"
-                  @rejected="onRejected"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="attach_file" />
-                  </template>
-                </q-file>
-              </div>
+              <q-file
+                class="q-mt-sm cursor-pointer"
+                dense
+                tabindex="1"
+                clearable
+                standout
+                input-style="width: 150px;"
+                max-total-size="5242880"
+                :display-value="
+                  imageFile ? 'Image is uploaded' : 'Upload image here!'
+                "
+                v-model="imageFile"
+                accept=".jpg, .png, .gif, .bmp, image/*"
+                @update:model-value="previewImage"
+                @clear="clearTempImage"
+                @rejected="onRejected"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="attach_file" />
+                </template>
+              </q-file>
             </div>
 
             <div class="first-name q-mt-lg q-px-lg">
@@ -1998,14 +1983,11 @@ export default defineComponent({
   name: "New Employee",
 
   props: {
-    employeeTransfer: Object,
-    statusUpdateTransfer: Boolean,
+    statusInsertTransfer: Boolean,
   },
 
   data() {
     return {
-      statusMode: false, // false: create - true: update
-
       tab: "1",
       tabModel: [
         { id: "1", name: "Skill" },
@@ -2288,8 +2270,10 @@ export default defineComponent({
         this.listOffice = result.resource;
 
         // Mode edit
-        if(this.employeeInfor.officeId){
-          this.tempListOffice = this.listOffice.filter(v => v.id == this.employeeInfor.officeId);
+        if (this.employeeInfor.officeId) {
+          this.tempListOffice = this.listOffice.filter(
+            (v) => v.id == this.employeeInfor.officeId
+          );
         }
       } else {
         this.$q.notify({
@@ -2428,16 +2412,17 @@ export default defineComponent({
       this.dialogToggle[index] = true;
     },
     orderTabNext() {
-      let count = this.tabModel.length;
-      let index = this.tabModel.findIndex((x) => x.id == this.tab);
+      // Print UI
+      let countTab = this.tabModel.length;
+      let indexTab = this.tabModel.findIndex((x) => x.id == this.tab);
 
-      if (index == count - 1) {
-        let temp = this.tabModel.slice(0, index);
-        temp.unshift(this.tabModel[index]);
+      if (indexTab == countTab - 1) {
+        let temp = this.tabModel.slice(0, indexTab);
+        temp.unshift(this.tabModel[indexTab]);
         this.tabModel = temp;
       } else {
-        for (let i = 0; i < count; i++) {
-          if (i == index) {
+        for (let i = 0; i < countTab; i++) {
+          if (i == indexTab) {
             let temp = this.tabModel[i];
             this.tabModel[i] = this.tabModel[i + 1];
             this.tabModel[i + 1] = temp;
@@ -2445,21 +2430,66 @@ export default defineComponent({
           }
         }
       }
+
+      // Array send to server
+      let countModel = this.employeeInfor.orderIndex.length;
+      let indexModel = this.employeeInfor.orderIndex.findIndex(
+        (x) => x == parseInt(this.tab)
+      );
+
+      if (indexModel == countModel - 1) {
+        let temp = this.employeeInfor.orderIndex.slice(0, indexModel);
+        temp.unshift(this.employeeInfor.orderIndex[indexModel]);
+        this.employeeInfor.orderIndex = temp;
+      } else {
+        for (let i = 0; i < countModel; i++) {
+          if (i == indexModel) {
+            let temp = this.employeeInfor.orderIndex[i];
+            this.employeeInfor.orderIndex[i] =
+              this.employeeInfor.orderIndex[i + 1];
+            this.employeeInfor.orderIndex[i + 1] = temp;
+            break;
+          }
+        }
+      }
     },
     orderTabPrev() {
-      let count = this.tabModel.length;
-      let index = this.tabModel.findIndex((x) => x.id == this.tab);
+      // Array send to server
+      let countTab = this.tabModel.length;
+      let indexTab = this.tabModel.findIndex((x) => x.id == this.tab);
 
-      if (index == 0) {
+      if (indexTab == 0) {
         let temp = this.tabModel.slice(1);
-        temp.push(this.tabModel[index]);
+        temp.push(this.tabModel[indexTab]);
         this.tabModel = temp;
       } else {
-        for (let i = 0; i < count; i++) {
-          if (i == index) {
+        for (let i = 0; i < countTab; i++) {
+          if (i == indexTab) {
             let temp = this.tabModel[i];
             this.tabModel[i] = this.tabModel[i - 1];
             this.tabModel[i - 1] = temp;
+            break;
+          }
+        }
+      }
+
+      // Array send to server
+      let countModel = this.employeeInfor.orderIndex.length;
+      let indexModel = this.employeeInfor.orderIndex.findIndex(
+        (x) => x == parseInt(this.tab)
+      );
+
+      if (indexModel == 0) {
+        let temp = this.employeeInfor.orderIndex.slice(1);
+        temp.push(this.employeeInfor.orderIndex[indexModel]);
+        this.employeeInfor.orderIndex = temp;
+      } else {
+        for (let i = 0; i < countModel; i++) {
+          if (i == indexModel) {
+            let temp = this.employeeInfor.orderIndex[i];
+            this.employeeInfor.orderIndex[i] =
+              this.employeeInfor.orderIndex[i - 1];
+            this.employeeInfor.orderIndex[i - 1] = temp;
             break;
           }
         }
@@ -3123,12 +3153,17 @@ export default defineComponent({
         if (result.success) {
           if (this.imageFile)
             await this.requestUpdateImage(result?.resource?.id);
-        } else return null;
+        } else {
+          this.$emit("insertSuccess", false);
+          return null;
+        }
 
         this.$q.notify({
           type: "positive",
           message: "Successfully added",
         });
+
+        this.$emit("insertSuccess", result?.resource?.id);
 
         this.employeeInfor.firstName = "";
         this.employeeInfor.lastName = "";
@@ -3210,27 +3245,6 @@ export default defineComponent({
     validateDate(dateTarget) {
       return date.isValid(dateTarget);
     },
-    async mappingDataEdit(){
-      // Set status mode
-      this.statusMode = true;
-      // Set infor
-     this.employeeInfor = Object.assign({}, this.employeeTransfer);
-     // Set office
-     this.employeeInfor.officeId = this.employeeInfor?.office?.id;
-     // Set self-project
-     this.employeeInfor.groupId = this.employeeInfor?.group?.id;
-     this.tempListWork.push(this.employeeInfor.group);
-     // Set image
-     this.imageURL = this.employeeInfor.avatar.original;
-     // Skill component
-
-    },
-    mappingDataInsert(){
-      // Set status mode
-      this.statusMode = false;
-      // Set image
-      this.imageURL = this.avatarDefault;
-    }
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
@@ -3256,27 +3270,21 @@ export default defineComponent({
       this.getOffice(),
       this.getAvatarUrl(),
     ]);
+
+    this.imageURL = this.avatarDefault;
   },
   watch: {
     getCategoryId: function (newVal, oldVal) {
       if (oldVal && newVal) this.tempCategoryPersonResource.technologies = [];
     },
-    employeeTransfer: {
+    statusInsertTransfer: {
       immediate: true,
       deep: true,
-      handler(newValue, oldValue) {
-        if(newValue) this.mappingDataEdit();
-        else this.mappingDataInsert();
-      }
-    },
-    statusUpdateTransfer: {
-      immediate: true,
-      deep: true,
-      handler(newValue, oldValue) {
-        if(newValue){
-          console.log("Okay");
+      async handler(newValue, oldValue) {
+        if (newValue) {
+          await this.saveAll();
         }
-      }
+      },
     },
   },
   mounted() {

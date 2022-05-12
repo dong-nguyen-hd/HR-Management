@@ -69,9 +69,43 @@
         </q-layout>
       </q-dialog>
 
+      <q-dialog v-model="showInsert" persistent full-width full-height>
+        <q-layout view="hHh lpR fFf" container class="bg-white">
+          <q-header class="bg-accent">
+            <q-toolbar>
+              <q-toolbar-title></q-toolbar-title>
+              <q-btn flat round dense icon="close" @click="closeInsertDialog" />
+            </q-toolbar>
+          </q-header>
+
+          <q-page-container>
+            <q-page>
+              <new-employee
+                v-if="showInsert"
+                @insertSuccess="insertReceive"
+                :statusInsertTransfer="statusInsert"
+              />
+            </q-page>
+          </q-page-container>
+
+          <q-footer class="bg-accent text-white">
+            <q-toolbar class="flex flex-center">
+              <q-btn
+                :loading="statusInsert"
+                dense
+                color="primary"
+                label="Save"
+                class="q-px-lg"
+                @click="saveInsert"
+              />
+            </q-toolbar>
+          </q-footer>
+        </q-layout>
+      </q-dialog>
+
       <div class="table-component full-height full-width flex flex-center">
         <div class="new-item q-mb-md q-pr-md flex justify-end full-width">
-          <q-btn to="/new-employee" color="primary" label="New employee" />
+          <q-btn @click="openInsert" color="primary" label="New employee" />
         </div>
 
         <q-table
@@ -379,18 +413,18 @@ import { mapActions } from "vuex";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 import EditEmployee from "src/pages/Employee/EditEmployee.vue";
+import NewEmployee from "src/pages/Employee/NewEmployee.vue";
 
 export default defineComponent({
   name: "List Employee",
 
   components: {
     "edit-employee": EditEmployee,
+    "new-employee": NewEmployee,
   },
 
   data() {
     return {
-      statusUpdate: false,
-
       labelColorFocus: ["white", "white", "white", "white"],
       labelNameFocus: ["Staff ID", "", "Full Name", "Skills"],
 
@@ -407,6 +441,10 @@ export default defineComponent({
 
       showEdit: false,
       editObj: null,
+      statusUpdate: false,
+
+      showInsert: false,
+      statusInsert: false,
 
       filter: {
         staffId: null,
@@ -487,10 +525,28 @@ export default defineComponent({
   },
   methods: {
     ...mapActions("auth", ["useRefreshToken", "validateToken"]),
+    
+    openInsert(){
+      this.showInsert = true;
+    },
+    closeInsertDialog(){
+      this.showInsert = false;
+    },
+    saveInsert(){
+      this.statusInsert = true;
+    },
+    async insertReceive(value){
+      if(value){
+        this.statusInsert = false;
 
-    openEdit(id) {
-      this.editObj = this.listEmployee.find((x) => x.id == id);
-      this.showEdit = true;
+        let result = await this.getEmployeeById(value);
+        this.listEmployee.unshift(result);
+        this.listEmployee.forEach((row, index) => {
+        row.index = index + 1;
+      });
+      } else {
+        this.statusInsert = false;
+      }
     },
     async getEmployee() {
       try {
@@ -715,6 +771,10 @@ export default defineComponent({
         this.deleteProcess = false;
         this.showDelete = false;
       }
+    },
+    openEdit(id) {
+      this.editObj = this.listEmployee.find((x) => x.id == id);
+      this.showEdit = true;
     },
     saveUpdate() {
       this.statusUpdate = true;
