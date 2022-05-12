@@ -39,19 +39,31 @@
           <q-header class="bg-accent">
             <q-toolbar>
               <q-toolbar-title></q-toolbar-title>
-              <q-btn flat v-close-popup round dense icon="close" />
+              <q-btn flat round dense icon="close" @click="closeEditDialog" />
             </q-toolbar>
           </q-header>
 
           <q-page-container>
             <q-page>
-              <edit-employee :statusUpdateTransfer="statusUpdate" :employeeTransfer="editObj" />
+              <edit-employee
+                v-if="showEdit"
+                @updateSuccess="updateReceive"
+                :statusUpdateTransfer="statusUpdate"
+                :employeeTransfer="editObj"
+              />
             </q-page>
           </q-page-container>
 
           <q-footer class="bg-accent text-white">
             <q-toolbar class="flex flex-center">
-              <q-btn dense color="primary" label="Save" class="q-px-lg" @click="saveUpdate"/>
+              <q-btn
+                :loading="statusUpdate"
+                dense
+                color="primary"
+                label="Save"
+                class="q-px-lg"
+                @click="saveUpdate"
+              />
             </q-toolbar>
           </q-footer>
         </q-layout>
@@ -320,7 +332,10 @@
           <template v-slot:body-cell-skill="props">
             <q-td :props="props">
               <div v-if="props.value?.length">
-                <div v-for="(item, index) in props.value.slice(0, 3)" :key="index">
+                <div
+                  v-for="(item, index) in props.value.slice(0, 3)"
+                  :key="index"
+                >
                   <q-badge :color="index % 2 == 0 ? 'blue-10' : 'teal-8'">
                     <span style="font-size: 14px"
                       >{{ props?.value[index].categoryName }}:</span
@@ -363,19 +378,19 @@ import { defineComponent } from "vue";
 import { mapActions } from "vuex";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
-import EditEmployee from 'src/pages/Employee/EditEmployee.vue'
+import EditEmployee from "src/pages/Employee/EditEmployee.vue";
 
 export default defineComponent({
   name: "List Employee",
-  
+
   components: {
-    'edit-employee': EditEmployee,
+    "edit-employee": EditEmployee,
   },
 
   data() {
     return {
       statusUpdate: false,
-      
+
       labelColorFocus: ["white", "white", "white", "white"],
       labelNameFocus: ["Staff ID", "", "Full Name", "Skills"],
 
@@ -701,9 +716,61 @@ export default defineComponent({
         this.showDelete = false;
       }
     },
-    saveUpdate(){
+    saveUpdate() {
       this.statusUpdate = true;
-    }
+    },
+    async updateReceive(value) {
+      if (value) {
+        let result = await this.getEmployeeById(this.editObj.id);
+
+        this.statusUpdate = false;
+        this.showEdit = false;
+
+        let index = this.listEmployee.findIndex((x) => x.id == this.editObj.id);
+        let numberIndex = this.listEmployee[index].index;
+        this.listEmployee[index] = Object.assign({}, result);
+        this.listEmployee[index].index = numberIndex;
+        this.editObj = null;
+      } else {
+        this.statusUpdate = false;
+      }
+    },
+    async closeEditDialog() {
+      let result = await this.getEmployeeById(this.editObj.id);
+
+      let index = this.listEmployee.findIndex((x) => x.id == this.editObj.id);
+      let numberIndex = this.listEmployee[index].index;
+      this.listEmployee[index] = Object.assign({}, result);
+      this.listEmployee[index].index = numberIndex;
+      this.editObj = null;
+
+      this.statusUpdate = false;
+      this.showEdit = false;
+    },
+    async getEmployeeById(id) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .get(`/api/v1/person/${id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      return result?.resource;
+    },
   },
   computed: {
     getNameDelete() {

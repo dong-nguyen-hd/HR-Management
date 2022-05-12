@@ -2,7 +2,6 @@
 using Business.Data;
 using Business.Extensions;
 using Business.Resources.Person;
-using System;
 
 namespace Business.Mapping.Person
 {
@@ -21,6 +20,7 @@ namespace Business.Mapping.Person
                 .ForMember(x => x.Educations, opt => opt.MapFrom(src => src.EducationResource))
                 .ForMember(x => x.Projects, opt => opt.MapFrom(src => src.ProjectResource))
                 .ForMember(x => x.WorkHistories, opt => opt.MapFrom(src => src.WorkHistoryResource))
+                .ForMember(x => x.OrderIndex, opt => opt.MapFrom(src => src.OrderIndex.RemoveDuplicate().ConcatenateWithComma()))
                 .ForMember(x => x.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
                 .ForMember(x => x.StaffId, opt => opt.MapFrom(src => ComputeStaffId()))
                 .ForMember(x => x.Avatar, opt => opt.MapFrom(src => Constant.DefaultAvatar)) // Use default image for new person.
@@ -28,6 +28,7 @@ namespace Business.Mapping.Person
 
             CreateMap<UpdatePersonResource, Domain.Models.Person>()
                 .ForMember(x => x.FirstName, opt => opt.MapFrom(src => src.FirstName.RemoveSpaceCharacter()))
+                .ForMember(x => x.OrderIndex, opt => opt.MapFrom(src => src.OrderIndex.RemoveDuplicate().ConcatenateWithComma()))
                 .ForMember(x => x.LastName, opt => opt.MapFrom(src => src.LastName.RemoveSpaceCharacter()))
                 .ForMember(x => x.Email, opt => opt.MapFrom(src => src.Email.RemoveSpaceCharacter()))
                 .ForMember(x => x.Description, opt => opt.MapFrom(src => src.Description.RemoveSpaceCharacter()))

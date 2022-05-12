@@ -453,7 +453,9 @@
                           map-options
                           options-selected-class="text-accent"
                           @filter="filterCategory"
-                          @update:model-value="this.tempCategoryPersonResource.technologies = []"
+                          @update:model-value="
+                            this.tempCategoryPersonResource.technologies = []
+                          "
                           fill-input
                           input-debounce="200"
                           hide-selected
@@ -1012,9 +1014,7 @@
                 <div class="fit">
                   <q-scroll-area class="q-mt-md" style="height: 411px">
                     <q-card
-                      v-for="(
-                        workHistory, index
-                      ) in listTempWorkHistory"
+                      v-for="(workHistory, index) in listTempWorkHistory"
                       :key="index"
                       bordered
                       class="inside"
@@ -1356,9 +1356,7 @@
                 <div class="fit">
                   <q-scroll-area class="q-mt-md" style="height: 411px">
                     <q-card
-                      v-for="(
-                        education, index
-                      ) in listTempEducation"
+                      v-for="(education, index) in listTempEducation"
                       :key="index"
                       bordered
                       class="inside"
@@ -1699,9 +1697,7 @@
                 <div class="fit">
                   <q-scroll-area class="q-mt-md" style="height: 411px">
                     <q-card
-                      v-for="(
-                        certificate, index
-                      ) in listTempCertificate"
+                      v-for="(certificate, index) in listTempCertificate"
                       :key="index"
                       bordered
                       class="inside"
@@ -2006,7 +2002,7 @@
 <script>
 import { defineComponent } from "vue";
 import { mapGetters, mapActions } from "vuex";
-import { useQuasar, date } from "quasar";
+import { useQuasar, date, extend } from "quasar";
 import { api } from "src/boot/axios";
 
 export default defineComponent({
@@ -2019,7 +2015,7 @@ export default defineComponent({
 
   data() {
     return {
-      tab: "4",
+      tab: "1",
       tabModel: [
         { id: "1", name: "Skill" },
         { id: "2", name: "Project" },
@@ -2042,7 +2038,7 @@ export default defineComponent({
         officeId: null,
         groupId: null,
         gender: "",
-        orderIndex: [1, 2, 3, 4, 5]
+        orderIndex: [],
       },
 
       tempCategoryPersonResource: {
@@ -2101,7 +2097,6 @@ export default defineComponent({
       tempDeleteCertificate: null,
 
       loadingSave: false,
-      componentKey: 0,
 
       labelColorFocus: [],
       colorFocusSkill: [],
@@ -2299,8 +2294,10 @@ export default defineComponent({
         this.listOffice = result.resource;
 
         // Mode edit
-        if(this.employeeInfor.officeId){
-          this.tempListOffice = this.listOffice.filter(v => v.id == this.employeeInfor.officeId);
+        if (this.employeeInfor.officeId) {
+          this.tempListOffice = this.listOffice.filter(
+            (v) => v.id == this.employeeInfor.officeId
+          );
         }
       } else {
         this.$q.notify({
@@ -2439,16 +2436,17 @@ export default defineComponent({
       this.dialogToggle[index] = true;
     },
     orderTabNext() {
-      let count = this.tabModel.length;
-      let index = this.tabModel.findIndex((x) => x.id == this.tab);
+      // Print UI
+      let countTab = this.tabModel.length;
+      let indexTab = this.tabModel.findIndex((x) => x.id == this.tab);
 
-      if (index == count - 1) {
-        let temp = this.tabModel.slice(0, index);
-        temp.unshift(this.tabModel[index]);
+      if (indexTab == countTab - 1) {
+        let temp = this.tabModel.slice(0, indexTab);
+        temp.unshift(this.tabModel[indexTab]);
         this.tabModel = temp;
       } else {
-        for (let i = 0; i < count; i++) {
-          if (i == index) {
+        for (let i = 0; i < countTab; i++) {
+          if (i == indexTab) {
             let temp = this.tabModel[i];
             this.tabModel[i] = this.tabModel[i + 1];
             this.tabModel[i + 1] = temp;
@@ -2456,21 +2454,66 @@ export default defineComponent({
           }
         }
       }
+
+      // Array send to server
+      let countModel = this.employeeInfor.orderIndex.length;
+      let indexModel = this.employeeInfor.orderIndex.findIndex(
+        (x) => x == parseInt(this.tab)
+      );
+
+      if (indexModel == countModel - 1) {
+        let temp = this.employeeInfor.orderIndex.slice(0, indexModel);
+        temp.unshift(this.employeeInfor.orderIndex[indexModel]);
+        this.employeeInfor.orderIndex = temp;
+      } else {
+        for (let i = 0; i < countModel; i++) {
+          if (i == indexModel) {
+            let temp = this.employeeInfor.orderIndex[i];
+            this.employeeInfor.orderIndex[i] =
+              this.employeeInfor.orderIndex[i + 1];
+            this.employeeInfor.orderIndex[i + 1] = temp;
+            break;
+          }
+        }
+      }
     },
     orderTabPrev() {
-      let count = this.tabModel.length;
-      let index = this.tabModel.findIndex((x) => x.id == this.tab);
+      // Array send to server
+      let countTab = this.tabModel.length;
+      let indexTab = this.tabModel.findIndex((x) => x.id == this.tab);
 
-      if (index == 0) {
+      if (indexTab == 0) {
         let temp = this.tabModel.slice(1);
-        temp.push(this.tabModel[index]);
+        temp.push(this.tabModel[indexTab]);
         this.tabModel = temp;
       } else {
-        for (let i = 0; i < count; i++) {
-          if (i == index) {
+        for (let i = 0; i < countTab; i++) {
+          if (i == indexTab) {
             let temp = this.tabModel[i];
             this.tabModel[i] = this.tabModel[i - 1];
             this.tabModel[i - 1] = temp;
+            break;
+          }
+        }
+      }
+
+      // Array send to server
+      let countModel = this.employeeInfor.orderIndex.length;
+      let indexModel = this.employeeInfor.orderIndex.findIndex(
+        (x) => x == parseInt(this.tab)
+      );
+
+      if (indexModel == 0) {
+        let temp = this.employeeInfor.orderIndex.slice(1);
+        temp.push(this.employeeInfor.orderIndex[indexModel]);
+        this.employeeInfor.orderIndex = temp;
+      } else {
+        for (let i = 0; i < countModel; i++) {
+          if (i == indexModel) {
+            let temp = this.employeeInfor.orderIndex[i];
+            this.employeeInfor.orderIndex[i] =
+              this.employeeInfor.orderIndex[i - 1];
+            this.employeeInfor.orderIndex[i - 1] = temp;
             break;
           }
         }
@@ -2507,39 +2550,39 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .post(`/api/v1/category-person`, this.tempCategoryPersonResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .post(`/api/v1/category-person`, this.tempCategoryPersonResource)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          this.listTempCategory.unshift(result.resource);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (result.success) {
+        this.listTempCategory.unshift(result.resource);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.dialogToggle[1] = false;
     },
     async editSkill(item) {
       await this.getByCategoryId(item.categoryId);
-     
+
       let temp = [];
-       
+
       item.technologies.forEach((x) => temp.push(x.id));
 
       this.tempCategoryPersonResource.categoryId = item.categoryId;
@@ -2560,36 +2603,39 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .put(`/api/v1/category-person/${this.tempCategoryPersonResource.id}`, this.tempCategoryPersonResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(
+          `/api/v1/category-person/${this.tempCategoryPersonResource.id}`,
+          this.tempCategoryPersonResource
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempCategory.findIndex(
-            (x) => x.id == this.tempCategoryPersonResource.id
-          );
+      if (result.success) {
+        let index = this.listTempCategory.findIndex(
+          (x) => x.id == this.tempCategoryPersonResource.id
+        );
 
-          this.listTempCategory[index] = result.resource;
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
-      
+        this.listTempCategory[index] = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+
       this.showEditBtn = false;
       this.dialogToggle[1] = false;
     },
@@ -2599,44 +2645,42 @@ export default defineComponent({
     },
     async saveDeleteSkill() {
       // Request API
-        let result = await api
-          .delete(`/api/v1/category-person/${this.tempDeleteSkill.id}`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .delete(`/api/v1/category-person/${this.tempDeleteSkill.id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempCategory.findIndex(
-            (x) => x.id == this.tempDeleteSkill.id
-          );
+      if (result.success) {
+        let index = this.listTempCategory.findIndex(
+          (x) => x.id == this.tempDeleteSkill.id
+        );
 
-          this.listTempCategory.splice(index, 1);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempCategory.splice(index, 1);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.deleteToggle[1] = false;
     },
     async orderSkillNext(item) {
       let count = this.listTempCategory.length;
       // Set list API
-      let index = this.listTempCategory.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempCategory.findIndex((x) => x.id == item.id);
 
       if (index == count - 1) {
         let temp = this.listTempCategory.slice(0, index);
@@ -2655,39 +2699,37 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempCategory.forEach(x => payload.push(x.id));
+      this.listTempCategory.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/category-person`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/category-person`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async orderSkillPrev(item) {
       let count = this.listTempCategory.length;
       // Set list API
-      let index = this.listTempCategory.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempCategory.findIndex((x) => x.id == item.id);
 
       if (index == 0) {
         let temp = this.listTempCategory.slice(1);
@@ -2706,32 +2748,32 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempCategory.forEach(x => payload.push(x.id));
+      this.listTempCategory.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/category-person`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/category-person`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async addProject() {
       if (
@@ -2744,31 +2786,31 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .post(`/api/v1/project`, this.tempProjectResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .post(`/api/v1/project`, this.tempProjectResource)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          this.listTempProject.unshift(result.resource);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (result.success) {
+        this.listTempProject.unshift(result.resource);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.dialogToggle[2] = false;
     },
@@ -2783,35 +2825,38 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .put(`/api/v1/project/${this.tempProjectResource.id}`, this.tempProjectResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(
+          `/api/v1/project/${this.tempProjectResource.id}`,
+          this.tempProjectResource
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempProject.findIndex(
-            (x) => x.id == this.tempProjectResource.id
-          );
+      if (result.success) {
+        let index = this.listTempProject.findIndex(
+          (x) => x.id == this.tempProjectResource.id
+        );
 
-          this.listTempProject[index] = result.resource;
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempProject[index] = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.showEditBtn = false;
       this.dialogToggle[2] = false;
@@ -2833,43 +2878,41 @@ export default defineComponent({
     },
     async saveDeleteProject() {
       // Request API
-        let result = await api
-          .delete(`/api/v1/project/${this.tempDeleteProject.id}`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .delete(`/api/v1/project/${this.tempDeleteProject.id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempProject.findIndex(
-            (x) => x.id == this.tempDeleteProject.id
-          );
+      if (result.success) {
+        let index = this.listTempProject.findIndex(
+          (x) => x.id == this.tempDeleteProject.id
+        );
 
-          this.listTempProject.splice(index, 1);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempProject.splice(index, 1);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.deleteToggle[2] = false;
     },
     async orderProjectNext(item) {
       let count = this.listTempProject.length;
-      let index = this.listTempProject.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempProject.findIndex((x) => x.id == item.id);
 
       if (index == count - 1) {
         let temp = this.listTempProject.slice(0, index);
@@ -2888,38 +2931,36 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempProject.forEach(x => payload.push(x.id));
+      this.listTempProject.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/project`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/project`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async orderProjectPrev(item) {
       let count = this.listTempProject.length;
-      let index = this.listTempProject.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempProject.findIndex((x) => x.id == item.id);
 
       if (index == 0) {
         let temp = this.listTempProject.slice(1);
@@ -2938,38 +2979,36 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempProject.forEach(x => payload.push(x.id));
+      this.listTempProject.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/project`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/project`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async orderWorkHistoryNext(item) {
       let count = this.listTempWorkHistory.length;
-      let index = this.listTempWorkHistory.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempWorkHistory.findIndex((x) => x.id == item.id);
 
       if (index == count - 1) {
         let temp = this.listTempWorkHistory.slice(0, index);
@@ -2988,38 +3027,36 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempWorkHistory.forEach(x => payload.push(x.id));
+      this.listTempWorkHistory.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/work-history`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/work-history`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async orderWorkHistoryPrev(item) {
       let count = this.listTempWorkHistory.length;
-      let index = this.listTempWorkHistory.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempWorkHistory.findIndex((x) => x.id == item.id);
 
       if (index == 0) {
         let temp = this.listTempWorkHistory.slice(1);
@@ -3038,32 +3075,32 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempWorkHistory.forEach(x => payload.push(x.id));
+      this.listTempWorkHistory.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/work-history`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/work-history`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async addWorkHistory() {
       if (
@@ -3076,31 +3113,31 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .post(`/api/v1/work-history`, this.tempWorkHistoryResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .post(`/api/v1/work-history`, this.tempWorkHistoryResource)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          this.listTempWorkHistory.unshift(result.resource);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (result.success) {
+        this.listTempWorkHistory.unshift(result.resource);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.dialogToggle[3] = false;
     },
@@ -3115,35 +3152,38 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .put(`/api/v1/work-history/${this.tempWorkHistoryResource.id}`, this.tempWorkHistoryResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(
+          `/api/v1/work-history/${this.tempWorkHistoryResource.id}`,
+          this.tempWorkHistoryResource
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempWorkHistory.findIndex(
-            (x) => x.id == this.tempWorkHistoryResource.id
-          );
+      if (result.success) {
+        let index = this.listTempWorkHistory.findIndex(
+          (x) => x.id == this.tempWorkHistoryResource.id
+        );
 
-          this.listTempWorkHistory[index] = result.resource;
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempWorkHistory[index] = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.showEditBtn = false;
       this.dialogToggle[3] = false;
@@ -3160,35 +3200,35 @@ export default defineComponent({
     },
     async saveDeleteWorkHistory() {
       // Request API
-        let result = await api
-          .delete(`/api/v1/work-history/${this.tempDeleteWorkHistory.id}`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .delete(`/api/v1/work-history/${this.tempDeleteWorkHistory.id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempWorkHistory.findIndex(
-            (x) => x.id == this.tempDeleteWorkHistory.id
-          );
+      if (result.success) {
+        let index = this.listTempWorkHistory.findIndex(
+          (x) => x.id == this.tempDeleteWorkHistory.id
+        );
 
-          this.listTempWorkHistory.splice(index, 1);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempWorkHistory.splice(index, 1);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.deleteToggle[3] = false;
     },
@@ -3200,33 +3240,33 @@ export default defineComponent({
       ) {
         return null;
       }
-      
-      // Request API
-        let result = await api
-          .post(`/api/v1/education`, this.tempEducationResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
 
-        if (result.success) {
-          this.listTempEducation.unshift(result.resource);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      // Request API
+      let result = await api
+        .post(`/api/v1/education`, this.tempEducationResource)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.listTempEducation.unshift(result.resource);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.dialogToggle[4] = false;
     },
@@ -3240,35 +3280,38 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .put(`/api/v1/education/${this.tempEducationResource.id}`, this.tempEducationResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(
+          `/api/v1/education/${this.tempEducationResource.id}`,
+          this.tempEducationResource
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempEducation.findIndex(
-            (x) => x.id == this.tempEducationResource.id
-          );
+      if (result.success) {
+        let index = this.listTempEducation.findIndex(
+          (x) => x.id == this.tempEducationResource.id
+        );
 
-          this.listTempEducation[index] = result.resource;
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempEducation[index] = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.showEditBtn = false;
       this.dialogToggle[4] = false;
@@ -3285,43 +3328,41 @@ export default defineComponent({
     },
     async saveDeleteEducation() {
       // Request API
-        let result = await api
-          .delete(`/api/v1/education/${this.tempDeleteEducation.id}`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .delete(`/api/v1/education/${this.tempDeleteEducation.id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempEducation.findIndex(
-            (x) => x.id == this.tempDeleteEducation.id
-          );
+      if (result.success) {
+        let index = this.listTempEducation.findIndex(
+          (x) => x.id == this.tempDeleteEducation.id
+        );
 
-          this.listTempProject.splice(index, 1);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempProject.splice(index, 1);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.deleteToggle[4] = false;
     },
     async orderEducationNext(item) {
       let count = this.listTempEducation.length;
-      let index = this.listTempEducation.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempEducation.findIndex((x) => x.id == item.id);
 
       if (index == count - 1) {
         let temp = this.listTempEducation.slice(0, index);
@@ -3340,38 +3381,36 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempEducation.forEach(x => payload.push(x.id));
+      this.listTempEducation.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/education`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/education`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async orderEducationPrev(item) {
       let count = this.listTempEducation.length;
-      let index = this.listTempEducation.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempEducation.findIndex((x) => x.id == item.id);
 
       if (index == 0) {
         let temp = this.listTempEducation.slice(1);
@@ -3390,32 +3429,32 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempEducation.forEach(x => payload.push(x.id));
+      this.listTempEducation.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/education`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/education`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async addCertificate() {
       if (
@@ -3427,31 +3466,31 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .post(`/api/v1/certificate`, this.tempCertificateResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .post(`/api/v1/certificate`, this.tempCertificateResource)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          this.listTempCertificate.unshift(result.resource);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (result.success) {
+        this.listTempCertificate.unshift(result.resource);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.dialogToggle[5] = false;
     },
@@ -3465,35 +3504,38 @@ export default defineComponent({
       }
 
       // Request API
-        let result = await api
-          .put(`/api/v1/certificate/${this.tempCertificateResource.id}`, this.tempCertificateResource)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(
+          `/api/v1/certificate/${this.tempCertificateResource.id}`,
+          this.tempCertificateResource
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempCertificate.findIndex(
-            (x) => x.id == this.tempCertificateResource.id
-          );
+      if (result.success) {
+        let index = this.listTempCertificate.findIndex(
+          (x) => x.id == this.tempCertificateResource.id
+        );
 
-          this.listTempCertificate[index] = result.resource;
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempCertificate[index] = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.showEditBtn = false;
       this.dialogToggle[5] = false;
@@ -3510,35 +3552,35 @@ export default defineComponent({
     },
     async saveDeleteCertificate() {
       // Request API
-        let result = await api
-          .delete(`/api/v1/certificate/${this.tempDeleteCertificate.id}`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .delete(`/api/v1/certificate/${this.tempDeleteCertificate.id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (result.success) {
-          let index  = this.listTempCertificate.findIndex(
-            (x) => x.id == this.tempDeleteCertificate.id
-          );
+      if (result.success) {
+        let index = this.listTempCertificate.findIndex(
+          (x) => x.id == this.tempDeleteCertificate.id
+        );
 
-          this.listTempCertificate.splice(index, 1);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+        this.listTempCertificate.splice(index, 1);
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
 
       this.deleteToggle[5] = false;
     },
@@ -3565,38 +3607,36 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempCertificate.forEach(x => payload.push(x.id));
+      this.listTempCertificate.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/certificate`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/certificate`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async orderCertificatePrev(item) {
       let count = this.listTempCertificate.length;
-      let index = this.listTempCertificate.findIndex(
-        (x) => x.id == item.id
-      );
+      let index = this.listTempCertificate.findIndex((x) => x.id == item.id);
 
       if (index == 0) {
         let temp = this.listTempCertificate.slice(1);
@@ -3615,40 +3655,40 @@ export default defineComponent({
       }
 
       let payload = [];
-      this.listTempCertificate.forEach(x => payload.push(x.id));
+      this.listTempCertificate.forEach((x) => payload.push(x.id));
 
       // Request API
-        let result = await api
-          .put(`/api/v1/certificate`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
+      let result = await api
+        .put(`/api/v1/certificate`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
 
-        if (!result.success) {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      if (!result.success) {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
-    async requestPostEmployee(payload) {
+    async requestUpdateEmployee() {
       let isValid = await this.validateToken();
       if (!isValid) this.$router.replace("/login");
 
       // Request API
       let result = await api
-        .post(`/api/v1/person`, payload)
+        .put(`/api/v1/person/${this.employeeInfor.id}`, this.employeeInfor)
         .then((response) => {
           return response.data;
         })
@@ -3675,13 +3715,15 @@ export default defineComponent({
         return result;
       }
     },
-    async requestUpdateImage(id) {
+    async requestUpdateImage() {
+      if (!this.imageFile) return null;
+
       let fd = new FormData();
       fd.append("image", this.imageFile);
 
       // Request API update image
       return api
-        .put(`/api/v1/person/image/${id}`, fd)
+        .put(`/api/v1/person/image/${this.employeeInfor.id}`, fd)
         .then((response) => {
           return response.data;
         })
@@ -3701,33 +3743,24 @@ export default defineComponent({
       try {
         this.loadingSave = true;
 
-        let result = await this.requestPostEmployee(this.employeeInfor);
-        if (result.success) {
-          if (this.imageFile)
-            await this.requestUpdateImage(result?.resource?.id);
-        } else return null;
+        let result = await Promise.all([
+          this.requestUpdateEmployee(),
+          this.requestUpdateImage(),
+        ]);
 
-        this.$q.notify({
-          type: "positive",
-          message: "Successfully added",
-        });
+        if (result[0]?.success) {
+          this.$q.notify({
+            type: "positive",
+            message: "Successfully updated",
+          });
 
-        this.employeeInfor.firstName = "";
-        this.employeeInfor.lastName = "";
-        this.employeeInfor.email = null;
-        this.employeeInfor.description = "";
-        this.employeeInfor.phone = null;
-        this.employeeInfor.dateOfBirth = "";
-        this.employeeInfor.officeId = null;
-        this.employeeInfor.groupId = null;
-        this.employeeInfor.gender = "";
-        this.employeeInfor.orderIndex = [1, 2, 3, 4, 5];
-
-        this.imageURL = this.avatarDefault;
-        this.imageFile = null;
-
-        this.listTempCategory = [];
-        this.listTempProject = [];
+          this.$emit("updateSuccess", true);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result[0]?.message[0],
+          });
+        }
       } finally {
         this.loadingSave = false;
       }
@@ -3755,16 +3788,8 @@ export default defineComponent({
         });
 
       if (result.success) {
-        let path = result.resource.avatar;
         this.imageFile = null;
-        let infor = Object.assign({}, this.getInformation);
-        infor.avatar = path;
-        this.setInformation(infor);
-        this.mapInformation();
-        this.$q.notify({
-          type: "positive",
-          message: "Successfully",
-        });
+        this.imageURL = result.resource.avatar.original;
       } else {
         this.$q.notify({
           type: "negative",
@@ -3787,48 +3812,69 @@ export default defineComponent({
     validateDate(dateTarget) {
       return date.isValid(dateTarget);
     },
-    convertDateTimeToDate(dateTime){
-      return date.formatDate(dateTime, 'YYYY-MM-DD');
+    convertDateTimeToDate(dateTime) {
+      return date.formatDate(dateTime, "YYYY-MM-DD");
     },
-    async mappingDataUpdate(){
+    mappingDataUpdate() {
       // Set infor
-     this.employeeInfor = Object.assign({}, this.employeeTransfer);
-     // Set office
-     this.employeeInfor.officeId = this.employeeInfor?.office?.id;
-     // Set self-project
-     this.employeeInfor.groupId = this.employeeInfor?.group?.id;
-     this.tempListWork.push(this.employeeInfor.group);
-     // Set image
-     this.imageURL = this.employeeInfor.avatar.original;
-     // Skill component
-     this.listTempCategory = this.employeeInfor.categoryPerson;
-     this.tempCategoryPersonResource.personId = this.employeeInfor.id;
-     // Project component
-     this.listTempProject = this.employeeInfor.project;
-     this.tempProjectResource.personId = this.employeeInfor.id;
-     // Work-History component
-     this.listTempWorkHistory = this.employeeInfor.workHistory;
-     this.tempWorkHistoryResource.personId = this.employeeInfor.id;
-     // Education component
-     this.listTempEducation = this.employeeInfor.education;
-     this.tempEducationResource.personId = this.employeeInfor.id;
-     // Certificate component
-     this.listTempCertificate = this.employeeInfor.certificate;
-     this.tempCertificateResource.personId = this.employeeInfor.id;
+      extend(true, this.employeeInfor, this.employeeTransfer);
+      // Set office
+      this.employeeInfor.officeId = this.employeeInfor?.office?.id;
+      // Set self-project
+      this.employeeInfor.groupId = this.employeeInfor?.group?.id;
+      this.tempListWork.push(this.employeeInfor.group);
+      // Set image
+      this.imageURL = this.employeeInfor.avatar.original;
+      // Skill component
+      this.listTempCategory = this.employeeInfor.categoryPerson;
+      this.tempCategoryPersonResource.personId = this.employeeInfor.id;
+      // Project component
+      this.listTempProject = this.employeeInfor.project;
+      this.tempProjectResource.personId = this.employeeInfor.id;
+      // Work-History component
+      this.listTempWorkHistory = this.employeeInfor.workHistory;
+      this.tempWorkHistoryResource.personId = this.employeeInfor.id;
+      // Education component
+      this.listTempEducation = this.employeeInfor.education;
+      this.tempEducationResource.personId = this.employeeInfor.id;
+      // Certificate component
+      this.listTempCertificate = this.employeeInfor.certificate;
+      this.tempCertificateResource.personId = this.employeeInfor.id;
+      // Order Component
+      let tempTab = [];
+      
+      for (let i = 0; i < this.employeeInfor.orderIndex.length; i++)
+        this.tempTab.push(
+          this.tabModel.find(
+            (x) => parseInt(x.id) == this.employeeInfor.orderIndex[i]
+          )
+        );
+
+      for (let i = 0; i < this.tabModel.length; i++) {
+        if (
+          this.employeeInfor.orderIndex[i].some(
+            (x) => x != parseInt(this.tabModel[i].id)
+          )
+        )
+          this.tempTab.push(this.tabModel[i]);
+      }
+
+      this.tabModel = tempTab;
+      this.tab = this.tabModel[0].id;
     },
   },
   computed: {
     ...mapGetters("auth", ["getInformation"]),
     getDisableCategory() {
       let temp = [];
-      this.listTempCategory.forEach((x) =>
-        temp.push(x.categoryId)
-      );
+      this.listTempCategory.forEach((x) => temp.push(x.categoryId));
 
       return temp;
     },
   },
   async created() {
+    this.mappingDataUpdate();
+
     let isValid = await this.validateToken();
     if (!isValid) this.$router.replace("/login");
 
@@ -3840,21 +3886,14 @@ export default defineComponent({
     ]);
   },
   watch: {
-    employeeTransfer: {
-      immediate: true,
-      deep: true,
-      handler(newValue, oldValue) {
-        if(newValue) this.mappingDataUpdate();
-      }
-    },
     statusUpdateTransfer: {
       immediate: true,
       deep: true,
-      handler(newValue, oldValue) {
-        if(newValue){
-          console.log("Okay");
+      async handler(newValue, oldValue) {
+        if (newValue) {
+          await this.saveAll();
         }
-      }
+      },
     },
   },
   mounted() {

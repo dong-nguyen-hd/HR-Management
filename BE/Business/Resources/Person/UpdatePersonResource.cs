@@ -41,7 +41,7 @@ namespace Business.Resources.Person
         public int OfficeId { get; set; }
 
         [Display(Name = "Group Id")]
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
 
         [MaxLength(50)]
         [ComponentOrder]

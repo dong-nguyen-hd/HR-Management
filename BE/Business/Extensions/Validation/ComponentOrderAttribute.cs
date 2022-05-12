@@ -9,7 +9,7 @@ namespace Business.Extensions.Validation
         {
             try
             {
-                List<int> tempList = new List<int>((List<int>)value);
+                List<int> tempList = value as List<int>;
 
                 foreach (var item in tempList)
                     if (!ValidateElement(item))

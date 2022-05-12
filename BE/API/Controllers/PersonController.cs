@@ -159,22 +159,6 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("swap/{id:int}")]
-        [Authorize(Roles = "editor, admin")]
-        [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AssignComponentAsync(int id, [FromBody] ComponentResource resource)
-        {
-            Log.Information($"{User.Identity?.Name}: assign a person with Id is {id}.");
-
-            var result = await _personService.AssignComponentAsync(id, resource);
-
-            if (result.Success)
-                return Ok(result);
-
-            return BadRequest(result);
-        }
-
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status200OK)]

@@ -4,8 +4,6 @@ using Business.Resources;
 using Business.Resources.Information;
 using Business.Resources.Person;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 
 namespace Business.Mapping.Person
 {

@@ -99,27 +99,15 @@ namespace Business.Services
             }
         }
 
-        public async Task<BaseResponse<PersonResource>> AssignComponentAsync(int id, ComponentResource component)
+        public override async Task<BaseResponse<PersonResource>> GetByIdAsync(int id)
         {
-            try
-            {
-                // Validate Id is existent?
-                var tempPerson = await _personRepository.GetByIdAsync(id);
-                if (tempPerson is null)
-                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
+            var totalTechnology = await _technologyService.GetAllAsync();
+            var person = await _personRepository.GetByIdAsync(id);
 
-                tempPerson.OrderIndex = component.OrderIndex.RemoveDuplicate().ConcatenateWithComma();
+            // Mapping
+            var personResource = ConvertPersonResource(totalTechnology.Resource, person);
 
-                await UnitOfWork.CompleteAsync();
-                // Mapping
-                var resource = Mapper.Map<Person, PersonResource>(tempPerson);
-
-                return new BaseResponse<PersonResource>(resource);
-            }
-            catch (Exception ex)
-            {
-                throw new MessageResultException(ResponseMessage.Values["Person_Updating_Error"], ex);
-            }
+            return new BaseResponse<PersonResource>(personResource);
         }
 
         public async Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource)

@@ -69,7 +69,7 @@ namespace Business.Resources.Person
         public bool Available { get; set; }
 
         [Required]
-        [MaxLength(250)]
+        [MaxLength(50)]
         [Display(Name = "Order Index")]
         public List<int> OrderIndex { get; set; }
 
