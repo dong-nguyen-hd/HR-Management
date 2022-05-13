@@ -39,6 +39,14 @@
           <q-header class="bg-accent">
             <q-toolbar>
               <q-toolbar-title></q-toolbar-title>
+              <q-btn
+                class="q-mr-lg"
+                flat
+                round
+                dense
+                icon="visibility"
+                @click="openViewDialog(editObj.id)"
+              />
               <q-btn flat round dense icon="close" @click="closeEditDialog" />
             </q-toolbar>
           </q-header>
@@ -97,6 +105,160 @@
                 label="Save"
                 class="q-px-lg"
                 @click="saveInsert"
+              />
+            </q-toolbar>
+          </q-footer>
+        </q-layout>
+      </q-dialog>
+
+      <q-dialog v-model="showView" full-height>
+        <q-layout
+          view="hHh lpR fFf"
+          container
+          class="bg-white"
+          style="width: 700px"
+        >
+          <q-header class="bg-accent">
+            <q-toolbar>
+              <q-toolbar-title></q-toolbar-title>
+              <q-btn v-close-popup flat round dense icon="close" />
+            </q-toolbar>
+          </q-header>
+
+          <q-page-container>
+            <q-page>
+              <q-scroll-area style="height: 580px">
+                <div>
+                  <div class="row" style="height: 56px; font-size: 9px">
+                    <div class="col-4">
+                      <q-img
+                        src="../../assets/images/logo-hybrid-technologies.svg"
+                        fit="cover"
+                      />
+                    </div>
+                    <div class="col-8">
+                      <div>
+                        Human Resources Department - Hybrid Technologies Co.,
+                        Ltd.
+                      </div>
+                      <div>
+                        Address: 9th Floor, Viet A Tower, Duy Tan Str., Cau Giay
+                        Dist., Hanoi., Viet Nam 19F, Ichigo Shinkawa Building,
+                        2-22-1 Shinkawa, Chuo-ku, Tokyo 104-0033 Japan
+                      </div>
+                      <div>
+                        Website:
+                        <span class="text-cyan-7"
+                          >https://hybrid-technologies.co.jp/</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-9">
+                      <div
+                        class="q-pl-md bg-cyan-7 flex items-center height-view"
+                        style="text-transform: uppercase"
+                      >
+                        <span>dong nguyen</span>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-4 q-pl-md flex items-center">
+                          Gender
+                        </div>
+                        <div class="col-8 q-pl-md flex items-center">Male</div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-4 q-pl-md flex items-center">
+                          Date of Birth
+                        </div>
+                        <div class="col-8 q-pl-md flex items-center">
+                          17/07/1900
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row-3">Image</div>
+                  </div>
+
+                  <div class="q-pl-md bg-cyan-7 height-view flex items-center">
+                    PROFESSIONAL OVERVIEW
+                  </div>
+                  <div class="q-pl-md flex items-center">Norem isum fhdsjkfhdsjkhfjkhsdjkfhdjshfjds</div>
+
+                  <div class="q-pl-md bg-cyan-7 height-view flex items-center">
+                    SKILLS
+                  </div>
+
+                  <div class="row">
+                    <div class="col-4 flex items-center q-pl-md">Back-end</div>
+                    <div class="col-8 flex items-center q-pl-md">ASP.net core</div>
+                  </div>
+
+                  <div class="q-pl-md bg-cyan-7 height-view flex items-center">
+                    WORKING HISTORY
+                  </div>
+
+                  <div class="row q-pl-md flex items-center">
+                    <div class="col-1 q-pl-md flex items-center">NO.</div>
+                    <div class="col q-pl-md flex items-center">PREIOD</div>
+                    <div class="col q-pl-md flex items-center">COMPANY</div>
+                    <div class="col q-pl-md flex items-center">JOB TITTLE</div>
+                  </div>
+
+                  <div class="row q-pl-md">
+                    <div class="col-1 q-pl-md flex items-center">1</div>
+                    <div class="col q-pl-md flex items-center">PREIOD</div>
+                    <div class="col q-pl-md flex items-center">COMPANY</div>
+                    <div class="col q-pl-md flex items-center">JOB TITTLE</div>
+                  </div>
+
+                  <div class="q-pl-md bg-cyan-7 height-view flex items-center">
+                    EDUCATION
+                  </div>
+
+                  <div>Content of education</div>
+
+                  <div class="q-pl-md bg-cyan-7 height-view flex items-center">
+                    CERTIFICATION
+                  </div>
+
+                  <div class="">Content of Certificate</div>
+
+                  <div class="q-pl-md bg-cyan-7 height-view flex items-center">
+                    PROJECTS
+                  </div>
+
+                  <div class="row">
+                    <div class="col-1 flex items-center q-pl-md">NO.</div>
+                    <div class="col flex items-center q-pl-md">PREIOD</div>
+                    <div class="col flex items-center q-pl-md">POSITION</div>
+                    <div class="col-5 flex items-center q-pl-md">DESCRIPTION</div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-1 q-pl-md flex items-center">1</div>
+                    <div class="col q-pl-md flex items-center">PREIOD</div>
+                    <div class="col q-pl-md flex items-center">POSITION</div>
+                    <div class="col-5 q-pl-md flex items-center">DESCRIPTION</div>
+                  </div>
+                </div>
+              </q-scroll-area>
+            </q-page>
+          </q-page-container>
+
+          <q-footer class="bg-accent text-white">
+            <q-toolbar class="flex flex-center">
+              <q-btn
+                v-show="false"
+                :loading="statusUpdate"
+                dense
+                color="primary"
+                label="Download"
+                class="q-px-lg"
               />
             </q-toolbar>
           </q-footer>
@@ -446,6 +608,9 @@ export default defineComponent({
       showInsert: false,
       statusInsert: false,
 
+      showView: false,
+      viewObj: null,
+
       filter: {
         staffId: null,
         officeId: null,
@@ -525,25 +690,27 @@ export default defineComponent({
   },
   methods: {
     ...mapActions("auth", ["useRefreshToken", "validateToken"]),
-    
-    openInsert(){
+
+    openInsert() {
       this.showInsert = true;
     },
-    closeInsertDialog(){
+    closeInsertDialog() {
       this.showInsert = false;
+      this.statusInsert = false;
     },
-    saveInsert(){
+    saveInsert() {
       this.statusInsert = true;
     },
-    async insertReceive(value){
-      if(value){
+    async insertReceive(value) {
+      if (value) {
         this.statusInsert = false;
 
         let result = await this.getEmployeeById(value);
         this.listEmployee.unshift(result);
+        this.listEmployee.pop();
         this.listEmployee.forEach((row, index) => {
-        row.index = index + 1;
-      });
+          row.index = index + 1;
+        });
       } else {
         this.statusInsert = false;
       }
@@ -708,7 +875,7 @@ export default defineComponent({
       this.pagination.totalPages = resource.totalPages;
     },
     showName(text) {
-      if (text.length > 20) return `${texttext.slice(0, 20)}...`;
+      if (text.length > 20) return `${text.slice(0, 20)}...`;
       else return text;
     },
     filterOffice(val, update, abort) {
@@ -831,6 +998,10 @@ export default defineComponent({
 
       return result?.resource;
     },
+    async openViewDialog(id) {
+      this.viewObj = this.listEmployee.find((x) => x.id == id);
+      this.showView = true;
+    },
   },
   computed: {
     getNameDelete() {
@@ -872,6 +1043,10 @@ export default defineComponent({
 </style>
 
 <style lang="scss">
+.height-view {
+  height: 36px;
+}
+
 .table-content {
   .q-table__top,
   .q-table__bottom,

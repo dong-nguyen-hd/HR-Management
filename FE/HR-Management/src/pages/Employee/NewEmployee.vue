@@ -45,6 +45,7 @@
                 @focus="labelColorFocus[0] = 'white'"
                 @blur="labelColorFocus[0] = ''"
                 :rules="[(val) => !!val || 'First Name is required']"
+                lazy-rules="ondemand"
                 hide-bottom-space
               >
               </q-input>
@@ -64,6 +65,7 @@
                 @focus="labelColorFocus[1] = 'white'"
                 @blur="labelColorFocus[1] = ''"
                 :rules="[(val) => !!val || 'Last Name is required']"
+                lazy-rules="ondemand"
                 hide-bottom-space
               ></q-input>
             </div>
@@ -87,6 +89,7 @@
                   (val) => !!val || 'DoB is required',
                   (val) => validateDoB(val) || 'DoB is invalid',
                 ]"
+                lazy-rules="ondemand"
                 hide-bottom-space
               >
                 <template v-slot:append>
@@ -129,6 +132,7 @@
                 map-options
                 options-selected-class="text-accent"
                 :rules="[(val) => !!val || 'Gender is required']"
+                lazy-rules="ondemand"
                 hide-bottom-space
                 :label-color="labelColorFocus[3]"
                 @focus="labelColorFocus[3] = 'white'"
@@ -173,6 +177,7 @@
                 hide-selected
                 use-input
                 :rules="[(val) => !!val || 'Office is required']"
+                lazy-rules="ondemand"
                 hide-bottom-space
                 :label-color="labelColorFocus[5]"
                 @focus="labelColorFocus[5] = 'white'"
@@ -1989,7 +1994,9 @@ export default defineComponent({
   data() {
     return {
       tab: "1",
-      tabModel: [
+      tabModel: [],
+
+      constTabModel: [
         { id: "1", name: "Skill" },
         { id: "2", name: "Project" },
         { id: "3", name: "Work History" },
@@ -3147,6 +3154,16 @@ export default defineComponent({
     },
     async saveAll() {
       try {
+        if (
+        !this.$refs.firstNameRef.validate() ||
+        !this.$refs.lastNameRef.validate() ||
+        !this.$refs.dobRef.validate() ||
+        !this.$refs.genderRef.validate()||
+        !this.$refs.officeRef.validate()
+      ) {
+        return null;
+      }
+
         this.loadingSave = true;
 
         let result = await this.requestPostEmployee(this.employeeInfor);
@@ -3180,6 +3197,7 @@ export default defineComponent({
         this.employeeInfor.educationResource = [];
         this.employeeInfor.projectResource = [];
         this.employeeInfor.workHistoryResource = [];
+        this.tabModel = [...this.constTabModel];
 
         this.imageURL = this.avatarDefault;
         this.imageFile = null;
@@ -3261,6 +3279,8 @@ export default defineComponent({
     },
   },
   async created() {
+    this.tabModel = [...this.constTabModel];
+
     let isValid = await this.validateToken();
     if (!isValid) this.$router.replace("/login");
 
