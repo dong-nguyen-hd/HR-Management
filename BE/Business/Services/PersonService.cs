@@ -149,15 +149,15 @@ namespace Business.Services
             var listProject = person.Projects.ToList();
             var countProject = listProject.Count;
             for (int i = 0; i < countProject; i++)
-                if (!string.IsNullOrEmpty(listProject?[i]?.Group?.Technology))
-                    tempPersonResource.Project[i].Technology = totalTechnology.IntersectTechnology(listProject[i]?.Group.Technology);
+                if (!string.IsNullOrEmpty(listProject?[i]?.Group?.Technologies))
+                    tempPersonResource.Project[i].Technologies = totalTechnology.IntersectTechnology(listProject[i]?.Group.Technologies);
 
             // Category-Person mapping
             var listCategoryPerson = person.CategoryPersons.ToList();
             var countCategoryPerson = listCategoryPerson.Count;
             for (int i = 0; i < countCategoryPerson; i++)
-                if (!string.IsNullOrEmpty(listCategoryPerson?[i].Technology))
-                    tempPersonResource.CategoryPerson[i].Technologies = totalTechnology.IntersectTechnology(listCategoryPerson[i].Technology);
+                if (!string.IsNullOrEmpty(listCategoryPerson?[i].Technologies))
+                    tempPersonResource.CategoryPerson[i].Technologies = totalTechnology.IntersectTechnology(listCategoryPerson[i].Technologies);
 
             return tempPersonResource;
         }

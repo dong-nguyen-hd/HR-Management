@@ -747,6 +747,7 @@
                           ref="projectOneRef"
                           v-model="tempProjectResource.groupId"
                           :options="tempListGroup"
+                          
                           :label="labelNameFocusProject[0]"
                           option-value="id"
                           option-label="name"

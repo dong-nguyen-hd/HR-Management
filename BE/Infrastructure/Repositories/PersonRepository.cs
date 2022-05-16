@@ -72,25 +72,25 @@ namespace Infrastructure.Repositories
                     {
                         case 2:
                             {
-                                var listPersonIdOne = tempQueryable.Where(x => x.Technology.Contains(filterResource.TechnologyId[0].ToString())).Select(x => x.PersonId);
+                                var listPersonIdOne = tempQueryable.Where(x => x.Technologies.Contains(filterResource.TechnologyId[0].ToString())).Select(x => x.PersonId);
 
                                 tempQueryable = tempQueryable.Where(x => listPersonIdOne.Contains(x.PersonId) &&
-                                x.Technology.Contains(filterResource.TechnologyId[1].ToString()));
+                                x.Technologies.Contains(filterResource.TechnologyId[1].ToString()));
                                 break;
                             }
                         case 3:
                             {
-                                var listPersonIdOne = tempQueryable.Where(x => x.Technology.Contains(filterResource.TechnologyId[0].ToString())).Select(x => x.PersonId);
+                                var listPersonIdOne = tempQueryable.Where(x => x.Technologies.Contains(filterResource.TechnologyId[0].ToString())).Select(x => x.PersonId);
 
                                 var listPersonIdTwo = tempQueryable.Where(x => listPersonIdOne.Contains(x.PersonId) &&
-                                x.Technology.Contains(filterResource.TechnologyId[1].ToString())).Select(x => x.PersonId);
+                                x.Technologies.Contains(filterResource.TechnologyId[1].ToString())).Select(x => x.PersonId);
 
                                 tempQueryable = tempQueryable.Where(x => listPersonIdTwo.Contains(x.PersonId) &&
-                                x.Technology.Contains(filterResource.TechnologyId[2].ToString()));
+                                x.Technologies.Contains(filterResource.TechnologyId[2].ToString()));
                                 break;
                             }
                         default:
-                            tempQueryable = tempQueryable.Where(x => x.Technology.Contains(filterResource.TechnologyId[0].ToString()));
+                            tempQueryable = tempQueryable.Where(x => x.Technologies.Contains(filterResource.TechnologyId[0].ToString()));
                             break;
                     }
 

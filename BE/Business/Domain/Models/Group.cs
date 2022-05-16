@@ -8,7 +8,7 @@
         public int TeamSize { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public string Technology { get; set; }
+        public string Technologies { get; set; }
         public bool IsDeleted { get; set; }
         public HashSet<Project> Projects { get; set; }
     }

@@ -44,7 +44,7 @@ namespace Business.Resources.Project
         public int OrderIndex { get; set; }
 
         [Required]
-        public List<TechnologyResource> Technology { get; set; }
+        public List<TechnologyResource> Technologies { get; set; }
 
         [Required]
         public int GroupId { get; set; }

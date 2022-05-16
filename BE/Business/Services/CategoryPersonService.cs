@@ -32,7 +32,7 @@ namespace Business.Services
         {
             try
             {
-                // Validate Category-Id isexistent?
+                // Validate Category-Id is existent?
                 if (await _categoryPersonRepository.ValidateExistent(createCategoryPersonResource.PersonId, createCategoryPersonResource.CategoryId))
                     return new BaseResponse<CategoryPersonResource>(ResponseMessage.Values["CategoryPerson_Id_Invalid"]);
 
@@ -64,9 +64,10 @@ namespace Business.Services
                 var categoryPerson = await _categoryPersonRepository.GetByIdAsync(id);
                 if (categoryPerson is null)
                     return new BaseResponse<CategoryPersonResource>(ResponseMessage.Values["CategoryPerson_NoData"]);
-                // Validate Category-Id isexistent?
-                if (await _categoryPersonRepository.ValidateExistent(categoryPerson.PersonId, updateCategoryPersonResource.CategoryId))
-                    return new BaseResponse<CategoryPersonResource>(ResponseMessage.Values["CategoryPerson_Id_Invalid"]);
+                // Validate Category-Id is existent?
+                if(categoryPerson.CategoryId != updateCategoryPersonResource.CategoryId)
+                    if (await _categoryPersonRepository.ValidateExistent(categoryPerson.PersonId, updateCategoryPersonResource.CategoryId))
+                        return new BaseResponse<CategoryPersonResource>(ResponseMessage.Values["CategoryPerson_Id_Invalid"]);
 
                 // Mapping
                 Mapper.Map(updateCategoryPersonResource, categoryPerson);

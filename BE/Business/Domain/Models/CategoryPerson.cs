@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public int OrderIndex { get; set; }
-        public string Technology { get; set; }
+        public string Technologies { get; set; }
         public bool IsDeleted { get; set; }
         public int CategoryId { get; set; }
         public int PersonId { get; set; }
