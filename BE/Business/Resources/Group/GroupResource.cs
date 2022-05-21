@@ -22,6 +22,9 @@ namespace Business.Resources.Group
         [Display(Name = "Team Size")]
         public int TeamSize { get; set; }
 
+        [Display(Name = "Is Finished")]
+        public bool IsFinished { get; set; }
+
         [Required]
         [JsonConverter(typeof(DateTimeConverter))]
         [Display(Name = "Start Date")]

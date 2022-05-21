@@ -4,8 +4,10 @@ using Business.CustomException;
 using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
+using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Group;
+using Business.Resources.Technology;
 using Microsoft.Extensions.Options;
 
 namespace Business.Services
@@ -14,16 +16,19 @@ namespace Business.Services
     {
         #region Constructor
         public GroupService(IGroupRepository groupRepository,
+            ITechnologyService technologyService,
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(groupRepository, mapper, unitOfWork, responseMessage)
         {
             this._groupRepository = groupRepository;
+            this._technologyService = technologyService;
         }
         #endregion
 
         #region Property
         private readonly IGroupRepository _groupRepository;
+        private readonly ITechnologyService _technologyService;
         #endregion
 
         #region Method
@@ -43,6 +48,49 @@ namespace Business.Services
                 throw new MessageResultException(ResponseMessage.Values["Group_Saving_Error"], ex);
             }
         }
+
+        public async Task<PaginationResponse<IEnumerable<GroupResource>>> GetPaginationAsync(QueryResource pagination, FilterGroupResource filterResource)
+        {
+            var totalTechnology = await _technologyService.GetAllAsync();
+            var paginationPerson = await _groupRepository.GetPaginationAsync(pagination, filterResource);
+
+            // Mapping
+            var tempResource = ConvertGroupResource(totalTechnology.Resource, paginationPerson.records);
+
+            var resource = new PaginationResponse<IEnumerable<GroupResource>>(tempResource);
+
+            // Using extension-method for pagination
+            resource.CreatePaginationResponse(pagination, paginationPerson.total);
+
+            return resource;
+        }
+
+        #region Private work
+        private IEnumerable<GroupResource> ConvertGroupResource(IEnumerable<TechnologyResource> totalTechnology, IEnumerable<Group> totalGroup)
+        {
+            List<GroupResource> listGroupResource = new List<GroupResource>(totalGroup.Count());
+
+            foreach (var group in totalGroup)
+            {
+                var tempGroupResource = ConvertGroupResource(totalTechnology, group);
+
+                listGroupResource.Add(tempGroupResource);
+            }
+
+            return listGroupResource;
+        }
+
+        private GroupResource ConvertGroupResource(IEnumerable<TechnologyResource> totalTechnology, Group group)
+        {
+            var tempGroupResource = Mapper.Map<Group, GroupResource>(group);
+
+            if (!string.IsNullOrEmpty(group.Technologies))
+                tempGroupResource.Technologies = totalTechnology.IntersectTechnology(group.Technologies);
+
+            return tempGroupResource;
+        }
+        #endregion
+
         #endregion
     }
 }

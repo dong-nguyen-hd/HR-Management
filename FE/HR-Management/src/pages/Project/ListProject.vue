@@ -1,0 +1,613 @@
+<template>
+  <q-page class="full-height full-width flex flex-center">
+    <div class="container full-height full-width">
+      <q-dialog v-model="showDelete" :persistent="deleteProcess">
+        <q-card>
+          <q-card-section class="row items-center">
+            <span class="text-h6">Delete {{ getNameDelete }}?</span>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section>
+            <span
+              >This can’t be undone and it will be removed from database.</span
+            >
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              :disable="deleteProcess"
+              label="Cancel"
+              color="primary"
+              v-close-popup
+            />
+            <q-btn
+              flat
+              label="Delete"
+              color="negative"
+              @click="deleteGroup"
+              :loading="deleteProcess"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
+      <q-dialog v-model="show" :persistent="true">
+        <q-card style="width: 400px">
+          <q-card-section class="row items-center">
+            <span v-show="!showEdit" class="text-h6">Add Project</span>
+            <span v-show="showEdit" class="text-h6">Edit Project</span>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section>
+            <div class="q-mt-sm">
+              <q-input
+                ref="oneRef"
+                standout
+                clearable
+                maxlength="250"
+                v-model="groupResource.name"
+                type="text"
+                label="Name:"
+                :label-color="colorFocusGroup[0]"
+                @focus="colorFocusGroup[0] = 'white'"
+                @blur="colorFocusGroup[0] = ''"
+                :rules="[(val) => !!val || 'Name is required']"
+                lazy-rules="ondemand"
+                hide-bottom-space
+              >
+              </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-input
+                ref="twoRef"
+                standout
+                clearable
+                autogrow
+                maxlength="250"
+                v-model="groupResource.description"
+                type="text"
+                label="Description:"
+                :label-color="colorFocusGroup[1]"
+                @focus="colorFocusGroup[1] = 'white'"
+                @blur="colorFocusGroup[1] = ''"
+                :rules="[(val) => !!val || 'Description is required']"
+                lazy-rules="ondemand"
+                hide-bottom-space
+              >
+              </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-input
+                ref="threeRef"
+                standout
+                clearable
+                v-model="groupResource.teamSize"
+                type="number"
+                label="Team Size:"
+                :label-color="colorFocusGroup[2]"
+                @focus="colorFocusGroup[2] = 'white'"
+                @blur="colorFocusGroup[2] = ''"
+                :rules="[(val) => !!val || 'Team Size is required']"
+                lazy-rules="ondemand"
+                hide-bottom-space
+              >
+              </q-input>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              :disable="groupProcess"
+              label="Cancel"
+              color="primary"
+              v-close-popup
+            />
+            <q-btn
+              v-show="!showEdit"
+              flat
+              label="Add"
+              color="info"
+              @click="saveInsert"
+              :loading="groupProcess"
+            />
+            <q-btn
+              v-show="showEdit"
+              flat
+              label="Edit"
+              color="info"
+              @click="saveUpdate"
+              :loading="groupProcess"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
+      <div class="table-component full-height full-width flex flex-center">
+        <div class="new-item q-mb-md q-pr-md flex justify-end full-width">
+          <q-btn @click="openInsert" color="primary" label="New Project" />
+        </div>
+
+        <q-table
+          class="table-content q-mx-md"
+          :rows="listGroup"
+          :columns="headerTable"
+          row-key="id"
+          flat
+          bordered
+          dark
+          :loading="loadingData"
+          v-model:pagination="pagination"
+          :rows-per-page-options="[5, 10, 15, 20]"
+          @request="getGroupWithFilter"
+        >
+          <template v-slot:header-cell-name="props">
+            <q-th :props="props">
+              <div :style="`min-width: ${widthOfName};`">
+                <q-input
+                  @update:model-value="getGroupWithFilter(false)"
+                  dark
+                  dense
+                  standout
+                  debounce="400"
+                  v-model="filter.name"
+                  input-class="text-right"
+                  :label="labelNameFocus[0]"
+                  :label-color="labelColorFocus[0]"
+                  @focus="
+                    labelColorFocus[0] = 'black';
+                    labelNameFocus[0] = 'Search by name';
+                    widthOfName = '170px';
+                  "
+                  @blur="
+                    labelColorFocus[0] = 'white';
+                    labelNameFocus[0] = props.col.label;
+                    widthOfName = '100px';
+                  "
+                >
+                  <template v-slot:append>
+                    <q-icon v-if="!filter.name" name="search" />
+                    <q-icon
+                      v-else
+                      name="clear"
+                      class="cursor-pointer"
+                      @click="
+                        filter.name = '';
+                        getGroupWithFilter(false);
+                      "
+                    />
+                  </template>
+                </q-input>
+              </div>
+            </q-th>
+          </template>
+
+          <template v-slot:header-cell-available="props">
+            <q-th :props="props">
+              <div>
+                <q-checkbox
+                  left-label
+                  dense
+                  dark
+                  v-model="filter.available"
+                  color="accent"
+                  @update:model-value="getGroupWithFilter(false)"
+                  label="Available"
+                />
+              </div>
+            </q-th>
+          </template>
+
+          <template v-slot:body-cell-action="props">
+            <q-td :props="props">
+              <div>
+                <q-btn
+                  style="width: 60px"
+                  dense
+                  color="white"
+                  text-color="black"
+                  label="Edit"
+                  @click="openEdit(props.value)"
+                />
+              </div>
+              <div class="q-mt-sm">
+                <q-btn
+                  style="width: 60px"
+                  dense
+                  color="negative"
+                  label="delete"
+                  @click="
+                    idDelete = props.value;
+                    showDelete = true;
+                  "
+                />
+              </div>
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-available="props">
+            <q-td :props="props">
+              <q-icon
+                v-show="props.value"
+                name="fas fa-check"
+                color="positive"
+                size="16px"
+              />
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-description="props">
+            <q-td :props="props">
+              {{ reduceText(props.description) }}
+            </q-td>
+          </template>
+
+          <template v-slot:loading>
+            <q-inner-loading showing color="primary" />
+          </template>
+        </q-table>
+      </div>
+    </div>
+  </q-page>
+</template>
+
+<script>
+import { defineComponent } from "vue";
+import { mapActions } from "vuex";
+import { useQuasar, date } from "quasar";
+import { api } from "src/boot/axios";
+
+export default defineComponent({
+  name: "List Project",
+
+  data() {
+    return {
+      labelColorFocus: ["white"],
+      labelNameFocus: ["Name"],
+      widthOfName: "100px",
+
+      colorFocusGroup: [],
+
+      loadingData: false,
+
+      showDelete: false,
+      idDelete: null,
+      deleteProcess: false,
+
+      show: false,
+      showEdit: false,
+      editObj: null,
+      statusUpdate: false,
+      groupProcess: false,
+
+      groupResource: {
+        name: "",
+        description: "",
+        teamSize: 0,
+        startDate: null,
+        endDate: null,
+        technologies: [],
+      },
+
+      filter: {
+        name: null,
+        available: false,
+      },
+
+      pagination: {
+        page: 1,
+        rowsPerPage: 10,
+        rowsNumber: 10, // is total records
+
+        firstPage: 1,
+        lastPage: null,
+        nextPage: null,
+        previousPage: null,
+        totalPages: 0,
+      },
+
+      listGroup: [],
+      headerTable: [
+        {
+          name: "index",
+          label: "#",
+          align: "center",
+          field: "index",
+        },
+        {
+          name: "name",
+          align: "left",
+          label: "Name",
+          field: "name",
+        },
+        {
+          name: "description",
+          align: "left",
+          label: "Description",
+          field: "description",
+        },
+        {
+          name: "teamSize",
+          align: "right",
+          label: "Team Size",
+          field: "teamSize",
+        },
+        {
+          name: "available",
+          align: "center",
+          label: "Available",
+          field: "available",
+        },
+        {
+          name: "action",
+          align: "center",
+          label: "Actions",
+          field: (row) => row.id,
+        },
+      ],
+    };
+  },
+  methods: {
+    ...mapActions("auth", ["useRefreshToken", "validateToken"]),
+
+    openInsert() {
+      this.show = true;
+      this.showEdit = false;
+    },
+    closeInsertDialog() {
+      this.showEdit = false;
+      this.statusInsert = false;
+    },
+    saveInsert() {
+      this.statusInsert = true;
+    },
+    async insertReceive(value) {
+      if (value) {
+        this.statusInsert = false;
+
+        let result = await this.getEmployeeById(value);
+        this.listGroup.unshift(result);
+        this.listGroup.pop();
+        this.listGroup.forEach((row, index) => {
+          row.index = index + 1;
+        });
+      } else {
+        this.statusInsert = false;
+      }
+    },
+    async getGroupWithFilter(props) {
+      try {
+        this.loadingData = true;
+
+        let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        let { page, rowsPerPage } = props
+          ? props.pagination
+          : { page: 1, rowsPerPage: this.pagination.rowsPerPage };
+
+        // Request API
+        let result = await api
+          .post(
+            `/api/v1/group/pagination?page=${page}&pageSize=${rowsPerPage}`,
+            this.filter
+          )
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          this.mappingPagination(result);
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } finally {
+        this.loadingData = false;
+      }
+    },
+    mappingPagination(resource) {
+      this.listGroup = resource.resource;
+
+      this.listGroup.forEach((row, index) => {
+        row.index = index + 1;
+      });
+
+      this.pagination.page = resource.page;
+      this.pagination.rowsPerPage = resource.pageSize;
+      this.pagination.rowsNumber = resource.totalRecords;
+
+      this.pagination.firstPage = resource.firstPage;
+      this.pagination.lastPage = resource.lastPage;
+      this.pagination.nextPage = resource.nextPage;
+      this.pagination.previousPage = resource.previousPage;
+      this.pagination.totalPages = resource.totalPages;
+    },
+    reduceText(text) {
+      if (!text) return "";
+
+      if (text.length > 50) return `${text.slice(0, 50)}...`;
+      else return text;
+    },
+    async deleteGroup() {
+      try {
+        this.deleteProcess = true;
+
+        let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        // Request API
+        let result = await api
+          .delete(`/api/v1/group/${this.idDelete}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          await this.getGroupWithFilter(false);
+
+          this.$q.notify({
+            type: "positive",
+            message: "Successfully deleted!",
+          });
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } finally {
+        this.deleteProcess = false;
+        this.showDelete = false;
+      }
+    },
+    openEdit(id) {
+      this.editObj = this.listGroup.find((x) => x.id == id);
+      this.showEdit = true;
+    },
+    saveUpdate() {
+      this.statusUpdate = true;
+    },
+    async updateReceive(value) {
+      if (value) {
+        let result = await this.getEmployeeById(this.editObj.id);
+
+        this.statusUpdate = false;
+        this.showEdit = false;
+
+        let index = this.listGroup.findIndex((x) => x.id == this.editObj.id);
+        let numberIndex = this.listGroup[index].index;
+        this.listGroup[index] = Object.assign({}, result);
+        this.listGroup[index].index = numberIndex;
+        this.editObj = null;
+      } else {
+        this.statusUpdate = false;
+      }
+    },
+    async closeEditDialog() {
+      let result = await this.getEmployeeById(this.editObj.id);
+
+      let index = this.listGroup.findIndex((x) => x.id == this.editObj.id);
+      let numberIndex = this.listGroup[index].index;
+      this.listGroup[index] = Object.assign({}, result);
+      this.listGroup[index].index = numberIndex;
+      this.editObj = null;
+
+      this.statusUpdate = false;
+      this.showEdit = false;
+    },
+    convertDateTimeToDate(dateTime, stringFormat = "YYYY-MM-DD") {
+      return date.formatDate(dateTime, stringFormat);
+    },
+  },
+  computed: {
+    getNameDelete() {
+      let tempEmployee = this.listGroup.filter((x) => x.id == this.idDelete);
+
+      let name = tempEmployee[0]?.name;
+
+      return name ? this.reduceText(name) : "";
+    },
+  },
+  async created() {
+    let isValid = await this.validateToken();
+    if (!isValid) this.$router.replace("/login");
+
+    await this.getGroupWithFilter(0);
+  },
+  mounted() {
+    const $q = useQuasar();
+  },
+});
+</script>
+
+<style lang="scss" scoped>
+.container {
+  position: relative;
+  .table-component {
+    position: relative;
+    .table-content {
+      /* height or max-height is important */
+      height: 600px;
+      width: 100%;
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+.table-content {
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: $accent !important;
+  }
+
+  thead tr th {
+    position: sticky;
+    z-index: 99;
+    font-size: 14px !important;
+    font-family: Poppins-Medium !important;
+  }
+
+  tbody tr td {
+    font-size: 14px !important;
+  }
+
+  thead tr:first-child th {
+    top: 0;
+  }
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 0;
+  }
+}
+
+/* Scroll bar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $accent;
+}
+
+::-webkit-scrollbar-corner {
+  background: $grey;
+}
+</style>

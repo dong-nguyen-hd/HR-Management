@@ -34,6 +34,11 @@ const routes = [
         path: "/office",
         component: () => import("pages/Office/Office.vue"),
       },
+      {
+        name: "List Project",
+        path: "/project",
+        component: () => import("pages/Project/ListProject.vue"),
+      },
     ],
   },
 

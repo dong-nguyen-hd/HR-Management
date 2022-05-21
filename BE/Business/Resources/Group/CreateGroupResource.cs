@@ -20,6 +20,7 @@ namespace Business.Resources.Group
         [Required]
         [StartDate("EndDate")]
         [DataType(DataType.Date)]
+
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 

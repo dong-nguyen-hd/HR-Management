@@ -97,6 +97,21 @@
               @click="isShowInfor = false"
               clickable
               v-ripple
+              to="/project"
+              exact
+              active-class="isActive"
+              class="q-pl-lg"
+            >
+              <q-item-section avatar>
+                <q-icon name="business_center" />
+              </q-item-section>
+              <q-item-section>Project</q-item-section>
+            </q-item>
+
+            <q-item
+              @click="isShowInfor = false"
+              clickable
+              v-ripple
               to="/category"
               exact
               active-class="isActive"

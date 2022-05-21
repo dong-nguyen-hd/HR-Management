@@ -23,14 +23,38 @@ namespace API.Controllers
             IOptionsMonitor<ResponseMessage> responseMessage) : base(groupService, mapper, responseMessage)
         {
             this._groupRepository = groupRepository;
+            this._groupService = groupService;
         }
         #endregion
 
         #region Property
         private readonly IGroupRepository _groupRepository;
+        private readonly IGroupService _groupService;
         #endregion
 
         #region Action
+        [HttpPost("pagination")]
+        [Authorize(Roles = "viewer, editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<GroupResource>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<GroupResource>>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<GroupResource>>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetPaginationWithFilterAsync([FromQuery] int page, [FromQuery] int pageSize, [FromBody] FilterGroupResource filterResource)
+        {
+            Log.Information($"{User.Identity?.Name}: get pagination group.");
+
+            QueryResource pagintation = new QueryResource(page, pageSize);
+
+            var result = await _groupService.GetPaginationAsync(pagintation, filterResource);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            if (result.Resource is null)
+                return NoContent();
+
+            return Ok(result);
+        }
+
         [HttpGet("search")]
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<GroupResource>>), StatusCodes.Status200OK)]
