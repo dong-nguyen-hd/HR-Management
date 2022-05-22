@@ -4,7 +4,7 @@
       <q-dialog v-model="showDelete" :persistent="deleteProcess">
         <q-card>
           <q-card-section class="row items-center">
-            <span class="text-h6">Delete {{ getNameDelete }}?</span>
+            <span class="text-h6">Delete "{{ getNameDelete }}"?</span>
           </q-card-section>
 
           <q-separator />
@@ -99,6 +99,132 @@
                 hide-bottom-space
               >
               </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-input
+                ref="fourRef"
+                standout
+                maxlength="500"
+                v-model="groupResource.startDate"
+                type="text"
+                placeholder="YYYY-MM-DD"
+                mask="####-##-##"
+                stack-label
+                label="Start Date:"
+                :label-color="colorFocusGroup[3]"
+                @focus="colorFocusGroup[3] = 'white'"
+                @blur="colorFocusGroup[3] = ''"
+                :rules="[
+                  (val) => !!val || 'Start Date is required',
+                  (val) => validateDate(val) || 'Start Date is invalid',
+                ]"
+                lazy-rules="ondemand"
+                hide-bottom-space
+              >
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date
+                        v-model="groupResource.startDate"
+                        mask="YYYY-MM-DD"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-input
+                ref="fiveRef"
+                standout
+                maxlength="500"
+                v-model="groupResource.endDate"
+                type="text"
+                placeholder="YYYY-MM-DD"
+                mask="####-##-##"
+                stack-label
+                label="End Date:"
+                :label-color="colorFocusGroup[4]"
+                @focus="colorFocusGroup[4] = 'white'"
+                @blur="colorFocusGroup[4] = ''"
+                :rules="[(val) => validateDate(val) || 'End Date is invalid']"
+                lazy-rules="ondemand"
+                hide-bottom-space
+              >
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date v-model="groupResource.endDate" mask="YYYY-MM-DD">
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-select
+                ref="sixRef"
+                standout
+                clearable
+                multiple
+                use-chips
+                max-values="̀50"
+                use-input
+                v-model="groupResource.technologies"
+                :options="listTechnology"
+                :label="labelNameFocus[1]"
+                option-value="id"
+                option-label="name"
+                emit-value
+                map-options
+                options-selected-class="text-accent"
+                :label-color="colorFocusGroup[5]"
+                :rules="[(val) => val?.length || 'Skill is required']"
+                @filter="filterTechnology"
+                @focus="
+                  colorFocusGroup[5] = 'white';
+                  labelNameFocus[1] = 'Search by skill';
+                "
+                @blur="
+                  colorFocusGroup[5] = '';
+                  labelNameFocus[1] = 'Skills:';
+                "
+                ><template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
             </div>
           </q-card-section>
 
@@ -243,9 +369,15 @@
             </q-td>
           </template>
 
+          <template v-slot:body-cell-name="props">
+            <q-td class="name-cell" :props="props">
+              <div>{{ reduceText(props.value) }}</div>
+            </q-td>
+          </template>
+
           <template v-slot:body-cell-description="props">
-            <q-td :props="props">
-              {{ reduceText(props.description) }}
+            <q-td class="description-cell" :props="props">
+              <div>{{ reduceText(props.value) }}</div>
             </q-td>
           </template>
 
@@ -270,7 +402,7 @@ export default defineComponent({
   data() {
     return {
       labelColorFocus: ["white"],
-      labelNameFocus: ["Name"],
+      labelNameFocus: ["Name", "Skills:"],
       widthOfName: "100px",
 
       colorFocusGroup: [],
@@ -284,13 +416,12 @@ export default defineComponent({
       show: false,
       showEdit: false,
       editObj: null,
-      statusUpdate: false,
       groupProcess: false,
 
       groupResource: {
         name: "",
         description: "",
-        teamSize: 0,
+        teamSize: null,
         startDate: null,
         endDate: null,
         technologies: [],
@@ -314,6 +445,8 @@ export default defineComponent({
       },
 
       listGroup: [],
+      listTechnology: [],
+      tempListTechnoly: [],
       headerTable: [
         {
           name: "index",
@@ -358,28 +491,188 @@ export default defineComponent({
     ...mapActions("auth", ["useRefreshToken", "validateToken"]),
 
     openInsert() {
-      this.show = true;
-      this.showEdit = false;
-    },
-    closeInsertDialog() {
-      this.showEdit = false;
-      this.statusInsert = false;
-    },
-    saveInsert() {
-      this.statusInsert = true;
-    },
-    async insertReceive(value) {
-      if (value) {
-        this.statusInsert = false;
+      this.groupResource.name = "";
+      this.groupResource.description = "";
+      this.groupResource.teamSize = null;
+      this.groupResource.startDate = null;
+      this.groupResource.endDate = "";
+      this.groupResource.technologies = [];
 
-        let result = await this.getEmployeeById(value);
-        this.listGroup.unshift(result);
+      this.showEdit = false;
+      this.show = true;
+    },
+    async saveInsert() {
+      if (
+        !this.$refs.oneRef.validate() ||
+        !this.$refs.twoRef.validate() ||
+        !this.$refs.threeRef.validate() ||
+        !this.$refs.fourRef.validate() ||
+        !this.$refs.sixRef.validate()
+      ) {
+        return null;
+      }
+
+      if (this.groupResource.endDate) {
+        if (!this.$refs.fiveRef.validate()) return null;
+      } else {
+        this.groupResource.endDate = null;
+      }
+
+      this.groupProcess = true;
+
+      // Request API
+      let result = await api
+        .post(`/api/v1/group`, this.groupResource)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
         this.listGroup.pop();
+        this.listGroup.unshift(result.resource);
         this.listGroup.forEach((row, index) => {
           row.index = index + 1;
         });
+
+        this.$q.notify({
+          type: "positive",
+          message: "Successfully added",
+        });
       } else {
-        this.statusInsert = false;
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+
+      this.show = false;
+      this.groupProcess = false;
+    },
+    openEdit(id) {
+      // Map obj
+      this.editObj = this.listGroup.find((x) => x.id == id);
+      this.groupResource.name = this.editObj.name;
+      this.groupResource.description = this.editObj.description;
+      this.groupResource.teamSize = this.editObj.teamSize;
+      this.groupResource.startDate = this.editObj.startDate;
+      this.groupResource.endDate = this.editObj.endDate;
+      this.groupResource.technologies = this.editObj.technologies.map(
+        (x) => x.id
+      );
+      // Map list technology
+      this.listTechnology = this.editObj.technologies;
+      // Pop up
+      this.showEdit = true;
+      this.show = true;
+    },
+    async saveUpdate() {
+      if (
+        !this.$refs.oneRef.validate() ||
+        !this.$refs.twoRef.validate() ||
+        !this.$refs.threeRef.validate() ||
+        !this.$refs.fourRef.validate() ||
+        !this.$refs.sixRef.validate()
+      ) {
+        return null;
+      }
+
+      if (this.groupResource.endDate) {
+        if (!this.$refs.fiveRef.validate()) return null;
+      } else {
+        this.groupResource.endDate = null;
+      }
+
+      this.groupProcess = true;
+
+      // Request API
+      let result = await api
+        .put(`/api/v1/group/${this.editObj.id}`, this.groupResource)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        let index = this.listGroup.findIndex((x) => x.id == this.editObj.id);
+        let rowNumber = this.listGroup[index].index;
+        this.listGroup[index] = result.resource;
+        this.listGroup[index].index = rowNumber;
+
+        this.$q.notify({
+          type: "positive",
+          message: "Successfully updated",
+        });
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+
+      this.show = false;
+      this.groupProcess = false;
+    },
+    async filterTechnology(val, update, abort) {
+      update(async () => {
+        if (val.length < 2) this.listTechnology = this.tempListTechnoly;
+        if (val.length >= 2) await this.findTechnology(val, false);
+      });
+    },
+    async findTechnology(keyword, seedValue) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .get(
+          `/api/v1/technology/search?filterName=${
+            !keyword ? "" : keyword.trim()
+          }`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        if (seedValue) this.tempListTechnoly = result.resource;
+        this.listTechnology = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
       }
     },
     async getGroupWithFilter(props) {
@@ -446,7 +739,7 @@ export default defineComponent({
     reduceText(text) {
       if (!text) return "";
 
-      if (text.length > 50) return `${text.slice(0, 50)}...`;
+      if (text.length > 200) return `${text.slice(0, 200)}...`;
       else return text;
     },
     async deleteGroup() {
@@ -492,43 +785,8 @@ export default defineComponent({
         this.showDelete = false;
       }
     },
-    openEdit(id) {
-      this.editObj = this.listGroup.find((x) => x.id == id);
-      this.showEdit = true;
-    },
-    saveUpdate() {
-      this.statusUpdate = true;
-    },
-    async updateReceive(value) {
-      if (value) {
-        let result = await this.getEmployeeById(this.editObj.id);
-
-        this.statusUpdate = false;
-        this.showEdit = false;
-
-        let index = this.listGroup.findIndex((x) => x.id == this.editObj.id);
-        let numberIndex = this.listGroup[index].index;
-        this.listGroup[index] = Object.assign({}, result);
-        this.listGroup[index].index = numberIndex;
-        this.editObj = null;
-      } else {
-        this.statusUpdate = false;
-      }
-    },
-    async closeEditDialog() {
-      let result = await this.getEmployeeById(this.editObj.id);
-
-      let index = this.listGroup.findIndex((x) => x.id == this.editObj.id);
-      let numberIndex = this.listGroup[index].index;
-      this.listGroup[index] = Object.assign({}, result);
-      this.listGroup[index].index = numberIndex;
-      this.editObj = null;
-
-      this.statusUpdate = false;
-      this.showEdit = false;
-    },
-    convertDateTimeToDate(dateTime, stringFormat = "YYYY-MM-DD") {
-      return date.formatDate(dateTime, stringFormat);
+    validateDate(dateTarget) {
+      return date.isValid(dateTarget);
     },
   },
   computed: {
@@ -544,7 +802,10 @@ export default defineComponent({
     let isValid = await this.validateToken();
     if (!isValid) this.$router.replace("/login");
 
-    await this.getGroupWithFilter(0);
+    await Promise.all([
+      this.getGroupWithFilter(0),
+      this.findTechnology("", true),
+    ]);
   },
   mounted() {
     const $q = useQuasar();
@@ -563,6 +824,16 @@ export default defineComponent({
       width: 100%;
     }
   }
+}
+
+.name-cell{
+  max-width: 200px;
+  white-space: initial;
+}
+
+.description-cell{
+  max-width: 400px;
+  white-space: initial;
 }
 </style>
 

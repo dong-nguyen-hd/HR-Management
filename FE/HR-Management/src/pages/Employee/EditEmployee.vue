@@ -838,7 +838,7 @@
                           @blur="colorFocusProject[3] = ''"
                           :rules="[
                             (val) => !!val || 'Start Date is required',
-                            (val) => validateDate(val) || 'DoB is invalid',
+                            (val) => validateDate(val) || 'Start Date is invalid',
                           ]"
                           lazy-rules="ondemand"
                           hide-bottom-space
