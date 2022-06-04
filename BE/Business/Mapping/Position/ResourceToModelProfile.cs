@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Business.Extensions;
-using Business.Resources.Office;
+using Business.Resources.Position;
 
 namespace Business.Mapping.Office
 {
@@ -8,12 +8,10 @@ namespace Business.Mapping.Office
     {
         public ResourceToModelProfile()
         {
-            CreateMap<CreateOfficeResource, Domain.Models.Office>()
-                .ForMember(x => x.Address, opt => opt.MapFrom(src => src.Address.RemoveSpaceCharacter()))
+            CreateMap<CreatePositionResource, Domain.Models.Position>()
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
 
-            CreateMap<UpdateOfficeResource, Domain.Models.Office>()
-                .ForMember(x => x.Address, opt => opt.MapFrom(src => src.Address.RemoveSpaceCharacter()))
+            CreateMap<UpdatePositionResource, Domain.Models.Position>()
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
         }
     }

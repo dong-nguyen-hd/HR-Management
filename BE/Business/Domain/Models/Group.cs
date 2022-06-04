@@ -11,5 +11,6 @@
         public string Technologies { get; set; }
         public bool IsDeleted { get; set; }
         public HashSet<Project> Projects { get; set; }
+        public HashSet<Account> Accounts { get; set; }
     }
 }

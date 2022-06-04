@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class OfficeRepository : BaseRepository<Office>, IOfficeRepository
+    public class PositionRepository : BaseRepository<Position>, IPositionRepository
     {
         #region Constructor
-        public OfficeRepository(AppDbContext context) : base(context) { }
+        public PositionRepository(AppDbContext context) : base(context) { }
         #endregion
 
         #region Method
-        public async Task<List<Office>> FindByNameAsync(string filterName, bool absolute = false)
+        public async Task<List<Position>> FindByNameAsync(string filterName, bool absolute = false)
         {
-            var queryable = Context.Offices.AsQueryable();
+            var queryable = Context.Positions.AsQueryable();
 
             if (!string.IsNullOrEmpty(filterName) && !absolute)
                 queryable = queryable.Where(x => x.Name.Contains(filterName));

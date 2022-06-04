@@ -3,7 +3,7 @@ using Business.Communication;
 using Business.Domain.Models;
 using Business.Domain.Services;
 using Business.Resources;
-using Business.Resources.Office;
+using Business.Resources.Position;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -12,10 +12,10 @@ using Serilog;
 namespace API.Controllers
 {
     [Route("api/v1/office")]
-    public class OfficeController : DongNguyenController<OfficeResource, CreateOfficeResource, UpdateOfficeResource, Office>
+    public class OfficeController : DongNguyenController<PositionResource, CreatePositionResource, UpdatePositionResource, Position>
     {
         #region Constructor
-        public OfficeController(IOfficeService officeService,
+        public OfficeController(IPositionService officeService,
             IMapper mapper,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(officeService, mapper, responseMessage)
         {
@@ -25,9 +25,9 @@ namespace API.Controllers
         #region Action
         [HttpGet]
         [Authorize(Roles = "viewer, editor, admin")]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<OfficeResource>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<OfficeResource>>), StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(BaseResponse<IEnumerable<OfficeResource>>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PositionResource>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PositionResource>>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PositionResource>>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetAllAsync()
         {
             Log.Information($"{User.Identity?.Name}: get all office data.");
@@ -37,9 +37,9 @@ namespace API.Controllers
 
         [HttpGet("{id:int}")]
         [Authorize(Roles = "viewer, editor, admin")]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetByIdAsync(int id)
         {
             Log.Information($"{User.Identity?.Name}: get a office with Id is {id}.");
@@ -49,9 +49,9 @@ namespace API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "editor, admin")]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status400BadRequest)]
-        public new async Task<IActionResult> CreateAsync([FromBody] CreateOfficeResource resource)
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
+        public new async Task<IActionResult> CreateAsync([FromBody] CreatePositionResource resource)
         {
             Log.Information($"{User.Identity?.Name}: create a office.");
 
@@ -60,9 +60,9 @@ namespace API.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "editor, admin")]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status400BadRequest)]
-        public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateOfficeResource resource)
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
+        public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdatePositionResource resource)
         {
             Log.Information($"{User.Identity?.Name}: update a office with Id is {id}.");
 
@@ -71,8 +71,8 @@ namespace API.Controllers
 
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "admin")]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<OfficeResource>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
         {
             Log.Information($"{User.Identity?.Name}: delete a office with Id is {id}.");

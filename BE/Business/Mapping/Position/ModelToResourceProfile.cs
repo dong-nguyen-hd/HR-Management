@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Business.Resources.Office;
+using Business.Resources.Position;
 
 namespace Business.Mapping.Office
 {
@@ -7,7 +7,7 @@ namespace Business.Mapping.Office
     {
         public ModelToResourceProfile()
         {
-            CreateMap<Domain.Models.Office, OfficeResource>();
+            CreateMap<Domain.Models.Position, PositionResource>();
         }
     }
 }

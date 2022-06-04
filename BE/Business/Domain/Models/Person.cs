@@ -16,8 +16,8 @@
         public DateTime CreatedAt { get; set; }
         public bool IsDeleted { get; set; }
         public string OrderIndex { get; set; }
-        public int OfficeId { get; set; }
-        public Office Office { get; set; }
+        public int PositionId { get; set; }
+        public Position Position { get; set; }
         public int? GroupId { get; set; }
         public Group Group { get; set; }
         public HashSet<Certificate> Certificates { get; set; }

@@ -75,11 +75,11 @@
       "Education_Deleting_Error": "An error occurred when deleting the Education",
       "Education_NoData": "Education is not existent",
 
-      "Office_Saving_Error": "An error occurred when saving the Office",
-      "Office_Deleting_Error": "An error occurred when deleting the Office",
-      "Office_Updating_Error": "An error occurred when updating the Office",
-      "Office_NoData": "Office is not existent.",
-      "Office_Existent": "Office is existent",
+      "Position_Saving_Error": "An error occurred when saving the Position",
+      "Position_Deleting_Error": "An error occurred when deleting the Position",
+      "Position_Updating_Error": "An error occurred when updating the Position",
+      "Position_NoData": "Position is not existent.",
+      "Position_Existent": "Position is existent",
 
       "WorkHistory_Saving_Error": "An error occurred when saving the Work-History",
       "WorkHistory_Deleting_Error": "An error occurred when deleting the Work-History",

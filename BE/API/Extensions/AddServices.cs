@@ -25,8 +25,8 @@ namespace API.Extensions
             services.AddScoped<IWorkHistoryRepository, WorkHistoryRepository>();
             services.AddScoped<IWorkHistoryService, WorkHistoryService>();
 
-            services.AddScoped<IOfficeRepository, OfficeRepository>();
-            services.AddScoped<IOfficeService, OfficeService>();
+            services.AddScoped<IPositionRepository, PositionRepository>();
+            services.AddScoped<IPositionService, PositionService>();
 
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectService, ProjectService>();

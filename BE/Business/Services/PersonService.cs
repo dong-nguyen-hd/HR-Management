@@ -17,7 +17,7 @@ namespace Business.Services
         #region Constructor
         public PersonService(IPersonRepository personRepository,
             ITechnologyService technologyService,
-            IOfficeRepository officeRepository,
+            IPositionRepository officeRepository,
             IGroupRepository groupRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
@@ -32,7 +32,7 @@ namespace Business.Services
 
         #region Property
         private readonly IPersonRepository _personRepository;
-        private readonly IOfficeRepository _officeRepository;
+        private readonly IPositionRepository _officeRepository;
         private readonly IGroupRepository _groupRepository;
         private readonly ITechnologyService _technologyService;
         #endregion

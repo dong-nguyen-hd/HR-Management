@@ -26,7 +26,7 @@ namespace Infrastructure.Repositories
                 .OrderByDescending(x => x.StaffId)
                 .Skip((pagination.Page - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
-                .Include(y => y.Office)
+                .Include(y => y.Position)
                 .Include(y => y.WorkHistories.OrderByDescending(z => z.OrderIndex))
                 .Include(y => y.CategoryPersons.OrderByDescending(z => z.OrderIndex))
                 .ThenInclude(z => z.Category)
@@ -50,7 +50,7 @@ namespace Infrastructure.Repositories
                     queryable = queryable.Where(x => x.StaffId.Equals(filterResource.StaffId.RemoveSpaceCharacter()));
 
                 if (filterResource.OfficeId != null)
-                    queryable = queryable.Where(x => x.OfficeId.Equals(filterResource.OfficeId));
+                    queryable = queryable.Where(x => x.PositionId.Equals(filterResource.OfficeId));
 
                 if (filterResource.Available)
                     queryable = queryable.Where(x => x.GroupId.Equals(null));
@@ -107,7 +107,7 @@ namespace Infrastructure.Repositories
         public override async Task<Person> GetByIdAsync(int id) =>
             await Context.People
                 .AsSplitQuery()
-                .Include(y => y.Office)
+                .Include(y => y.Position)
                 .Include(y => y.WorkHistories.OrderByDescending(z => z.OrderIndex))
                 .Include(y => y.CategoryPersons.OrderByDescending(z => z.OrderIndex))
                 .ThenInclude(z => z.Category)

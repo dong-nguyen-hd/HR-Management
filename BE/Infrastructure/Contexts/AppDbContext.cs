@@ -16,7 +16,7 @@ namespace Infrastructure.Contexts
         public DbSet<Education> Educations { get; set; }
         public DbSet<WorkHistory> WorkHistories { get; set; }
         public DbSet<Certificate> Certificates { get; set; }
-        public DbSet<Office> Offices { get; set; }
+        public DbSet<Position> Positions { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<CategoryPerson> CategoryPersons { get; set; }
         public DbSet<Category> Categories { get; set; }

@@ -16,14 +16,12 @@ namespace Business.Mapping.Account
                 .ForMember(x => x.Avatar, opt => opt.MapFrom(src => Constant.DefaultAvatar)) // Use default image for new account.
                 .ForMember(x => x.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(x => x.LastActivity, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(x => x.Group, opt => opt.MapFrom(src => src.Group.ConcatenateWithComma()))
                 .ForMember(x => x.Role, opt => opt.MapFrom(src => GetRole(src.Role)));
 
             CreateMap<UpdateAccountResource, Domain.Models.Account>()
                 .ForMember(x => x.Password, opt => opt.MapFrom(src => src.Password.HashingPassword(Constant.IterationCount)))
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()))
                 .ForMember(x => x.LastActivity, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(x => x.Group, opt => opt.MapFrom(src => src.Group.ConcatenateWithComma()))
                 .ForMember(x => x.Role, opt => opt.MapFrom(src => GetRole(src.Role)));
 
             CreateMap<SelfUpdateAccountResource, Domain.Models.Account>()

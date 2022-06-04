@@ -5,7 +5,7 @@ using Business.Resources.CategoryPerson;
 using Business.Resources.Certificate;
 using Business.Resources.Education;
 using Business.Resources.Group;
-using Business.Resources.Office;
+using Business.Resources.Position;
 using Business.Resources.Project;
 using Business.Resources.WorkHistory;
 using Newtonsoft.Json;
@@ -73,7 +73,7 @@ namespace Business.Resources.Person
         [Display(Name = "Order Index")]
         public List<int> OrderIndex { get; set; }
 
-        public OfficeResource Office { get; set; }
+        public PositionResource Office { get; set; }
         public GroupResource Group { get; set; }
 
         [Display(Name = "Work-History")]

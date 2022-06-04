@@ -1,9 +1,9 @@
 ﻿using Business.Domain.Models;
-using Business.Resources.Office;
+using Business.Resources.Position;
 
 namespace Business.Domain.Services
 {
-    public interface IOfficeService : IBaseService<OfficeResource, CreateOfficeResource, UpdateOfficeResource, Office>
+    public interface IPositionService : IBaseService<PositionResource, CreatePositionResource, UpdatePositionResource, Position>
     {
     }
 }
