@@ -49,8 +49,8 @@ namespace Infrastructure.Repositories
                 if (!string.IsNullOrEmpty(filterResource.StaffId))
                     queryable = queryable.Where(x => x.StaffId.Equals(filterResource.StaffId.RemoveSpaceCharacter()));
 
-                if (filterResource.OfficeId != null)
-                    queryable = queryable.Where(x => x.PositionId.Equals(filterResource.OfficeId));
+                if (filterResource.PositionId != null)
+                    queryable = queryable.Where(x => x.PositionId.Equals(filterResource.PositionId));
 
                 if (filterResource.Available)
                     queryable = queryable.Where(x => x.GroupId.Equals(null));

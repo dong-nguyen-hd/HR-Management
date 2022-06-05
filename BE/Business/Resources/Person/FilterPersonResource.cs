@@ -13,7 +13,7 @@ namespace Business.Resources.Person
         public string FirstName { get; set; }
 
         [Display(Name = "Office Id")]
-        public int? OfficeId { get; set; }
+        public int? PositionId { get; set; }
 
         public bool Available { get; set; }
 
