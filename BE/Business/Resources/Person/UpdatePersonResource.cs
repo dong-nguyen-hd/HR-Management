@@ -37,8 +37,8 @@ namespace Business.Resources.Person
         public eGender Gender { get; set; }
 
         [Required]
-        [Display(Name = "Location Id")]
-        public int OfficeId { get; set; }
+        [Display(Name = "Position Id")]
+        public int PositionId { get; set; }
 
         [Display(Name = "Group Id")]
         public int? GroupId { get; set; }

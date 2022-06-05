@@ -42,16 +42,16 @@ namespace Business.Services
         {
             try
             {
-                // Validate Office is existent?
-                var tempOffice = await _officeRepository.GetByIdAsync(createPersonResource.OfficeId);
-                if (tempOffice is null)
-                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Office_NoData"]);
+                // Validate Position is existent?
+                var tempPosition = await _officeRepository.GetByIdAsync(createPersonResource.PositionId);
+                if (tempPosition is null)
+                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Position_NoData"]);
 
                 // Validate Group is existent?
                 if(createPersonResource.GroupId != null)
                 {
                     var tempGroup = await _groupRepository.GetByIdAsync((int)createPersonResource.GroupId);
-                    if (tempOffice is null)
+                    if (tempPosition is null)
                         return new BaseResponse<PersonResource>(ResponseMessage.Values["Group_NoData"]);
                 }
 
@@ -81,10 +81,10 @@ namespace Business.Services
                 var tempPerson = await _personRepository.GetByIdAsync(id);
                 if (tempPerson is null)
                     return new BaseResponse<PersonResource>(ResponseMessage.Values["Person_Id_NoData"]);
-                // Validate Office is existent?
-                var tempOffice = await _officeRepository.GetByIdAsync(updatePersonResource.OfficeId);
-                if (tempOffice is null)
-                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Office_NoData"]);
+                // Validate Position is existent?
+                var tempPosition = await _officeRepository.GetByIdAsync(updatePersonResource.PositionId);
+                if (tempPosition is null)
+                    return new BaseResponse<PersonResource>(ResponseMessage.Values["Position_NoData"]);
 
                 // Mapping Resource to Person
                 Mapper.Map(updatePersonResource, tempPerson);

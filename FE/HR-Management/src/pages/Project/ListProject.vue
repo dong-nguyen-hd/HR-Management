@@ -256,13 +256,13 @@
         </q-card>
       </q-dialog>
 
-      <div class="table-component full-height full-width flex flex-center">
-        <div class="new-item q-mb-md q-pr-md flex justify-end full-width">
+      <div class="table-component full-height full-width flex flex-center q-px-md">
+        <div class="new-item q-mb-md flex justify-end full-width">
           <q-btn @click="openInsert" color="primary" label="New Project" />
         </div>
 
         <q-table
-          class="table-content q-mx-md"
+          class="table-content"
           :rows="listGroup"
           :columns="headerTable"
           row-key="id"

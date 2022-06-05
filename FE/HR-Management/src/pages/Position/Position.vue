@@ -92,15 +92,15 @@
         </q-card>
       </q-dialog>
 
-      <div class="table-component full-height full-width flex flex-center">
+      <div class="table-component full-height full-width flex flex-center q-px-md">
         <div class="q-mb-md full-width" style="height: 36px">
-          <div class="full-width flex justify-end q-pr-md">
+          <div class="full-width flex justify-end">
             <q-btn color="primary" label="New Position" @click="openAddPosition" />
           </div>
         </div>
 
         <q-table
-          class="table-content q-mx-md"
+          class="table-content"
           :rows="tempListPosition"
           :columns="headerTable"
           row-key="id"

@@ -124,7 +124,7 @@
             <q-page>
               <q-scroll-area style="height: 581px">
                 <div>
-                  <div class="row" style="height: 86px; font-size: 10px">
+                  <div class="row q-mt-sm" style="height: 86px; font-size: 10px">
                     <div class="col-4">
                       <q-img
                         src="../../assets/images/logo-hybrid-technologies.svg"
@@ -476,13 +476,13 @@
         </q-layout>
       </q-dialog>
 
-      <div class="table-component full-height full-width flex flex-center">
-        <div class="new-item q-mb-md q-pr-md flex justify-end full-width">
+      <div class="table-component full-height full-width flex flex-center q-px-md">
+        <div class="new-item q-mb-md flex justify-end full-width">
           <q-btn @click="openInsert" color="primary" label="New employee" />
         </div>
 
         <q-table
-          class="table-content q-mx-md"
+          class="table-content"
           :rows="listEmployee"
           :columns="headerTable"
           row-key="id"
@@ -560,11 +560,11 @@
                   :label-color="labelColorFocus[1]"
                   @focus="
                     labelColorFocus[1] = 'black';
-                    widthOfPosition = '140px';
+                    widthOfPosition = '160px';
                   "
                   @blur="
                     labelColorFocus[1] = 'white';
-                    widthOfPosition = !filter.positionId ? '120px' : '140px';
+                    widthOfPosition = !filter.positionId ? '120px' : '160px';
                   "
                   @clear="getEmployeeWithFilter(false)"
                   ><template v-slot:no-option>
@@ -917,11 +917,14 @@ export default defineComponent({
         this.statusInsert = false;
 
         let result = await this.getEmployeeById(value);
+        if(this.listEmployee.length >= 10) this.listEmployee.pop();
         this.listEmployee.unshift(result);
-        this.listEmployee.pop();
         this.listEmployee.forEach((row, index) => {
           row.index = index + 1;
         });
+
+        // Update pagination
+        this.pagination.rowsNumber = this.pagination.rowsNumber + 1;
       } else {
         this.statusInsert = false;
       }

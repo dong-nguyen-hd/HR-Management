@@ -73,7 +73,7 @@ namespace Business.Resources.Person
         [Display(Name = "Order Index")]
         public List<int> OrderIndex { get; set; }
 
-        public PositionResource Office { get; set; }
+        public PositionResource Position { get; set; }
         public GroupResource Group { get; set; }
 
         [Display(Name = "Work-History")]
