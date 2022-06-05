@@ -159,24 +159,24 @@
               ></q-input>
             </div>
 
-            <div class="office q-mt-sm q-px-lg">
+            <div class="position q-mt-sm q-px-lg">
               <q-select
                 standout
-                ref="officeRef"
+                ref="positionRef"
                 tabindex="7"
-                v-model="employeeInfor.officeId"
-                :options="tempListOffice"
-                label="Office:"
+                v-model="employeeInfor.positionId"
+                :options="tempListPosition"
+                label="Position:"
                 option-value="id"
                 option-label="name"
                 emit-value
                 map-options
                 options-selected-class="text-accent"
-                @filter="filterOffice"
+                @filter="filterPosition"
                 fill-input
                 hide-selected
                 use-input
-                :rules="[(val) => !!val || 'Office is required']"
+                :rules="[(val) => !!val || 'Position is required']"
                 lazy-rules="ondemand"
                 hide-bottom-space
                 :label-color="labelColorFocus[5]"
@@ -447,7 +447,7 @@
                           input-debounce="200"
                           hide-selected
                           use-input
-                          :rules="[(val) => !!val || 'Office is required']"
+                          :rules="[(val) => !!val || 'Position is required']"
                           hide-bottom-space
                           :label-color="colorFocusSkill[0]"
                           @focus="
@@ -2015,7 +2015,7 @@ export default defineComponent({
         description: "",
         phone: null,
         dateOfBirth: "",
-        officeId: null,
+        positionId: null,
         groupId: null,
         gender: "",
         orderIndex: [1, 2, 3, 4, 5],
@@ -2111,8 +2111,8 @@ export default defineComponent({
       tempListSkillCategory: [],
       tempListCategory: [],
       listCategory: [],
-      tempListOffice: [],
-      listOffice: [],
+      tempListPosition: [],
+      listPosition: [],
       tempListGroup: [],
       tempListWork: [],
       listGroup: [],
@@ -2254,10 +2254,10 @@ export default defineComponent({
         });
       }
     },
-    async getOffice() {
+    async getPosition() {
       // Request API
       let result = await api
-        .get("/api/v1/office")
+        .get("/api/v1/position")
         .then((response) => {
           return response.data;
         })
@@ -2274,12 +2274,12 @@ export default defineComponent({
         });
 
       if (result.success) {
-        this.listOffice = result.resource;
+        this.listPosition = result.resource;
 
         // Mode edit
-        if (this.employeeInfor.officeId) {
-          this.tempListOffice = this.listOffice.filter(
-            (v) => v.id == this.employeeInfor.officeId
+        if (this.employeeInfor.positionId) {
+          this.tempListPosition = this.listPosition.filter(
+            (v) => v.id == this.employeeInfor.positionId
           );
         }
       } else {
@@ -2326,13 +2326,13 @@ export default defineComponent({
         message: `Image size must lower than 5 MB`,
       });
     },
-    filterOffice(val, update, abort) {
+    filterPosition(val, update, abort) {
       update(() => {
         if (!val) {
-          this.tempListOffice = this.listOffice.slice(0, 5);
+          this.tempListPosition = this.listPosition.slice(0, 5);
         } else {
           let needle = val.toLowerCase();
-          this.tempListOffice = this.listOffice.filter(
+          this.tempListPosition = this.listPosition.filter(
             (v) => v.name.toLowerCase().indexOf(needle) > -1
           );
         }
@@ -3155,14 +3155,14 @@ export default defineComponent({
     async saveAll() {
       try {
         if (
-        !this.$refs.firstNameRef.validate() ||
-        !this.$refs.lastNameRef.validate() ||
-        !this.$refs.dobRef.validate() ||
-        !this.$refs.genderRef.validate()||
-        !this.$refs.officeRef.validate()
-      ) {
-        return null;
-      }
+          !this.$refs.firstNameRef.validate() ||
+          !this.$refs.lastNameRef.validate() ||
+          !this.$refs.dobRef.validate() ||
+          !this.$refs.genderRef.validate() ||
+          !this.$refs.positionRef.validate()
+        ) {
+          return null;
+        }
 
         this.loadingSave = true;
 
@@ -3188,7 +3188,7 @@ export default defineComponent({
         this.employeeInfor.description = "";
         this.employeeInfor.phone = null;
         this.employeeInfor.dateOfBirth = "";
-        this.employeeInfor.officeId = null;
+        this.employeeInfor.positionId = null;
         this.employeeInfor.groupId = null;
         this.employeeInfor.gender = "";
         this.employeeInfor.orderIndex = [1, 2, 3, 4, 5];
@@ -3287,7 +3287,7 @@ export default defineComponent({
     await Promise.all([
       this.findCategory(false, true),
       this.findGroup(false, true),
-      this.getOffice(),
+      this.getPosition(),
       this.getAvatarUrl(),
     ]);
 

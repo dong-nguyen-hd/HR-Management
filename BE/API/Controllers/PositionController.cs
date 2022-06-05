@@ -11,13 +11,13 @@ using Serilog;
 
 namespace API.Controllers
 {
-    [Route("api/v1/office")]
-    public class OfficeController : DongNguyenController<PositionResource, CreatePositionResource, UpdatePositionResource, Position>
+    [Route("api/v1/position")]
+    public class PositionController : DongNguyenController<PositionResource, CreatePositionResource, UpdatePositionResource, Position>
     {
         #region Constructor
-        public OfficeController(IPositionService officeService,
+        public PositionController(IPositionService positionService,
             IMapper mapper,
-            IOptionsMonitor<ResponseMessage> responseMessage) : base(officeService, mapper, responseMessage)
+            IOptionsMonitor<ResponseMessage> responseMessage) : base(positionService, mapper, responseMessage)
         {
         }
         #endregion
@@ -30,7 +30,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<PositionResource>>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetAllAsync()
         {
-            Log.Information($"{User.Identity?.Name}: get all office data.");
+            Log.Information($"{User.Identity?.Name}: get all position data.");
 
             return await base.GetAllAsync();
         }
@@ -42,7 +42,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> GetByIdAsync(int id)
         {
-            Log.Information($"{User.Identity?.Name}: get a office with Id is {id}.");
+            Log.Information($"{User.Identity?.Name}: get a position with Id is {id}.");
 
             return await base.GetByIdAsync(id);
         }
@@ -53,7 +53,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreatePositionResource resource)
         {
-            Log.Information($"{User.Identity?.Name}: create a office.");
+            Log.Information($"{User.Identity?.Name}: create a position.");
 
             return await base.CreateAsync(resource);
         }
@@ -64,7 +64,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdatePositionResource resource)
         {
-            Log.Information($"{User.Identity?.Name}: update a office with Id is {id}.");
+            Log.Information($"{User.Identity?.Name}: update a position with Id is {id}.");
 
             return await base.UpdateAsync(id, resource);
         }
@@ -75,7 +75,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
         {
-            Log.Information($"{User.Identity?.Name}: delete a office with Id is {id}.");
+            Log.Information($"{User.Identity?.Name}: delete a position with Id is {id}.");
 
             return await base.DeleteAsync(id);
         }

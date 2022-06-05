@@ -61,9 +61,12 @@ namespace Business.Services
                     return new BaseResponse<CategoryResource>(ResponseMessage.Values["Category_NoData"]);
 
                 // Validate category name is existent?
-                var hasValue = await _categoryRepository.FindByNameAsync(updateCategoryResource.Name, true);
-                if (hasValue.ToList().Count != 1)
-                    return new BaseResponse<CategoryResource>(ResponseMessage.Values["Category_Existent"]);
+                if (!tempCategory.Name.Equals(updateCategoryResource.Name))
+                {
+                    var hasValue = await _categoryRepository.FindByNameAsync(updateCategoryResource.Name, true);
+                    if (hasValue.ToList().Count > 0)
+                        return new BaseResponse<CategoryResource>(ResponseMessage.Values["Category_Existent"]);
+                }
 
                 // Update infomation
                 Mapper.Map(updateCategoryResource, tempCategory);

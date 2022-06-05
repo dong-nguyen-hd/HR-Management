@@ -170,24 +170,24 @@
               ></q-input>
             </div>
 
-            <div class="office q-mt-sm q-px-lg">
+            <div class="position q-mt-sm q-px-lg">
               <q-select
                 standout
-                ref="officeRef"
+                ref="positionRef"
                 tabindex="7"
-                v-model="employeeInfor.officeId"
-                :options="tempListOffice"
-                label="Office:"
+                v-model="employeeInfor.positionId"
+                :options="tempListPosition"
+                label="Position:"
                 option-value="id"
                 option-label="name"
                 emit-value
                 map-options
                 options-selected-class="text-accent"
-                @filter="filterOffice"
+                @filter="filterPosition"
                 fill-input
                 hide-selected
                 use-input
-                :rules="[(val) => !!val || 'Office is required']"
+                :rules="[(val) => !!val || 'Position is required']"
                 hide-bottom-space
                 :label-color="labelColorFocus[5]"
                 @focus="labelColorFocus[5] = 'white'"
@@ -460,7 +460,7 @@
                           input-debounce="200"
                           hide-selected
                           use-input
-                          :rules="[(val) => !!val || 'Office is required']"
+                          :rules="[(val) => !!val || 'Position is required']"
                           lazy-rules="ondemand"
                           hide-bottom-space
                           :label-color="colorFocusSkill[0]"
@@ -747,7 +747,6 @@
                           ref="projectOneRef"
                           v-model="tempProjectResource.groupId"
                           :options="tempListGroup"
-                          
                           :label="labelNameFocusProject[0]"
                           option-value="id"
                           option-label="name"
@@ -838,7 +837,8 @@
                           @blur="colorFocusProject[3] = ''"
                           :rules="[
                             (val) => !!val || 'Start Date is required',
-                            (val) => validateDate(val) || 'Start Date is invalid',
+                            (val) =>
+                              validateDate(val) || 'Start Date is invalid',
                           ]"
                           lazy-rules="ondemand"
                           hide-bottom-space
@@ -2036,7 +2036,7 @@ export default defineComponent({
         description: "",
         phone: null,
         dateOfBirth: "",
-        officeId: null,
+        positionId: null,
         groupId: null,
         gender: "",
         orderIndex: [],
@@ -2129,8 +2129,8 @@ export default defineComponent({
       tempListSkillCategory: [],
       tempListCategory: [],
       listCategory: [],
-      tempListOffice: [],
-      listOffice: [],
+      tempListPosition: [],
+      listPosition: [],
       tempListGroup: [],
       tempListWork: [],
       listGroup: [],
@@ -2272,10 +2272,10 @@ export default defineComponent({
         });
       }
     },
-    async getOffice() {
+    async getPosition() {
       // Request API
       let result = await api
-        .get("/api/v1/office")
+        .get("/api/v1/position")
         .then((response) => {
           return response.data;
         })
@@ -2292,12 +2292,12 @@ export default defineComponent({
         });
 
       if (result.success) {
-        this.listOffice = result.resource;
+        this.listPosition = result.resource;
 
         // Mode edit
-        if (this.employeeInfor.officeId) {
-          this.tempListOffice = this.listOffice.filter(
-            (v) => v.id == this.employeeInfor.officeId
+        if (this.employeeInfor.positionId) {
+          this.tempListPosition = this.listPosition.filter(
+            (v) => v.id == this.employeeInfor.positionId
           );
         }
       } else {
@@ -2344,13 +2344,13 @@ export default defineComponent({
         message: `Image size must lower than 5 MB`,
       });
     },
-    filterOffice(val, update, abort) {
+    filterPosition(val, update, abort) {
       update(() => {
         if (!val) {
-          this.tempListOffice = this.listOffice.slice(0, 5);
+          this.tempListPosition = this.listPosition.slice(0, 5);
         } else {
           let needle = val.toLowerCase();
-          this.tempListOffice = this.listOffice.filter(
+          this.tempListPosition = this.listPosition.filter(
             (v) => v.name.toLowerCase().indexOf(needle) > -1
           );
         }
@@ -3817,8 +3817,8 @@ export default defineComponent({
     mappingDataUpdate() {
       // Set infor
       extend(true, this.employeeInfor, this.employeeTransfer);
-      // Set office
-      this.employeeInfor.officeId = this.employeeInfor?.office?.id;
+      // Set position
+      this.employeeInfor.positionId = this.employeeInfor?.position?.id;
       // Set self-project
       this.employeeInfor.groupId = this.employeeInfor?.group?.id;
       this.tempListWork.push(this.employeeInfor.group);
@@ -3841,21 +3841,23 @@ export default defineComponent({
       this.tempCertificateResource.personId = this.employeeInfor.id;
       // Order Component
       let tempTab = [];
-      
-      for (let i = 0; i < this.employeeInfor.orderIndex.length; i++){
+
+      for (let i = 0; i < this.employeeInfor.orderIndex.length; i++) {
         let element = this.employeeInfor.orderIndex[i];
-        let temp = this.tabModel.find(x => parseInt(x.id) == element);
+        let temp = this.tabModel.find((x) => parseInt(x.id) == element);
 
-        if(temp) tempTab.push(temp);
+        if (temp) tempTab.push(temp);
       }
 
-      for (let i = 0; i < this.tabModel.length; i++){
+      for (let i = 0; i < this.tabModel.length; i++) {
         let element = this.tabModel[i];
-        let isSuccess = this.employeeInfor.orderIndex.includes(parseInt(element.id));
+        let isSuccess = this.employeeInfor.orderIndex.includes(
+          parseInt(element.id)
+        );
 
-        if(!isSuccess) tempTab.push(element);
+        if (!isSuccess) tempTab.push(element);
       }
-        
+
       this.tabModel = tempTab;
       this.tab = this.tabModel[0].id;
     },
@@ -3878,7 +3880,7 @@ export default defineComponent({
     await Promise.all([
       this.findCategory(false, true),
       this.findGroup(false, true),
-      this.getOffice(),
+      this.getPosition(),
       this.getAvatarUrl(),
     ]);
   },

@@ -10,12 +10,26 @@
           <q-separator />
 
           <q-card-section>
-            <span>This can’t be undone and it will be removed from database.</span>
+            <span
+              >This can’t be undone and it will be removed from database.</span
+            >
           </q-card-section>
 
           <q-card-actions align="right">
-            <q-btn flat :disable="deleteProcess" label="Cancel" color="primary" v-close-popup />
-            <q-btn flat label="Delete" color="negative" @click="deleteEmployee" :loading="deleteProcess" />
+            <q-btn
+              flat
+              :disable="deleteProcess"
+              label="Cancel"
+              color="primary"
+              v-close-popup
+            />
+            <q-btn
+              flat
+              label="Delete"
+              color="negative"
+              @click="deleteEmployee"
+              :loading="deleteProcess"
+            />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -25,21 +39,39 @@
           <q-header class="bg-accent">
             <q-toolbar>
               <q-toolbar-title></q-toolbar-title>
-              <q-btn class="q-mr-lg" flat round dense icon="visibility" @click="openViewDialog(editObj.id)" />
+              <q-btn
+                class="q-mr-lg"
+                flat
+                round
+                dense
+                icon="visibility"
+                @click="openViewDialog(editObj.id)"
+              />
               <q-btn flat round dense icon="close" @click="closeEditDialog" />
             </q-toolbar>
           </q-header>
 
           <q-page-container>
             <q-page>
-              <edit-employee v-if="showEdit" @updateSuccess="updateReceive" :statusUpdateTransfer="statusUpdate"
-                :employeeTransfer="editObj" />
+              <edit-employee
+                v-if="showEdit"
+                @updateSuccess="updateReceive"
+                :statusUpdateTransfer="statusUpdate"
+                :employeeTransfer="editObj"
+              />
             </q-page>
           </q-page-container>
 
           <q-footer class="bg-accent text-white">
             <q-toolbar class="flex flex-center">
-              <q-btn :loading="statusUpdate" dense color="primary" label="Save" class="q-px-lg" @click="saveUpdate" />
+              <q-btn
+                :loading="statusUpdate"
+                dense
+                color="primary"
+                label="Save"
+                class="q-px-lg"
+                @click="saveUpdate"
+              />
             </q-toolbar>
           </q-footer>
         </q-layout>
@@ -56,13 +88,24 @@
 
           <q-page-container>
             <q-page>
-              <new-employee v-if="showInsert" @insertSuccess="insertReceive" :statusInsertTransfer="statusInsert" />
+              <new-employee
+                v-if="showInsert"
+                @insertSuccess="insertReceive"
+                :statusInsertTransfer="statusInsert"
+              />
             </q-page>
           </q-page-container>
 
           <q-footer class="bg-accent text-white">
             <q-toolbar class="flex flex-center">
-              <q-btn :loading="statusInsert" dense color="primary" label="Save" class="q-px-lg" @click="saveInsert" />
+              <q-btn
+                :loading="statusInsert"
+                dense
+                color="primary"
+                label="Save"
+                class="q-px-lg"
+                @click="saveInsert"
+              />
             </q-toolbar>
           </q-footer>
         </q-layout>
@@ -83,7 +126,10 @@
                 <div>
                   <div class="row" style="height: 86px; font-size: 10px">
                     <div class="col-4">
-                      <q-img src="../../assets/images/logo-hybrid-technologies.svg" fit="cover" />
+                      <q-img
+                        src="../../assets/images/logo-hybrid-technologies.svg"
+                        fit="cover"
+                      />
                     </div>
                     <div class="col-8">
                       <div>
@@ -97,19 +143,27 @@
                       </div>
                       <div>
                         Website:
-                        <span class="text-cyan-7">https://hybrid-technologies.co.jp/</span>
+                        <span class="text-cyan-7"
+                          >https://hybrid-technologies.co.jp/</span
+                        >
                       </div>
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="col-9">
-                      <div class="q-pl-md bg-cyan-3 flex items-center height-view text-uppercase">
-                        <span class="text-bold">{{ viewObj.firstName }} {{ viewObj.lastName }}</span>
+                      <div
+                        class="q-pl-md bg-cyan-3 flex items-center height-view text-uppercase"
+                      >
+                        <span class="text-bold"
+                          >{{ viewObj.firstName }} {{ viewObj.lastName }}</span
+                        >
                       </div>
 
                       <div class="row height-view-sub">
-                        <div class="col-4 q-pl-md flex items-center border-right">
+                        <div
+                          class="col-4 q-pl-md flex items-center border-right"
+                        >
                           <span class="text-bold">Gender</span>
                         </div>
                         <div class="col-8 q-pl-md flex items-center">
@@ -118,7 +172,9 @@
                       </div>
 
                       <div class="row height-view-sub">
-                        <div class="col-4 q-pl-md flex items-center border-right text-bold">
+                        <div
+                          class="col-4 q-pl-md flex items-center border-right text-bold"
+                        >
                           Date of Birth
                         </div>
                         <div class="col-8 q-pl-md flex items-center">
@@ -132,47 +188,72 @@
                     </div>
                   </div>
 
-                  <div class="q-pl-md bg-cyan-3 height-view flex items-center text-bold">
+                  <div
+                    class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
+                  >
                     PROFESSIONAL OVERVIEW
                   </div>
                   <div class="q-pa-md flex items-center height-view-sub">
                     {{ viewObj.description }}
                   </div>
 
-                  <div class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
-                    v-show="viewObj.orderIndex.includes(1)">
+                  <div
+                    class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
+                    v-show="viewObj.orderIndex.includes(1)"
+                  >
                     SKILLS
                   </div>
 
-                  <div class="row height-view-sub" v-show="viewObj.orderIndex.includes(1)"
-                    v-for="(skill, index) in viewObj.categoryPerson" :key="index">
-                    <div class="col-4 flex items-center q-pl-md border-right text-bold">
+                  <div
+                    class="row height-view-sub"
+                    v-show="viewObj.orderIndex.includes(1)"
+                    v-for="(skill, index) in viewObj.categoryPerson"
+                    :key="index"
+                  >
+                    <div
+                      class="col-4 flex items-center q-pl-md border-right text-bold"
+                    >
                       {{ skill.categoryName }}
                     </div>
                     <div class="col-8 flex items-center q-pl-md">
                       <span>
-                        <span v-for="(technology, i) in skill.technologies" :key="i">
+                        <span
+                          v-for="(technology, i) in skill.technologies"
+                          :key="i"
+                        >
                           {{ technology.name
-                          }}<span v-show="i != skill.technologies.length - 1">,
+                          }}<span v-show="i != skill.technologies.length - 1"
+                            >,
                           </span>
                         </span>
                       </span>
                     </div>
                   </div>
 
-                  <div class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
-                    v-show="viewObj.orderIndex.includes(3)">
+                  <div
+                    class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
+                    v-show="viewObj.orderIndex.includes(3)"
+                  >
                     WORKING HISTORY
                   </div>
 
-                  <div class="row height-view-sub" v-show="viewObj.orderIndex.includes(3)">
-                    <div class="col-1 q-pl-md flex items-center border-right text-bold">
+                  <div
+                    class="row height-view-sub"
+                    v-show="viewObj.orderIndex.includes(3)"
+                  >
+                    <div
+                      class="col-1 q-pl-md flex items-center border-right text-bold"
+                    >
                       NO.
                     </div>
-                    <div class="col q-pl-md flex items-center border-right text-bold">
+                    <div
+                      class="col q-pl-md flex items-center border-right text-bold"
+                    >
                       PREIOD
                     </div>
-                    <div class="col q-pl-md flex items-center border-right text-bold">
+                    <div
+                      class="col q-pl-md flex items-center border-right text-bold"
+                    >
                       COMPANY
                     </div>
                     <div class="col q-pl-md flex items-center text-bold">
@@ -180,27 +261,33 @@
                     </div>
                   </div>
 
-                  <div class="row height-view-sub" v-show="viewObj.orderIndex.includes(3)"
-                    v-for="(workHistory, index) in viewObj.workHistory" :key="index">
+                  <div
+                    class="row height-view-sub"
+                    v-show="viewObj.orderIndex.includes(3)"
+                    v-for="(workHistory, index) in viewObj.workHistory"
+                    :key="index"
+                  >
                     <div class="col-1 q-pl-md flex items-center border-right">
                       {{ index + 1 }}
                     </div>
                     <div class="col q-pl-md flex items-center border-right">
-                      <span>{{
+                      <span
+                        >{{
                           convertDateTimeToDate(
                             workHistory.startDate,
                             "MMM YYYY"
                           )
-                      }}
+                        }}
                         -
                         {{
-                            workHistory.endDate
-                              ? convertDateTimeToDate(
+                          workHistory.endDate
+                            ? convertDateTimeToDate(
                                 workHistory.endDate,
                                 "MMM YYYY"
                               )
-                              : "Now"
-                        }}</span>
+                            : "Now"
+                        }}</span
+                      >
                     </div>
                     <div class="col q-pl-md flex items-center border-right">
                       {{ workHistory.companyName }}
@@ -210,59 +297,89 @@
                     </div>
                   </div>
 
-                  <div class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
-                    v-show="viewObj.orderIndex.includes(4)">
+                  <div
+                    class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
+                    v-show="viewObj.orderIndex.includes(4)"
+                  >
                     EDUCATION
                   </div>
 
-                  <div class="education-view column q-pa-md" v-show="viewObj.orderIndex.includes(4)"
-                    v-for="(education, index) in viewObj.education" :key="index">
+                  <div
+                    class="education-view column q-pa-md"
+                    v-show="viewObj.orderIndex.includes(4)"
+                    v-for="(education, index) in viewObj.education"
+                    :key="index"
+                  >
                     <div class="flex items-center col">
-                      <span class="text-bold">{{
+                      <span class="text-bold"
+                        >{{
                           convertDateTimeToDate(education.startDate, "YYYY")
-                      }}
+                        }}
                         -
                         {{
-                            education.endDate
-                              ? convertDateTimeToDate(
+                          education.endDate
+                            ? convertDateTimeToDate(
                                 education.endDate,
                                 "MMM YYYY"
                               )
-                              : "Now"
+                            : "Now"
                         }}
-                        | {{ education.collegeName }}</span>
+                        | {{ education.collegeName }}</span
+                      >
                     </div>
                     <div class="flex items-center col">
-                      <span><span class="text-bold">Major: </span>{{ education.major }}</span>
+                      <span
+                        ><span class="text-bold">Major: </span
+                        >{{ education.major }}</span
+                      >
                     </div>
                   </div>
 
-                  <div class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
-                    v-show="viewObj.orderIndex.includes(5)">
+                  <div
+                    class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
+                    v-show="viewObj.orderIndex.includes(5)"
+                  >
                     CERTIFICATION
                   </div>
 
-                  <div class="height-view-sub q-pl-md flex items-center" v-show="viewObj.orderIndex.includes(5)"
-                    v-for="(certificate, index) in viewObj.certificate" :key="index">
-                    <span class="text-bold">{{
+                  <div
+                    class="height-view-sub q-pl-md flex items-center"
+                    v-show="viewObj.orderIndex.includes(5)"
+                    v-for="(certificate, index) in viewObj.certificate"
+                    :key="index"
+                  >
+                    <span class="text-bold"
+                      >{{
                         convertDateTimeToDate(certificate.startDate, "YYYY")
-                    }}
-                      | {{ certificate.name }}</span>
+                      }}
+                      | {{ certificate.name }}</span
+                    >
                   </div>
 
-                  <div class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
-                    v-show="viewObj.orderIndex.includes(2)">
+                  <div
+                    class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
+                    v-show="viewObj.orderIndex.includes(2)"
+                  >
                     PROJECTS
                   </div>
 
-                  <div class="row height-view-sub" v-show="viewObj.orderIndex.includes(2)">
-                    <div class="col-1 flex items-center q-pl-md border-right text-bold">
+                  <div
+                    class="row height-view-sub"
+                    v-show="viewObj.orderIndex.includes(2)"
+                  >
+                    <div
+                      class="col-1 flex items-center q-pl-md border-right text-bold"
+                    >
                       NO.
                     </div>
-                    <div class="col flex items-center q-pl-md border-right text-bold">
+                    <div
+                      class="col flex items-center q-pl-md border-right text-bold"
+                    >
                       PREIOD
                     </div>
-                    <div class="col flex items-center q-pl-md border-right text-bold">
+                    <div
+                      class="col flex items-center q-pl-md border-right text-bold"
+                    >
                       POSITION
                     </div>
                     <div class="col-5 flex items-center q-pl-md text-bold">
@@ -270,45 +387,73 @@
                     </div>
                   </div>
 
-                  <div class="row project-view" v-show="viewObj.orderIndex.includes(2)"
-                    v-for="(project, index) in viewObj.project" :key="index">
+                  <div
+                    class="row project-view"
+                    v-show="viewObj.orderIndex.includes(2)"
+                    v-for="(project, index) in viewObj.project"
+                    :key="index"
+                  >
                     <div class="col-1 q-pl-md flex items-center border-right">
                       {{ index + 1 }}
                     </div>
                     <div class="col q-pl-md flex items-center border-right">
-                      {{
-                          convertDateTimeToDate(project.startDate, "MMM YYYY")
-                      }}
+                      {{ convertDateTimeToDate(project.startDate, "MMM YYYY") }}
                       -
                       {{
-                          project.endDate
-                            ? convertDateTimeToDate(project.endDate, "MMM YYYY")
-                            : "Now"
+                        project.endDate
+                          ? convertDateTimeToDate(project.endDate, "MMM YYYY")
+                          : "Now"
                       }}
                     </div>
                     <div class="col q-pl-md flex items-center border-right">
                       {{ project.position }}
                     </div>
                     <div class="col-5">
-                      <div class="q-pl-md project-bottom-view flex items-center project-height-view">
+                      <div
+                        class="q-pl-md project-bottom-view flex items-center project-height-view"
+                      >
                         <span class="text-bold">{{ project.name }}</span>
                       </div>
-                      <div class="q-pl-md project-bottom-view flex items-center project-height-view">
-                        <span><span class="text-bold">Description: </span>{{ project.description }}</span>
+                      <div
+                        class="q-pl-md project-bottom-view flex items-center project-height-view"
+                      >
+                        <span
+                          ><span class="text-bold">Description: </span
+                          >{{ project.description }}</span
+                        >
                       </div>
-                      <div class="q-pl-md project-bottom-view flex items-center project-height-view">
-                        <span><span class="text-bold">Responsibilities: </span>{{ project.responsibilities }}</span>
+                      <div
+                        class="q-pl-md project-bottom-view flex items-center project-height-view"
+                      >
+                        <span
+                          ><span class="text-bold">Responsibilities: </span
+                          >{{ project.responsibilities }}</span
+                        >
                       </div>
-                      <div class="q-pl-md project-bottom-view flex items-center project-height-view">
-                        <span><span class="text-bold">Team size: </span>{{ project.teamSize }}</span>
+                      <div
+                        class="q-pl-md project-bottom-view flex items-center project-height-view"
+                      >
+                        <span
+                          ><span class="text-bold">Team size: </span
+                          >{{ project.teamSize }}</span
+                        >
                       </div>
-                      <div class="q-pl-md flex items-center project-height-view">
-                        <span><span class="text-bold">Technologies used: </span><span
-                            v-for="(technology, i) in project.technologies" :key="i">
+                      <div
+                        class="q-pl-md flex items-center project-height-view"
+                      >
+                        <span
+                          ><span class="text-bold">Technologies used: </span
+                          ><span
+                            v-for="(technology, i) in project.technologies"
+                            :key="i"
+                          >
                             {{ technology.name
-                            }}<span v-show="i != project.technologies.length - 1">,
+                            }}<span
+                              v-show="i != project.technologies.length - 1"
+                              >,
                             </span>
-                          </span></span>
+                          </span></span
+                        >
                       </div>
                     </div>
                   </div>
@@ -319,7 +464,13 @@
 
           <q-footer class="bg-accent text-white">
             <q-toolbar class="flex flex-center">
-              <q-btn v-show="false" dense color="primary" label="Download" class="q-px-lg" />
+              <q-btn
+                v-show="false"
+                dense
+                color="primary"
+                label="Download"
+                class="q-px-lg"
+              />
             </q-toolbar>
           </q-footer>
         </q-layout>
@@ -330,48 +481,93 @@
           <q-btn @click="openInsert" color="primary" label="New employee" />
         </div>
 
-        <q-table class="table-content q-mx-md" :rows="listEmployee" :columns="headerTable" row-key="id" flat bordered
-          dark :loading="loadingData" v-model:pagination="pagination" :rows-per-page-options="[5, 10, 15, 20]"
-          @request="getEmployeeWithFilter">
+        <q-table
+          class="table-content q-mx-md"
+          :rows="listEmployee"
+          :columns="headerTable"
+          row-key="id"
+          flat
+          bordered
+          dark
+          :loading="loadingData"
+          v-model:pagination="pagination"
+          :rows-per-page-options="[5, 10, 15, 20]"
+          @request="getEmployeeWithFilter"
+        >
           <template v-slot:header-cell-staffId="props">
             <q-th :props="props">
               <div :style="`min-width: ${widthOfStaffId}`">
-                <q-input @update:model-value="getEmployeeWithFilter(false)" dark dense standout v-model="filter.staffId"
-                  input-class="text-right" :label="labelNameFocus[0]" :label-color="labelColorFocus[0]" debounce="300"
+                <q-input
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  dark
+                  dense
+                  standout
+                  v-model="filter.staffId"
+                  input-class="text-right"
+                  :label="labelNameFocus[0]"
+                  :label-color="labelColorFocus[0]"
+                  debounce="300"
                   @focus="
-  labelColorFocus[0] = 'black';
-labelNameFocus[0] = 'Search by staff id';
-widthOfStaffId = '154px';
-                  " @blur="
-  labelColorFocus[0] = 'white';
-labelNameFocus[0] = props.col.label;
-widthOfStaffId = '110px';
-                  ">
+                    labelColorFocus[0] = 'black';
+                    labelNameFocus[0] = 'Search by staff id';
+                    widthOfStaffId = '154px';
+                  "
+                  @blur="
+                    labelColorFocus[0] = 'white';
+                    labelNameFocus[0] = props.col.label;
+                    widthOfStaffId = '100px';
+                  "
+                >
                   <template v-slot:append>
                     <q-icon v-if="!filter.staffId" name="search" />
-                    <q-icon v-else name="clear" class="cursor-pointer" @click="
-  filter.staffId = '';
-getEmployeeWithFilter(false);
-                    " />
+                    <q-icon
+                      v-else
+                      name="clear"
+                      class="cursor-pointer"
+                      @click="
+                        filter.staffId = '';
+                        getEmployeeWithFilter(false);
+                      "
+                    />
                   </template>
                 </q-input>
               </div>
             </q-th>
           </template>
 
-          <template v-slot:header-cell-office="props">
+          <template v-slot:header-cell-position="props">
             <q-th :props="props">
-              <div :style="`width: ${widthOfOffice};`">
-                <q-select @update:model-value="getEmployeeWithFilter(false)" dense standout dark clearable
-                  v-model="filter.officeId" :options="tempListOffice" :label="props.col.label" option-value="id"
-                  option-label="name" emit-value map-options options-selected-class="text-accent" @filter="filterOffice"
-                  input-debounce="100" fill-input hide-selected use-input :label-color="labelColorFocus[1]" @focus="
-  labelColorFocus[1] = 'black';
-widthOfOffice = '140px';
-                  " @blur="
-  labelColorFocus[1] = 'white';
-widthOfOffice = !filter.officeId ? '100px' : '140px';
-                  " @clear="getEmployeeWithFilter(false)"><template v-slot:no-option>
+              <div :style="`width: ${widthOfPosition};`">
+                <q-select
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  dense
+                  standout
+                  dark
+                  clearable
+                  v-model="filter.positionId"
+                  :options="tempListPosition"
+                  :label="props.col.label"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  @filter="filterPosition"
+                  input-debounce="100"
+                  fill-input
+                  hide-selected
+                  use-input
+                  :label-color="labelColorFocus[1]"
+                  @focus="
+                    labelColorFocus[1] = 'black';
+                    widthOfPosition = '140px';
+                  "
+                  @blur="
+                    labelColorFocus[1] = 'white';
+                    widthOfPosition = !filter.positionId ? '120px' : '140px';
+                  "
+                  @clear="getEmployeeWithFilter(false)"
+                  ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
                         No results
@@ -386,23 +582,38 @@ widthOfOffice = !filter.officeId ? '100px' : '140px';
           <template v-slot:header-cell-fullName="props">
             <q-th :props="props">
               <div :style="`min-width: ${widthOfFullName};`">
-                <q-input @update:model-value="getEmployeeWithFilter(false)" dark dense standout debounce="400"
-                  v-model="filter.firstName" input-class="text-right" :label="labelNameFocus[2]"
-                  :label-color="labelColorFocus[2]" @focus="
-  labelColorFocus[2] = 'black';
-labelNameFocus[2] = 'Search by first name';
-widthOfFullName = '170px';
-                  " @blur="
-  labelColorFocus[2] = 'white';
-labelNameFocus[2] = props.col.label;
-widthOfFullName = '130px';
-                  ">
+                <q-input
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  dark
+                  dense
+                  standout
+                  debounce="400"
+                  v-model="filter.firstName"
+                  input-class="text-right"
+                  :label="labelNameFocus[2]"
+                  :label-color="labelColorFocus[2]"
+                  @focus="
+                    labelColorFocus[2] = 'black';
+                    labelNameFocus[2] = 'Search by first name';
+                    widthOfFullName = '170px';
+                  "
+                  @blur="
+                    labelColorFocus[2] = 'white';
+                    labelNameFocus[2] = props.col.label;
+                    widthOfFullName = '130px';
+                  "
+                >
                   <template v-slot:append>
                     <q-icon v-if="!filter.firstName" name="search" />
-                    <q-icon v-else name="clear" class="cursor-pointer" @click="
-  filter.firstName = '';
-getEmployeeWithFilter(false);
-                    " />
+                    <q-icon
+                      v-else
+                      name="clear"
+                      class="cursor-pointer"
+                      @click="
+                        filter.firstName = '';
+                        getEmployeeWithFilter(false);
+                      "
+                    />
                   </template>
                 </q-input>
               </div>
@@ -412,8 +623,15 @@ getEmployeeWithFilter(false);
           <template v-slot:header-cell-available="props">
             <q-th :props="props">
               <div>
-                <q-checkbox left-label dense dark v-model="filter.available" color="accent"
-                  @update:model-value="getEmployeeWithFilter(false)" label="Available" />
+                <q-checkbox
+                  left-label
+                  dense
+                  dark
+                  v-model="filter.available"
+                  color="accent"
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  label="Available"
+                />
               </div>
             </q-th>
           </template>
@@ -421,21 +639,40 @@ getEmployeeWithFilter(false);
           <template v-slot:header-cell-skill="props">
             <q-th :props="props">
               <div :style="`width: ${widthOfSkill};`">
-                <q-select dense standout dark max-values="3" clearable multiple use-chips use-input input-debounce="200"
-                  v-model="filter.technologyId" :options="tempListSkill" :label="labelNameFocus[3]" option-value="id"
-                  option-label="name" emit-value map-options options-selected-class="text-accent"
-                  :label-color="labelColorFocus[3]" @update:model-value="getEmployeeWithFilter(false)"
-                  @filter="filterSkill" @focus="
-  labelColorFocus[3] = 'black';
-labelNameFocus[3] = 'Search by skill';
-widthOfSkill = '250px';
-                  " @blur="
-  labelColorFocus[3] = 'white';
-labelNameFocus[3] = props.col.label;
-widthOfSkill = !filter?.technologyId?.length
-  ? '150px'
-  : '250px';
-                  "><template v-slot:no-option>
+                <q-select
+                  dense
+                  standout
+                  dark
+                  max-values="3"
+                  clearable
+                  multiple
+                  use-chips
+                  use-input
+                  input-debounce="200"
+                  v-model="filter.technologyId"
+                  :options="tempListSkill"
+                  :label="labelNameFocus[3]"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  :label-color="labelColorFocus[3]"
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  @filter="filterSkill"
+                  @focus="
+                    labelColorFocus[3] = 'black';
+                    labelNameFocus[3] = 'Search by skill';
+                    widthOfSkill = '250px';
+                  "
+                  @blur="
+                    labelColorFocus[3] = 'white';
+                    labelNameFocus[3] = props.col.label;
+                    widthOfSkill = !filter?.technologyId?.length
+                      ? '150px'
+                      : '250px';
+                  "
+                  ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
                         No results
@@ -458,21 +695,38 @@ widthOfSkill = !filter?.technologyId?.length
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
               <div>
-                <q-btn style="width: 60px" dense color="white" text-color="black" label="Edit"
-                  @click="openEdit(props.value)" />
+                <q-btn
+                  style="width: 60px"
+                  dense
+                  color="white"
+                  text-color="black"
+                  label="Edit"
+                  @click="openEdit(props.value)"
+                />
               </div>
               <div class="q-mt-sm">
-                <q-btn style="width: 60px" dense color="negative" label="delete" @click="
-  idDelete = props.value;
-showDelete = true;
-                " />
+                <q-btn
+                  style="width: 60px"
+                  dense
+                  color="negative"
+                  label="delete"
+                  @click="
+                    idDelete = props.value;
+                    showDelete = true;
+                  "
+                />
               </div>
             </q-td>
           </template>
 
           <template v-slot:body-cell-available="props">
             <q-td :props="props">
-              <q-icon v-show="props.value" name="fas fa-check" color="positive" size="16px" />
+              <q-icon
+                v-show="props.value"
+                name="fas fa-check"
+                color="positive"
+                size="16px"
+              />
             </q-td>
           </template>
 
@@ -485,25 +739,32 @@ showDelete = true;
           <template v-slot:body-cell-skill="props">
             <q-td :props="props">
               <div v-if="props.value?.length">
-                <div v-for="(item, index) in props.value.slice(0, 3)" :key="index">
+                <div
+                  v-for="(item, index) in props.value.slice(0, 3)"
+                  :key="index"
+                >
                   <q-badge :color="index % 2 == 0 ? 'blue-10' : 'teal-8'">
-                    <span style="font-size: 14px">{{ props?.value[index].categoryName }}:</span>
+                    <span style="font-size: 14px"
+                      >{{ props?.value[index].categoryName }}:</span
+                    >
                   </q-badge>
                   <span>
                     {{
-                        props?.value[index]?.technologies[0]?.name
-                          ? ` ${props?.value[index]?.technologies[0]?.name},`
-                          : ""
+                      props?.value[index]?.technologies[0]?.name
+                        ? ` ${props?.value[index]?.technologies[0]?.name},`
+                        : ""
                     }}{{
-    props?.value[index]?.technologies[1]?.name
-      ? ` ${props?.value[index]?.technologies[1]?.name},`
-      : ""
-}}{{
-    props?.value[index]?.technologies[2]?.name
-      ? ` ${props?.value[index]?.technologies[2]?.name},`
-      : ""
-}}
-                    <span v-show="props?.value[index]?.technologies.length">...</span>
+                      props?.value[index]?.technologies[1]?.name
+                        ? ` ${props?.value[index]?.technologies[1]?.name},`
+                        : ""
+                    }}{{
+                      props?.value[index]?.technologies[2]?.name
+                        ? ` ${props?.value[index]?.technologies[2]?.name},`
+                        : ""
+                    }}
+                    <span v-show="props?.value[index]?.technologies.length"
+                      >...</span
+                    >
                   </span>
                 </div>
               </div>
@@ -540,8 +801,8 @@ export default defineComponent({
       labelColorFocus: ["white", "white", "white", "white"],
       labelNameFocus: ["Staff ID", "", "Full Name", "Skills"],
 
-      widthOfStaffId: "110px",
-      widthOfOffice: "100px",
+      widthOfStaffId: "100px",
+      widthOfPosition: "120px",
       widthOfFullName: "130px",
       widthOfSkill: "150px",
 
@@ -563,7 +824,7 @@ export default defineComponent({
 
       filter: {
         staffId: null,
-        officeId: null,
+        positionId: null,
         firstName: null,
         available: false,
         technologyId: [],
@@ -581,8 +842,8 @@ export default defineComponent({
         totalPages: 0,
       },
 
-      tempListOffice: [],
-      listOffice: [],
+      tempListPosition: [],
+      listPosition: [],
       tempListSkill: [],
       listSkill: [],
       listEmployee: [],
@@ -600,10 +861,10 @@ export default defineComponent({
           field: "staffId",
         },
         {
-          name: "office",
+          name: "position",
           align: "left",
-          label: "Office",
-          field: (row) => row.office.name,
+          label: "Position",
+          field: (row) => row.position.name,
         },
         {
           name: "avatar",
@@ -743,10 +1004,10 @@ export default defineComponent({
         this.loadingData = false;
       }
     },
-    async getOffice() {
+    async getPosition() {
       // Request API
       let result = await api
-        .get("/api/v1/office")
+        .get("/api/v1/position")
         .then((response) => {
           return response.data;
         })
@@ -763,7 +1024,7 @@ export default defineComponent({
         });
 
       if (result.success) {
-        this.listOffice = result.resource;
+        this.listPosition = result.resource;
       } else {
         this.$q.notify({
           type: "negative",
@@ -778,7 +1039,8 @@ export default defineComponent({
       // Request API
       let result = await api
         .get(
-          `/api/v1/technology/search?filterName=${!keyword ? "" : keyword.trim()
+          `/api/v1/technology/search?filterName=${
+            !keyword ? "" : keyword.trim()
           }`
         )
         .then((response) => {
@@ -827,13 +1089,13 @@ export default defineComponent({
       if (text.length > 20) return `${text.slice(0, 20)}...`;
       else return text;
     },
-    filterOffice(val, update, abort) {
+    filterPosition(val, update, abort) {
       update(() => {
         if (!val) {
-          this.tempListOffice = this.listOffice.slice(0, 5);
+          this.tempListPosition = this.listPosition.slice(0, 5);
         } else {
           let needle = val.toLowerCase();
-          this.tempListOffice = this.listOffice.filter(
+          this.tempListPosition = this.listPosition.filter(
             (v) => v.name.toLowerCase().indexOf(needle) > -1
           );
         }
@@ -975,7 +1237,7 @@ export default defineComponent({
 
     await Promise.all([
       this.getEmployee(),
-      this.getOffice(),
+      this.getPosition(),
       this.findTechnology(false, true),
     ]);
   },
@@ -988,8 +1250,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 .container {
   position: relative;
+
   .table-component {
     position: relative;
+
     .table-content {
       /* height or max-height is important */
       height: 600px;
@@ -1041,7 +1305,6 @@ export default defineComponent({
 
 <style lang="scss">
 .table-content {
-
   .q-table__top,
   .q-table__bottom,
   thead tr:first-child th {

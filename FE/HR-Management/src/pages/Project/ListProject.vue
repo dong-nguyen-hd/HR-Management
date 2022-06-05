@@ -361,7 +361,7 @@
           <template v-slot:body-cell-available="props">
             <q-td :props="props">
               <q-icon
-                v-show="props.value"
+                v-show="!props.value"
                 name="fas fa-check"
                 color="positive"
                 size="16px"
@@ -476,7 +476,7 @@ export default defineComponent({
           name: "available",
           align: "center",
           label: "Available",
-          field: "available",
+          field: "isFinished",
         },
         {
           name: "action",
@@ -539,11 +539,13 @@ export default defineComponent({
         });
 
       if (result.success) {
-        this.listGroup.pop();
+        if(this.listGroup.length >= 10) this.listGroup.pop();
         this.listGroup.unshift(result.resource);
         this.listGroup.forEach((row, index) => {
           row.index = index + 1;
         });
+
+        this.show = false;
 
         this.$q.notify({
           type: "positive",
@@ -556,7 +558,6 @@ export default defineComponent({
         });
       }
 
-      this.show = false;
       this.groupProcess = false;
     },
     openEdit(id) {
@@ -567,7 +568,7 @@ export default defineComponent({
       this.groupResource.teamSize = this.editObj.teamSize;
       this.groupResource.startDate = this.editObj.startDate;
       this.groupResource.endDate = this.editObj.endDate;
-      this.groupResource.technologies = this.editObj.technologies.map(
+      this.groupResource.technologies = this.editObj.technologies?.map(
         (x) => x.id
       );
       // Map list technology
@@ -619,6 +620,8 @@ export default defineComponent({
         this.listGroup[index] = result.resource;
         this.listGroup[index].index = rowNumber;
 
+        this.show = false;
+
         this.$q.notify({
           type: "positive",
           message: "Successfully updated",
@@ -629,8 +632,7 @@ export default defineComponent({
           message: result.message[0],
         });
       }
-
-      this.show = false;
+      
       this.groupProcess = false;
     },
     async filterTechnology(val, update, abort) {

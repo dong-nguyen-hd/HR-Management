@@ -127,15 +127,15 @@
               @click="isShowInfor = false"
               clickable
               v-ripple
-              to="/office"
+              to="/position"
               exact
               active-class="isActive"
               class="q-pl-lg"
             >
               <q-item-section avatar>
-                <q-icon name="apartment" />
+                <q-icon name="badge" />
               </q-item-section>
-              <q-item-section>Office</q-item-section>
+              <q-item-section>Position</q-item-section>
             </q-item>
 
           </q-list>

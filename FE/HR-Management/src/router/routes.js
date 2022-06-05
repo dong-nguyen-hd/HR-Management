@@ -30,9 +30,9 @@ const routes = [
         component: () => import("pages/Category/Category.vue"),
       },
       {
-        name: "Office",
-        path: "/office",
-        component: () => import("pages/Office/Office.vue"),
+        name: "Position",
+        path: "/position",
+        component: () => import("pages/Position/Position.vue"),
       },
       {
         name: "List Project",

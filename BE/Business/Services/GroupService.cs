@@ -41,11 +41,40 @@ namespace Business.Services
                 await _groupRepository.InsertAsync(tempGroup);
                 await UnitOfWork.CompleteAsync();
 
-                return new BaseResponse<GroupResource>(Mapper.Map<Group, GroupResource>(tempGroup));
+                // Mapping
+                var totalTechnology = await _technologyService.GetAllAsync();
+                var tempResource = ConvertGroupResource(totalTechnology.Resource, tempGroup);
+
+                return new BaseResponse<GroupResource>(tempResource);
             }
             catch (Exception ex)
             {
                 throw new MessageResultException(ResponseMessage.Values["Group_Saving_Error"], ex);
+            }
+        }
+
+        public override async Task<BaseResponse<GroupResource>> UpdateAsync(int id, UpdateGroupResource updateGroupResource)
+        {
+            try
+            {
+                // Validate Id is existent?
+                var tempGroup = await _groupRepository.GetByIdAsync(id);
+                if (tempGroup is null)
+                    return new BaseResponse<GroupResource>(ResponseMessage.Values["Group_NoData"]);
+
+                // Update infomation
+                Mapper.Map(updateGroupResource, tempGroup);
+                await UnitOfWork.CompleteAsync();
+
+                // Mapping
+                var totalTechnology = await _technologyService.GetAllAsync();
+                var tempResource = ConvertGroupResource(totalTechnology.Resource, tempGroup);
+
+                return new BaseResponse<GroupResource>(tempResource);
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["Group_Updating_Error"], ex);
             }
         }
 

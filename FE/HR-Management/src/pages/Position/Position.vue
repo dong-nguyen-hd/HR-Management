@@ -27,18 +27,18 @@
               flat
               label="Delete"
               color="negative"
-              @click="deleteOffice"
+              @click="deletePosition"
               :loading="deleteProcess"
             />
           </q-card-actions>
         </q-card>
       </q-dialog>
 
-      <q-dialog v-model="showOffice" :persistent="getPersistentOffice">
+      <q-dialog v-model="showPosition" :persistent="getPersistentPosition">
         <q-card style="width: 400px">
           <q-card-section class="row items-center">
-            <span v-show="!showEdit" class="text-h6">Add Office</span>
-            <span v-show="showEdit" class="text-h6">Edit Office</span>
+            <span v-show="!showEdit" class="text-h6">Add Position</span>
+            <span v-show="showEdit" class="text-h6">Edit Position</span>
           </q-card-section>
 
           <q-separator />
@@ -50,7 +50,7 @@
                 standout
                 clearable
                 maxlength="250"
-                v-model="tempOfficeResource.name"
+                v-model="tempPositionResource.name"
                 type="text"
                 label="Name:"
                 :label-color="colorFocusCategory[0]"
@@ -62,31 +62,12 @@
               >
               </q-input>
             </div>
-
-            <div class="q-mt-sm">
-              <q-input
-                ref="addCategoryTwoRef"
-                standout
-                clearable
-                maxlength="250"
-                v-model="tempOfficeResource.address"
-                type="text"
-                label="Address:"
-                :label-color="colorFocusCategory[1]"
-                @focus="colorFocusCategory[1] = 'white'"
-                @blur="colorFocusCategory[1] = ''"
-                :rules="[(val) => !!val || 'Address is required']"
-                lazy-rules="ondemand"
-                hide-bottom-space
-              >
-              </q-input>
-            </div>
           </q-card-section>
 
           <q-card-actions align="right">
             <q-btn
               flat
-              :disable="officeProcess"
+              :disable="positionProcess"
               label="Cancel"
               color="primary"
               v-close-popup
@@ -96,16 +77,16 @@
               flat
               label="Add"
               color="info"
-              @click="addOffice"
-              :loading="officeProcess"
+              @click="addPosition"
+              :loading="positionProcess"
             />
             <q-btn
               v-show="showEdit"
               flat
               label="Edit"
               color="info"
-              @click="editOffice"
-              :loading="officeProcess"
+              @click="editPosition"
+              :loading="positionProcess"
             />
           </q-card-actions>
         </q-card>
@@ -114,13 +95,13 @@
       <div class="table-component full-height full-width flex flex-center">
         <div class="q-mb-md full-width" style="height: 36px">
           <div class="full-width flex justify-end q-pr-md">
-            <q-btn color="primary" label="New Office" @click="openAddOffice" />
+            <q-btn color="primary" label="New Position" @click="openAddPosition" />
           </div>
         </div>
 
         <q-table
           class="table-content q-mx-md"
-          :rows="tempListOffice"
+          :rows="tempListPosition"
           :columns="headerTable"
           row-key="id"
           flat
@@ -134,7 +115,7 @@
             <q-th :props="props">
               <div :style="`min-width: ${widthName}`">
                 <q-input
-                  @update:model-value="filterNameOffice"
+                  @update:model-value="filterNamePosition"
                   dark
                   dense
                   standout
@@ -161,47 +142,7 @@
                       class="cursor-pointer"
                       @click="
                         filterModel.name = '';
-                        filterNameOffice();
-                      "
-                    />
-                  </template>
-                </q-input>
-              </div>
-            </q-th>
-          </template>
-
-          <template v-slot:header-cell-address="props">
-            <q-th :props="props">
-              <div :style="`min-width: ${widthAddress}`">
-                <q-input
-                  @update:model-value="filterAddressOffice"
-                  dark
-                  dense
-                  standout
-                  v-model="filterModel.address"
-                  input-class="text-right"
-                  :label="labelNameFocus[1]"
-                  :label-color="labelColorFocus[1]"
-                  @focus="
-                    labelColorFocus[1] = 'black';
-                    labelNameFocus[1] = 'Search by address';
-                    widthAddress = '154px';
-                  "
-                  @blur="
-                    labelColorFocus[1] = 'white';
-                    labelNameFocus[1] = props.col.label;
-                    widthAddress = '110px';
-                  "
-                >
-                  <template v-slot:append>
-                    <q-icon v-if="!filterModel.address" name="search" />
-                    <q-icon
-                      v-else
-                      name="clear"
-                      class="cursor-pointer"
-                      @click="
-                        filterModel.address = '';
-                        filterAddressOffice();
+                        filterNamePosition();
                       "
                     />
                   </template>
@@ -219,7 +160,7 @@
                   color="white"
                   text-color="black"
                   label="Edit"
-                  @click="openEditOffice(props.value)"
+                  @click="openEditPosition(props.value)"
                 />
               </div>
               <div class="q-mt-sm">
@@ -253,7 +194,7 @@ import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
 
 export default defineComponent({
-  name: "Office",
+  name: "Position",
 
   data() {
     return {
@@ -262,7 +203,6 @@ export default defineComponent({
       labelNameFocus: ["Category", "Skills"],
 
       widthName: "130px",
-      widthAddress: "110px",
 
       loadingData: false,
 
@@ -270,20 +210,18 @@ export default defineComponent({
       idDelete: null,
       deleteProcess: false,
 
-      showOffice: false,
-      officeProcess: false,
+      showPosition: false,
+      positionProcess: false,
 
       idEdit: null,
       showEdit: false,
 
-      tempOfficeResource: {
+      tempPositionResource: {
         name: "",
-        address: "",
       },
 
       filterModel: {
         name: "",
-        address: "",
       },
 
       pagination: {
@@ -291,8 +229,8 @@ export default defineComponent({
         rowsPerPage: 10,
       },
 
-      tempListOffice: [],
-      listOffice: [],
+      tempListPosition: [],
+      listPosition: [],
       headerTable: [
         {
           name: "index",
@@ -307,12 +245,6 @@ export default defineComponent({
           field: (row) => row.name,
         },
         {
-          name: "address",
-          align: "left",
-          label: "Address",
-          field: (row) => row.address,
-        },
-        {
           name: "action",
           align: "center",
           label: "Actions",
@@ -324,7 +256,7 @@ export default defineComponent({
   methods: {
     ...mapActions("auth", ["validateToken"]),
 
-    async getAllOffice() {
+    async getAllPosition() {
       try {
         this.loadingData = true;
 
@@ -333,7 +265,7 @@ export default defineComponent({
 
         // Request API
         let result = await api
-          .get(`/api/v1/office`)
+          .get(`/api/v1/position`)
           .then((response) => {
             return response.data;
           })
@@ -350,13 +282,13 @@ export default defineComponent({
           });
 
         if (result.success) {
-          this.listOffice = [...result.resource];
+          this.listPosition = [...result.resource];
 
-          this.listOffice.forEach((row, index) => {
+          this.listPosition.forEach((row, index) => {
             row.index = index + 1;
           });
 
-          this.tempListOffice = [...this.listOffice];
+          this.tempListPosition = [...this.listPosition];
         } else {
           this.$q.notify({
             type: "negative",
@@ -367,59 +299,33 @@ export default defineComponent({
         this.loadingData = false;
       }
     },
-    filterNameOffice(val) {
-      let nameOfficeSearch = val ? val?.trim().toUpperCase() : null;
-      let addressOfficeSearch = this.filterModel?.address?.trim().toUpperCase();
+    filterNamePosition(val) {
+      let namePositionSearch = val ? val?.trim().toUpperCase() : null;
+      let addressPositionSearch = this.filterModel?.address?.trim().toUpperCase();
 
-      if (nameOfficeSearch && addressOfficeSearch) {
-        this.tempListOffice = this.listOffice.filter(
+      if (namePositionSearch && addressPositionSearch) {
+        this.tempListPosition = this.listPosition.filter(
           (x) =>
-            x.name?.toUpperCase().includes(nameOfficeSearch) &&
-            x.address?.toUpperCase().includes(addressOfficeSearch)
+            x.name?.toUpperCase().includes(namePositionSearch) &&
+            x.address?.toUpperCase().includes(addressPositionSearch)
         );
-      } else if (nameOfficeSearch) {
-        this.tempListOffice = this.listOffice.filter((x) =>
-          x.name?.toUpperCase().includes(nameOfficeSearch)
+      } else if (namePositionSearch) {
+        this.tempListPosition = this.listPosition.filter((x) =>
+          x.name?.toUpperCase().includes(namePositionSearch)
         );
-      } else if (addressOfficeSearch) {
-        this.tempListOffice = this.listOffice.filter((x) =>
-          x.address?.toUpperCase().includes(addressOfficeSearch)
+      } else if (addressPositionSearch) {
+        this.tempListPosition = this.listPosition.filter((x) =>
+          x.address?.toUpperCase().includes(addressPositionSearch)
         );
-      } else if (!nameOfficeSearch && !addressOfficeSearch) {
-        this.tempListOffice = [...this.listOffice];
+      } else if (!namePositionSearch && !addressPositionSearch) {
+        this.tempListPosition = [...this.listPosition];
       }
 
-      this.tempListOffice.forEach((row, index) => {
+      this.tempListPosition.forEach((row, index) => {
         row.index = index + 1;
       });
     },
-    filterAddressOffice(val) {
-      let addressOfficeSearch = val ? val?.trim().toUpperCase() : null;
-      let nameOfficeSearch = this.filterModel?.name?.trim().toUpperCase();
-
-      if (nameOfficeSearch && addressOfficeSearch) {
-        this.tempListOffice = this.listOffice.filter(
-          (x) =>
-            x.name?.toUpperCase().includes(nameOfficeSearch) &&
-            x.address?.toUpperCase().includes(addressOfficeSearch)
-        );
-      } else if (addressOfficeSearch) {
-        this.tempListOffice = this.listOffice.filter((x) =>
-          x.address?.toUpperCase().includes(addressOfficeSearch)
-        );
-      } else if (nameOfficeSearch) {
-        this.tempListOffice = this.listOffice.filter((x) =>
-          x.name?.toUpperCase().includes(nameOfficeSearch)
-        );
-      } else if (!nameOfficeSearch && !addressOfficeSearch) {
-        this.tempListOffice = [...this.listOffice];
-      }
-
-      this.tempListOffice.forEach((row, index) => {
-        row.index = index + 1;
-      });
-    },
-    async deleteOffice() {
+    async deletePosition() {
       try {
         this.deleteProcess = true;
 
@@ -428,7 +334,7 @@ export default defineComponent({
 
         // Request API
         let result = await api
-          .delete(`/api/v1/office/${this.idDelete}`)
+          .delete(`/api/v1/position/${this.idDelete}`)
           .then((response) => {
             return response.data;
           })
@@ -445,17 +351,17 @@ export default defineComponent({
           });
 
         if (result.success) {
-          let index = this.listOffice.findIndex((x) => x.id == this.idDelete);
-          let indexTemp = this.tempListOffice.findIndex(
+          let index = this.listPosition.findIndex((x) => x.id == this.idDelete);
+          let indexTemp = this.tempListPosition.findIndex(
             (x) => x.id == this.idDelete
           );
 
           // Original object
-          this.listOffice.splice(index, 1);
+          this.listPosition.splice(index, 1);
           // Temp object
-          this.tempListOffice.splice(indexTemp, 1);
+          this.tempListPosition.splice(indexTemp, 1);
 
-          this.tempListOffice.forEach((row, index) => {
+          this.tempListPosition.forEach((row, index) => {
             row.index = index + 1;
           });
 
@@ -476,22 +382,21 @@ export default defineComponent({
         this.showDelete = false;
       }
     },
-    async addOffice() {
+    async addPosition() {
       try {
         if (
-          !this.$refs.addCategoryOneRef.validate() ||
-          !this.$refs.addCategoryTwoRef.validate()
+          !this.$refs.addCategoryOneRef.validate()
         )
           return null;
 
-        this.officeProcess = true;
+        this.positionProcess = true;
 
         let isValid = await this.validateToken();
         if (!isValid) this.$router.replace("/login");
 
         // Request API
         let result = await api
-          .post(`/api/v1/office`, this.tempOfficeResource)
+          .post(`/api/v1/position`, this.tempPositionResource)
           .then((response) => {
             return response.data;
           })
@@ -508,15 +413,14 @@ export default defineComponent({
           });
 
         if (result.success) {
-          this.tempListOffice.unshift(result.resource);
-          this.listOffice.push(result.resource);
+          this.tempListPosition.unshift(result.resource);
+          this.listPosition.push(result.resource);
 
-          this.tempListOffice.forEach((row, index) => {
+          this.tempListPosition.forEach((row, index) => {
             row.index = index + 1;
           });
 
-          this.tempOfficeResource.name = "";
-          this.tempOfficeResource.address = "";
+          this.tempPositionResource.name = "";
 
           this.$q.notify({
             type: "positive",
@@ -529,33 +433,31 @@ export default defineComponent({
           });
         }
       } finally {
-        this.officeProcess = false;
+        this.positionProcess = false;
       }
     },
-    openAddOffice() {
+    openAddPosition() {
       this.showEdit = false;
 
-      this.tempOfficeResource.name = "";
-      this.tempOfficeResource.address = "";
+      this.tempPositionResource.name = "";
 
-      this.showOffice = true;
+      this.showPosition = true;
     },
-    async editOffice() {
+    async editPosition() {
       try {
         if (
-          !this.$refs.addCategoryOneRef.validate() ||
-          !this.$refs.addCategoryTwoRef.validate()
+          !this.$refs.addCategoryOneRef.validate()
         )
           return null;
 
-        this.officeProcess = true;
+        this.positionProcess = true;
 
         let isValid = await this.validateToken();
         if (!isValid) this.$router.replace("/login");
 
         // Request API
         let result = await api
-          .put(`/api/v1/office/${this.idEdit}`, this.tempOfficeResource)
+          .put(`/api/v1/position/${this.idEdit}`, this.tempPositionResource)
           .then((response) => {
             return response.data;
           })
@@ -572,19 +474,17 @@ export default defineComponent({
           });
 
         if (result.success) {
-          let index = this.listOffice.findIndex((x) => x.id == this.idEdit);
-          let indexTemp = this.tempListOffice.findIndex(
+          let index = this.listPosition.findIndex((x) => x.id == this.idEdit);
+          let indexTemp = this.tempListPosition.findIndex(
             (x) => x.id == this.idEdit
           );
 
           // Original object
-          this.listOffice[index].name = result.resource.name;
-          this.listOffice[index].address = result.resource.address;
+          this.listPosition[index].name = result.resource.name;
           // Temp object
-          this.tempListOffice[indexTemp].name = result.resource.name;
-          this.tempListOffice[indexTemp].address = result.resource.address;
+          this.tempListPosition[indexTemp].name = result.resource.name;
 
-          this.showOffice = false;
+          this.showPosition = false;
 
           this.$q.notify({
             type: "positive",
@@ -597,37 +497,34 @@ export default defineComponent({
           });
         }
       } finally {
-        this.officeProcess = false;
+        this.positionProcess = false;
       }
     },
-    openEditOffice(id) {
+    openEditPosition(id) {
       this.idEdit = id;
       this.showEdit = true;
-      let tempOffice = this.tempListOffice.find((x) => x.id == id);
+      let tempPosition = this.tempListPosition.find((x) => x.id == id);
 
-      this.tempOfficeResource.name = tempOffice.name;
-      this.tempOfficeResource.address = tempOffice.address;
+      this.tempPositionResource.name = tempPosition.name;
 
-      this.showOffice = true;
+      this.showPosition = true;
     },
   },
   computed: {
     getNameDelete() {
-      let tempCategory = this.listOffice.filter((x) => x.id == this.idDelete);
+      let tempCategory = this.listPosition.filter((x) => x.id == this.idDelete);
 
       return tempCategory[0]?.name;
     },
-    getPersistentOffice() {
-      return this.tempOfficeResource.name || this.tempOfficeResource.address
-        ? true
-        : false;
+    getPersistentPosition() {
+      return this.tempPositionResource.name ? true : false;
     },
   },
   async created() {
     let isValid = await this.validateToken();
     if (!isValid) this.$router.replace("/login");
 
-    await Promise.all([this.getAllOffice()]);
+    await Promise.all([this.getAllPosition()]);
   },
   mounted() {
     const $q = useQuasar();
