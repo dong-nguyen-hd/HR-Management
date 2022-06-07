@@ -15,6 +15,9 @@ namespace Business.Resources.Person
         [Display(Name = "Office Id")]
         public int? PositionId { get; set; }
 
+        [Display(Name = "Last Day")]
+        public DateTime? LastDay { get; set; }
+
         public bool Available { get; set; }
 
         [Display(Name = "Technology Id")]

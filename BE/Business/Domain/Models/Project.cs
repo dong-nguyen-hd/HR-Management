@@ -10,7 +10,7 @@
         public int OrderIndex { get; set; }
         public bool IsDeleted { get; set; }
         public int PersonId { get; set; }
-        public Person People { get; set; }
+        public Person Person { get; set; }
         public int GroupId { get; set; }
         public Group Group { get; set; }
     }

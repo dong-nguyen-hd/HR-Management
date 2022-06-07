@@ -29,6 +29,16 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Person>> GetListPersonByGroupIdAsync(int groupId)
+        {
+            var projectQueryable = Context.Projects.Where(x => x.Group.Id == groupId).Select(x => x.PersonId);
+
+            var temp = Context.People.Where(x => projectQueryable.Contains(x.Id));
+            Console.WriteLine($"SQl Query: {temp.ToQueryString()}"); // Debug performance of sql query
+
+            return await temp.ToListAsync();
+        }
+
         public async Task<(IEnumerable<Group> records, int total)> GetPaginationAsync(QueryResource pagination, FilterGroupResource filterResource)
         {
             var queryable = ConditionFilter(filterResource);
@@ -55,6 +65,9 @@ namespace Infrastructure.Repositories
                     string name = filterResource.Name.RemoveSpaceCharacter().ToLower();
                     queryable = queryable.Where(x => x.Name.Contains(name));
                 }
+
+                if (filterResource.LastDay != null)
+                    queryable = queryable.Where(x => x.EndDate != null || (DateTime.Compare((DateTime)x.EndDate, (DateTime)filterResource.LastDay) < 0));
 
                 if (filterResource.Available)
                     queryable = queryable.Where(x => x.EndDate == null);

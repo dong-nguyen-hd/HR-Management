@@ -8,5 +8,8 @@ namespace Business.Resources.Group
         public string Name { get; set; }
 
         public bool Available { get; set; }
+
+        [Display(Name = "Last Day")]
+        public DateTime? LastDay { get; set; }
     }
 }

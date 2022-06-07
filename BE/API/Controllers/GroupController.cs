@@ -6,6 +6,7 @@ using Business.Domain.Services;
 using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Group;
+using Business.Resources.Person;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -70,6 +71,23 @@ namespace API.Controllers
                 return NoContent();
 
             return Ok(new BaseResponse<IEnumerable<GroupResource>>(Mapper.Map<IEnumerable<Group>, IEnumerable<GroupResource>>(result)));
+        }
+
+        [HttpGet("list-person/{id:int}")]
+        [Authorize(Roles = "editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetListEmployeeByGroupIdAsync(int id)
+        {
+            Log.Information($"{User.Identity?.Name}: get list person with group-id is {id}.");
+
+            var result = await _groupRepository.GetListPersonByGroupIdAsync(id);
+
+            if (result is null)
+                return NoContent();
+
+            return Ok(new BaseResponse<IEnumerable<PersonResourceView>>(Mapper.Map<IEnumerable<Person>, IEnumerable<PersonResourceView>>(result)));
         }
 
         [HttpGet("{id:int}")]

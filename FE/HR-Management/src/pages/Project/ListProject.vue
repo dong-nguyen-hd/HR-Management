@@ -258,7 +258,57 @@
 
       <div class="table-component full-height full-width flex flex-center q-px-md">
         <div class="new-item q-mb-md flex justify-end full-width">
-          <q-btn @click="openInsert" color="primary" label="New Project" />
+          <div class="q-mr-md" v-show="!filter.available">
+              <q-input
+                dense
+                readonly
+                clearable
+                standout
+                v-model="filter.lastDay"
+                type="text"
+                placeholder="YYYY-MM-DD"
+                stack-label
+                label="Day finish project:"
+                label-color="white"
+                bg-color="primary"
+                input-class="text-white"
+                hide-bottom-space
+              >
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer" color="white">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date
+                        v-model="filter.lastDay"
+                        mask="YYYY-MM-DD"
+                        @update:model-value="getGroupWithFilter(false)"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            @click="clearLastDay"
+                            label="Clear"
+                            color="primary"
+                            flat
+                          />
+
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+          <q-btn @click="openInsert" color="primary" label="New Project" unelevated />
         </div>
 
         <q-table
@@ -430,6 +480,7 @@ export default defineComponent({
       filter: {
         name: null,
         available: false,
+        lastDay: null,
       },
 
       pagination: {
@@ -688,6 +739,8 @@ export default defineComponent({
           ? props.pagination
           : { page: 1, rowsPerPage: this.pagination.rowsPerPage };
 
+        if(!this.filter.lastDay) this.filter.lastDay = null;
+
         // Request API
         let result = await api
           .post(
@@ -790,6 +843,11 @@ export default defineComponent({
     validateDate(dateTarget) {
       return date.isValid(dateTarget);
     },
+    async clearLastDay(){
+      this.filter.lastDay = null;
+
+      await this.getGroupWithFilter(false);
+    }
   },
   computed: {
     getNameDelete() {

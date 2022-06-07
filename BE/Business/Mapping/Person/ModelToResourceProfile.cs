@@ -22,6 +22,15 @@ namespace Business.Mapping.Person
                 .ForMember(x => x.Certificate, opt => opt.MapFrom(src => src.Certificates))
                 .ForMember(x => x.CategoryPerson, opt => opt.MapFrom(src => src.CategoryPersons))
                 .ForMember(x => x.Project, opt => opt.MapFrom(src => src.Projects));
+
+            CreateMap<Domain.Models.Person, PersonResourceView>()
+                .ForMember(x => x.Avatar, opt => opt.MapFrom<CustomTwoResolver>())
+                .ForMember(x => x.OrderIndex, opt => opt.MapFrom(src => ConvertList(src.OrderIndex)))
+                .ForMember(x => x.WorkHistory, opt => opt.MapFrom(src => src.WorkHistories))
+                .ForMember(x => x.Education, opt => opt.MapFrom(src => src.Educations))
+                .ForMember(x => x.Certificate, opt => opt.MapFrom(src => src.Certificates))
+                .ForMember(x => x.CategoryPerson, opt => opt.MapFrom(src => src.CategoryPersons))
+                .ForMember(x => x.Project, opt => opt.MapFrom(src => src.Projects));
         }
 
         private static List<int> ConvertList(string resource)
@@ -45,6 +54,7 @@ namespace Business.Mapping.Person
         }
     }
 
+    #region Resolver
     /// <summary>
     /// Custom Value Resolvers
     /// </summary>
@@ -79,4 +89,40 @@ namespace Business.Mapping.Person
         }
         #endregion
     }
+
+    /// <summary>
+    /// Custom Value Resolvers
+    /// </summary>
+    class CustomTwoResolver : IValueResolver<Domain.Models.Person, PersonResourceView, AvatarResource>
+    {
+        #region Property
+        private readonly IUriService _uriService;
+        private readonly HostResource _hostResource;
+        #endregion
+
+        #region Constructor
+        public CustomTwoResolver(IUriService uriService, IOptionsSnapshot<HostResource> hostResource)
+        {
+            this._uriService = uriService;
+            this._hostResource = hostResource.Value;
+        }
+        #endregion
+
+        #region Method
+        public AvatarResource Resolve(Domain.Models.Person source, PersonResourceView destination, AvatarResource destMember, ResolutionContext context)
+        {
+            if (!string.IsNullOrEmpty(source.Avatar))
+            {
+                return new AvatarResource
+                {
+                    Thumbnail = _uriService.GetRouteUri($"{_hostResource.ThumbnailImagePath}{source.Avatar}"),
+                    Original = _uriService.GetRouteUri($"{_hostResource.OriginalImagePath}{source.Avatar}"),
+                };
+            }
+
+            return null;
+        }
+        #endregion
+    }
+    #endregion
 }
