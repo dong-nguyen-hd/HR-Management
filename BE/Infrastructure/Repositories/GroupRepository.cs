@@ -33,10 +33,20 @@ namespace Infrastructure.Repositories
         {
             var projectQueryable = Context.Projects.Where(x => x.Group.Id == groupId).Select(x => x.PersonId);
 
-            var temp = Context.People.Where(x => projectQueryable.Contains(x.Id));
-            Console.WriteLine($"SQl Query: {temp.ToQueryString()}"); // Debug performance of sql query
-
-            return await temp.ToListAsync();
+            return await Context.People.Where(x => projectQueryable.Contains(x.Id))
+                .AsNoTracking()
+                .AsSplitQuery()
+                .OrderByDescending(x => x.StaffId)
+                .Include(y => y.Position)
+                .Include(y => y.WorkHistories.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.CategoryPersons.OrderByDescending(z => z.OrderIndex))
+                .ThenInclude(z => z.Category)
+                .Include(y => y.Educations.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.Certificates.OrderByDescending(z => z.OrderIndex))
+                .Include(y => y.Group)
+                .Include(y => y.Projects.OrderByDescending(z => z.OrderIndex))
+                .ThenInclude(z => z.Group)
+                .ToListAsync();
         }
 
         public async Task<(IEnumerable<Group> records, int total)> GetPaginationAsync(QueryResource pagination, FilterGroupResource filterResource)

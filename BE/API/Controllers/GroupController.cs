@@ -73,12 +73,12 @@ namespace API.Controllers
             return Ok(new BaseResponse<IEnumerable<GroupResource>>(Mapper.Map<IEnumerable<Group>, IEnumerable<GroupResource>>(result)));
         }
 
-        [HttpGet("list-person/{id:int}")]
+        [HttpGet("list-person-view/{id:int}")]
         [Authorize(Roles = "editor, admin")]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetListEmployeeByGroupIdAsync(int id)
+        public async Task<IActionResult> GetListPersonForViewAsync(int id)
         {
             Log.Information($"{User.Identity?.Name}: get list person with group-id is {id}.");
 
@@ -88,6 +88,23 @@ namespace API.Controllers
                 return NoContent();
 
             return Ok(new BaseResponse<IEnumerable<PersonResourceView>>(Mapper.Map<IEnumerable<Person>, IEnumerable<PersonResourceView>>(result)));
+        }
+
+        [HttpGet("list-person-edit/{id:int}")]
+        [Authorize(Roles = "editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetListPersonForEditAsync(int id)
+        {
+            Log.Information($"{User.Identity?.Name}: get list person with group-id is {id}.");
+
+            var result = await _groupRepository.GetListPersonByGroupIdAsync(id);
+
+            if (result is null)
+                return NoContent();
+
+            return Ok(new BaseResponse<IEnumerable<PersonResource>>(Mapper.Map<IEnumerable<Person>, IEnumerable<PersonResource>>(result)));
         }
 
         [HttpGet("{id:int}")]
