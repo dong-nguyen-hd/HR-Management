@@ -306,7 +306,7 @@
                         color="white"
                         text-color="black"
                         label="Edit"
-                        @click="openEdit(props.value)"
+                        @click="openEditEmployee(props.value)"
                       />
                     </div>
                   </q-td>
@@ -701,6 +701,41 @@
         </q-layout>
       </q-dialog>
 
+      <q-dialog v-model="showEditEmployee" persistent full-width full-height>
+        <q-layout view="hHh lpR fFf" container class="bg-white">
+          <q-header class="bg-accent">
+            <q-toolbar>
+              <q-toolbar-title></q-toolbar-title>
+              <q-btn flat round dense icon="close" @click="closeEditEmployeeDialog" />
+            </q-toolbar>
+          </q-header>
+
+          <q-page-container>
+            <q-page>
+              <edit-employee
+                v-if="showEditEmployee"
+                @updateSuccess="updateReceiveEmployee"
+                :statusUpdateTransfer="statusUpdateEmployee"
+                :employeeTransfer="editEmployeeObj"
+              />
+            </q-page>
+          </q-page-container>
+
+          <q-footer class="bg-accent text-white">
+            <q-toolbar class="flex flex-center">
+              <q-btn
+                :loading="statusUpdateEmployee"
+                dense
+                color="primary"
+                label="Save"
+                class="q-px-lg"
+                @click="saveUpdateEmployee"
+              />
+            </q-toolbar>
+          </q-footer>
+        </q-layout>
+      </q-dialog>
+
       <div
         class="table-component full-height full-width flex flex-center q-px-md"
       >
@@ -907,9 +942,14 @@ import { defineComponent } from "vue";
 import { mapActions } from "vuex";
 import { useQuasar, date } from "quasar";
 import { api } from "src/boot/axios";
+import EditEmployee from "src/pages/Employee/EditEmployee.vue";
 
 export default defineComponent({
   name: "List Project",
+
+  components: {
+    "edit-employee": EditEmployee,
+  },
 
   data() {
     return {
@@ -937,6 +977,10 @@ export default defineComponent({
 
       showView: false,
       viewObj: null,
+
+      showEditEmployee: false,
+      editEmployeeObj: null,
+      statusUpdateEmployee: false,
 
       groupResource: {
         name: "",
@@ -1416,6 +1460,65 @@ export default defineComponent({
       if (value == 1) return "Male";
       if (value == 2) return "Female";
       if (value == 3) return "Sexless";
+    },
+    openEditEmployee(id) {
+      this.editEmployeeObj = this.listEmployee.find((x) => x.id == id);
+      this.showEditEmployee = true;
+    },
+    saveUpdateEmployee() {
+      this.statusUpdateEmployee = true;
+    },
+    async updateReceiveEmployee(value) {
+      if (value) {
+        let result = await this.getEmployeeById(this.editEmployeeObj.id);
+
+        this.statusUpdateEmployee = false;
+        this.showEditEmployee = false;
+
+        let index = this.listEmployee.findIndex((x) => x.id == this.editEmployeeObj.id);
+        let numberIndex = this.listEmployee[index].index;
+        this.listEmployee[index] = Object.assign({}, result);
+        this.listEmployee[index].index = numberIndex;
+        this.editEmployeeObj = null;
+      } else {
+        this.statusUpdateEmployee = false;
+      }
+    },
+    async closeEditEmployeeDialog() {
+      let result = await this.getEmployeeById(this.editEmployeeObj.id);
+
+      let index = this.listEmployee.findIndex((x) => x.id == this.editEmployeeObj.id);
+      let numberIndex = this.listEmployee[index].index;
+      this.listEmployee[index] = Object.assign({}, result);
+      this.listEmployee[index].index = numberIndex;
+      this.editEmployeeObj = null;
+
+      this.statusUpdateEmployee = false;
+      this.showEditEmployee = false;
+    },
+    async getEmployeeById(id) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .get(`/api/v1/person/${id}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      return result?.resource;
     },
   },
   computed: {

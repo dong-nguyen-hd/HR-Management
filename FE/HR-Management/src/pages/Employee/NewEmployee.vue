@@ -237,7 +237,7 @@
                 clearable
                 v-model="employeeInfor.groupId"
                 :options="tempListWork"
-                label="Work:"
+                label="Current Project:"
                 option-value="id"
                 option-label="name"
                 emit-value
