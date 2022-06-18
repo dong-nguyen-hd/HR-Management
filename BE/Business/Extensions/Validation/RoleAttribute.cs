@@ -9,6 +9,9 @@ namespace Business.Extensions.Validation
         {
             try
             {
+                if(value is null)
+                    return ValidationResult.Success;
+
                 if (Enum.IsDefined(typeof(eRole), value))
                     return ValidationResult.Success;
                 else

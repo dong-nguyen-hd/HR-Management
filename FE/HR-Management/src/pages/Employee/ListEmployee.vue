@@ -621,7 +621,6 @@
                     labelColorFocus[1] = 'white';
                     widthOfPosition = !filter.positionId ? '120px' : '160px';
                   "
-                  @clear="getEmployeeWithFilter(false)"
                   ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">

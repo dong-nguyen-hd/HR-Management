@@ -47,17 +47,17 @@ namespace Business.Services
             }
         }
 
-        public async Task<PaginationResponse<IEnumerable<AccountResource>>> ListPaginationAsync(QueryResource pagintation)
+        public async Task<PaginationResponse<IEnumerable<AccountResource>>> GetPaginationAsync(QueryResource pagintation, FilterAccountResource filterResource)
         {
-            var tempAccount = await _accountRepository.ListPaginationAsync(pagintation);
-            var totalRecords = await _accountRepository.TotalRecordAsync();
+            var paginationAccount = await _accountRepository.GetPaginationAsync(pagintation, filterResource);
 
             // Mapping
-            var tempResource = Mapper.Map<IEnumerable<Account>, IEnumerable<AccountResource>>(tempAccount);
+            var tempResource = Mapper.Map<IEnumerable<Account>, IEnumerable<AccountResource>>(paginationAccount.records);
 
             var resource = new PaginationResponse<IEnumerable<AccountResource>>(tempResource);
+
             // Using extension-method for pagination
-            resource.CreatePaginationResponse(pagintation, totalRecords);
+            resource.CreatePaginationResponse(pagintation, paginationAccount.total);
 
             return resource;
         }

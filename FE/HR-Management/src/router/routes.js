@@ -39,6 +39,11 @@ const routes = [
         path: "/project",
         component: () => import("pages/Project/ListProject.vue"),
       },
+      {
+        name: "List Account",
+        path: "/list-account-admin",
+        component: () => import("pages/Account/ListAccount.vue"),
+      },
     ],
   },
 

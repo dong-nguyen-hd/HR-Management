@@ -5,7 +5,7 @@ namespace Business.Data
     public enum eRole
     {
         [Description("admin")]
-        Admin,
+        Admin = 1,
 
         [Description("editor")]
         Editor,

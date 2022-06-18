@@ -138,6 +138,22 @@
               <q-item-section>Position</q-item-section>
             </q-item>
 
+            <q-item
+              v-show="getRole == 'admin'"
+              @click="isShowInfor = false"
+              clickable
+              v-ripple
+              to="/list-account-admin"
+              exact
+              active-class="isActive"
+              class="q-pl-lg"
+            >
+              <q-item-section avatar>
+                <q-icon name="account_circle" />
+              </q-item-section>
+              <q-item-section>Account</q-item-section>
+            </q-item>
+
           </q-list>
       </div>
     </q-drawer>
@@ -177,7 +193,7 @@ export default defineComponent({
     },
   },
   computed: {
-    ...mapGetters("auth", ["getInformation"]),
+    ...mapGetters("auth", ["getInformation", "getRole"]),
     showName() {
       if (this.getInformation?.name?.length > 30)
         return `${this.getInformation?.name.slice(0, 30)}...`;

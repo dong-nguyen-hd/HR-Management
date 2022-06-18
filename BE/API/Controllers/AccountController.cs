@@ -93,7 +93,29 @@ namespace API.Controllers
 
             QueryResource pagintation = new QueryResource(page, pageSize);
 
-            var result = await _accountService.ListPaginationAsync(pagintation);
+            var result = await _accountService.GetPaginationAsync(pagintation, null);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            if (result.Resource is null)
+                return NoContent();
+
+            return Ok(result);
+        }
+
+        [HttpPost("pagination")]
+        [Authorize(Roles = "admin")]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetPaginationWithFilterAsync([FromQuery] int page, [FromQuery] int pageSize, [FromBody] FilterAccountResource filterResource)
+        {
+            Log.Information($"{User.Identity?.Name}: get pagination account.");
+
+            QueryResource pagintation = new QueryResource(page, pageSize);
+
+            var result = await _accountService.GetPaginationAsync(pagintation, filterResource);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -109,6 +131,28 @@ namespace API.Controllers
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateAccountResource resource)
+        {
+            Log.Information($"{User.Identity?.Name}: create account is {resource.UserName}.");
+
+            if (resource.Role == (int)eRole.Admin)
+            {
+                if (!User.IsInRole(eRole.Admin.ToDescriptionString()))
+                    return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+            }
+
+            var result = await _accountService.InsertAsync(resource);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return StatusCode(201, result);
+        }
+
+        [HttpPost("modify-group/{id:int}")]
+        [Authorize(Roles = "editor, admin")]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
+        public new async Task<IActionResult> ModifyListGroupAsync(int id, [FromBody] CreateAccountResource resource)
         {
             Log.Information($"{User.Identity?.Name}: create account is {resource.UserName}.");
 
@@ -153,7 +197,7 @@ namespace API.Controllers
         [Authorize(Roles = "admin, editor, viewer")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> SeflUpdateAsync(int id, [FromBody] SelfUpdateAccountResource resource)
+        public async Task<IActionResult> SelfUpdateAsync(int id, [FromBody] SelfUpdateAccountResource resource)
         {
             Log.Information($"{User.Identity?.Name}: self-update account with Id is {id}.");
 

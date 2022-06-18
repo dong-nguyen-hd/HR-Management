@@ -1,7 +1,9 @@
-﻿using Business.Domain.Models;
+﻿using Business.Data;
+using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Business.Extensions;
 using Business.Resources;
+using Business.Resources.Account;
 using Business.Resources.Authentication;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -24,13 +26,39 @@ namespace Infrastructure.Repositories
             return await queryable.SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Account>> ListPaginationAsync(QueryResource pagination) =>
-            await Context.Accounts
-            .AsNoTracking()
-            .OrderBy(x => x.Id)
-            .Skip((pagination.Page - 1) * pagination.PageSize)
-            .Take(pagination.PageSize)
-            .ToListAsync();
+        public async Task<(IEnumerable<Account> records, int total)> GetPaginationAsync(QueryResource pagination, FilterAccountResource filterResource)
+        {
+            var queryable = ConditionFilter(filterResource);
+
+            var total = await queryable.CountAsync();
+
+            var records = await queryable.AsNoTracking()
+                .OrderBy(x => x.UserName)
+                .Skip((pagination.Page - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            return (records, total);
+        }
+
+        private IQueryable<Account> ConditionFilter(FilterAccountResource filterResource)
+        {
+            var queryable = Context.Accounts.AsQueryable();
+
+            if (filterResource != null)
+            {
+                if (!string.IsNullOrEmpty(filterResource.UserName))
+                    queryable = queryable.Where(x => x.UserName.Contains(filterResource.UserName.RemoveSpaceCharacter()));
+
+                if (filterResource.Role != null)
+                {
+                    eRole filterRole = (eRole)filterResource.Role;
+                    queryable = queryable.Where(x => x.Role.Equals(filterRole.ToDescriptionString()));
+                }
+            }
+
+            return queryable;
+        }
 
         public async Task<int> TotalRecordAsync() => await Context.Accounts.CountAsync();
 
