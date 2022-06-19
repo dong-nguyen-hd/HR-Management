@@ -29,5 +29,6 @@ namespace Business.Domain.Repositories
         Task<bool> ValidateUserNameAsync(string userName);
         Task<Account> ValidateCredentialsAsync(LoginResource loginResource);
         Task<Account> GetByIdAsync(int id, bool hasToken);
+        Task<Account> GetByIdIncludeGroupAsync(int accountId);
     }
 }

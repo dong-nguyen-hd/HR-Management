@@ -172,6 +172,108 @@
         </q-card>
       </q-dialog>
 
+      <q-dialog v-model="showProject" persistent full-width>
+        <q-layout view="hHh lpR fFf" container class="bg-white">
+          <q-header class="bg-accent">
+            <q-toolbar class="q-pl-md">
+              <q-toolbar-title></q-toolbar-title>
+              <div style="width: 300px">
+                <q-select
+                  standout
+                  dense
+                  dark
+                  clearable
+                  v-model="tempAddProjectId"
+                  :options="listTempProject"
+                  label="Search by name project"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  @filter="filterWork"
+                  fill-input
+                  hide-selected
+                  use-input
+                  hide-bottom-space
+                  :label-color="labelColorFocus[1]"
+                  @focus="labelColorFocus[1] = 'black'"
+                  @blur="labelColorFocus[1] = 'white'"
+                  ><template v-slot:no-option>
+                    <q-item>
+                      <q-item-section class="text-grey">
+                        No results
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+              <q-btn
+                class="q-ml-sm"
+                icon="add"
+                round
+                unelevated
+                @click="addProject"
+              />
+            </q-toolbar>
+          </q-header>
+
+          <q-page-container>
+            <q-page class="q-pa-md relative-position">
+              <q-table
+                table-style="height: 500px"
+                :rows="listProject"
+                :columns="headerTableProject"
+                :loading="loadingProject"
+                :rows-per-page-options="[10, 15, 20]"
+                row-key="id"
+                dark
+                color="amber"
+              >
+                <template v-slot:body-cell-avatar="props">
+                  <q-td :props="props">
+                    <q-avatar>
+                      <img :src="props.value" />
+                    </q-avatar>
+                  </q-td>
+                </template>
+
+                <template v-slot:body-cell-action="props">
+                  <q-td :props="props">
+                    <div style="display: inline">
+                      <q-btn
+                        style="width: 60px"
+                        dense
+                        color="negative"
+                        text-color="white"
+                        label="Remove"
+                        @click="removeProject(props.value)"
+                      />
+                    </div>
+                  </q-td>
+                </template>
+
+                <template v-slot:loading>
+                  <q-inner-loading showing color="primary" />
+                </template>
+              </q-table>
+            </q-page>
+          </q-page-container>
+
+          <q-footer class="bg-accent text-white">
+            <q-toolbar class="flex flex-center">
+              <q-btn
+                dense
+                color="primary"
+                label="Close"
+                class="q-px-lg"
+                @click="closeProject"
+              />
+            </q-toolbar>
+          </q-footer>
+        </q-layout>
+      </q-dialog>
+
       <div
         class="table-component full-height full-width flex flex-center q-px-md"
       >
@@ -369,6 +471,37 @@ export default defineComponent({
       show: false,
       accountProcess: false,
 
+      showProject: false,
+      loadingProject: false,
+      tempAddAccountId: null,
+      tempAddProjectId: null,
+      headerTableProject: [
+        {
+          name: "index",
+          label: "#",
+          align: "center",
+          field: "index",
+        },
+        {
+          name: "name",
+          align: "left",
+          label: "Name",
+          field: "name",
+        },
+        {
+          name: "description",
+          align: "left",
+          label: "Description",
+          field: "description",
+        },
+        {
+          name: "action",
+          align: "center",
+          label: "Actions",
+          field: (row) => row.id,
+        },
+      ],
+
       tempPwd: "1234@dongnguyen",
       tempAccountResource: {
         userName: "",
@@ -395,6 +528,8 @@ export default defineComponent({
         totalPages: 0,
       },
 
+      listProject: [],
+      listTempProject: [],
       listAccount: [],
       headerTable: [
         {
@@ -483,7 +618,7 @@ export default defineComponent({
           password: MD5(this.tempAccountResource.password).toString(),
           role: this.tempAccountResource.role,
           email: this.tempAccountResource.email,
-        }
+        };
 
         // Request API
         let result = await api
@@ -529,14 +664,140 @@ export default defineComponent({
         this.accountProcess = false;
       }
     },
-    closeModifyPopup(){
+    closeModifyPopup() {
       this.showDelete = false;
       this.showEdit = false;
       this.showInsert = false;
       this.show = false;
     },
-    openProject(id){
-        console.log(id);
+    async openProject(accountId) {
+      try {
+        this.loadingProject = true;
+
+        let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        this.tempAddAccountId = accountId;
+        this.showProject = true;
+
+        // Request API
+        let result = await api
+          .get(`/api/v1/account/with-group/${accountId}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          this.listProject = result.resource.groups;
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } finally {
+        this.loadingProject = false;
+      }
+    },
+    async addProject() {
+       let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        let payload ={
+            accountId: this.tempAddAccountId,
+            groupId: this.tempAddProjectId
+        }
+
+        // Request API
+        let result = await api
+          .post(`/api/v1/group/add-account`, payload)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          if (this.listProject.length >= 10) this.listProject.pop();
+          this.listProject.unshift(result.resource);
+
+          this.listProject.forEach((row, index) => {
+            row.index = index + 1;
+          });
+
+          this.tempAddProjectId = null;
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+    },
+    removeProject(id) {
+      console.log(id);
+    },
+    closeProject() {
+      this.tempAddProjectId = null;
+      this.tempAddAccountId = null;
+      this.showProject = false;
+    },
+    filterWork(val, update, abort) {
+      update(async () => {
+        if (val.length >= 2) await this.findGroup(val);
+      });
+    },
+    async findGroup(keyword) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      // Request API
+      let result = await api
+        .get(
+          `/api/v1/group/search?filterName=${!keyword ? "" : keyword.trim()}`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.listTempProject = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     async getAccount() {
       try {
@@ -725,7 +986,7 @@ export default defineComponent({
           userName: this.tempAccountResource.userName,
           role: this.tempAccountResource.role,
           email: this.tempAccountResource.email,
-        }
+        };
 
         // Request API
         let result = await api

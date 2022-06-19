@@ -90,7 +90,7 @@
               <q-item-section avatar>
                 <q-icon name="summarize" />
               </q-item-section>
-              <q-item-section>List Employee</q-item-section>
+              <q-item-section>Employee</q-item-section>
             </q-item>
 
             <q-item

@@ -17,6 +17,13 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
+        public async Task<Account> GetByIdIncludeGroupAsync(int accountId) =>
+            await Context.Accounts.Where(x => x.Id.Equals(accountId))
+                .AsNoTracking()
+                .AsSplitQuery()
+                .Include(x => x.Groups)
+                .SingleOrDefaultAsync();
+
         public async Task<Account> GetByIdAsync(int id, bool hasToken)
         {
             var queryable = Context.Accounts.Where(x => x.Id.Equals(id));

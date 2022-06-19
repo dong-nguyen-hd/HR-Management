@@ -16,22 +16,50 @@ namespace Business.Services
     {
         #region Constructor
         public GroupService(IGroupRepository groupRepository,
+            IAccountRepository _accountRepository,
             ITechnologyService technologyService,
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(groupRepository, mapper, unitOfWork, responseMessage)
         {
             this._groupRepository = groupRepository;
+            this._accountRepository = _accountRepository;
             this._technologyService = technologyService;
         }
         #endregion
 
         #region Property
         private readonly IGroupRepository _groupRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly ITechnologyService _technologyService;
         #endregion
 
         #region Method
+        public async Task<BaseResponse<GroupResource>> AddGroupToAccountAsync(int accountId, int groupId)
+        {
+            try
+            {
+                // Validate account-Id is existent?
+                var tempAccount = await _accountRepository.GetByIdAsync(accountId);
+                if (tempAccount is null)
+                    return new BaseResponse<GroupResource>(ResponseMessage.Values["Account_NoData"]);
+
+                // Validate group-Id is existent?
+                var tempGroup = await _groupRepository.GetByIdAsync(groupId);
+                if (tempGroup is null)
+                    return new BaseResponse<GroupResource>(ResponseMessage.Values["Group_NoData"]);
+
+                tempAccount.Groups.Add(tempGroup);
+                await UnitOfWork.CompleteAsync();
+
+                return new BaseResponse<GroupResource>(Mapper.Map<Group, GroupResource>(tempGroup));
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["Group_Saving_Error"], ex);
+            }
+        }
+
         public override async Task<BaseResponse<GroupResource>> InsertAsync(CreateGroupResource createGroupResource)
         {
             try

@@ -13,6 +13,7 @@ namespace Business.Mapping.Account
         public ModelToResourceProfile()
         {
             CreateMap<Domain.Models.Account, AccountResource>()
+                .ForMember(x => x.Groups, opt => opt.MapFrom(src => src.Groups))
                 .ForMember(x => x.Avatar, opt => opt.MapFrom<CustomResolver>());
 
             CreateMap<Domain.Models.Account, AccessTokenResource>()

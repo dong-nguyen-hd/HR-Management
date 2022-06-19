@@ -534,7 +534,7 @@
             </q-input>
           </div>
           <q-btn
-            v-show="getRole == 'editor-qtns'"
+            v-show="getRole == 'editor-qtns' || getRole == 'admin'"
             class="q-ml-md"
             @click="openInsert"
             color="primary"

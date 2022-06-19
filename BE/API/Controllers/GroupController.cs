@@ -131,6 +131,23 @@ namespace API.Controllers
             return await base.CreateAsync(resource);
         }
 
+
+        [HttpPost("add-account")]
+        [Authorize(Roles = $"{Role.EditorQTDA}")]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AddGroupToAccountAsync([FromBody] GroupIdResource resource)
+        {
+            Log.Information($"{User.Identity?.Name}: add group-id '{resource.GroupId}' to account-id '{resource.AccountId}'.");
+
+            var result = await _groupService.AddGroupToAccountAsync(resource.AccountId, resource.GroupId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return StatusCode(201, result);
+        }
+
         [HttpPut("{id:int}")]
         [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]

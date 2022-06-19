@@ -8,5 +8,6 @@ namespace Business.Domain.Services
     public interface IGroupService : IBaseService<GroupResource, CreateGroupResource, UpdateGroupResource, Group>
     {
         Task<PaginationResponse<IEnumerable<GroupResource>>> GetPaginationAsync(QueryResource pagination, FilterGroupResource filterResource);
+        Task<BaseResponse<GroupResource>> AddGroupToAccountAsync(int accountId, int groupId);
     }
 }

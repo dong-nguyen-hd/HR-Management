@@ -8,7 +8,6 @@ namespace Business.Domain.Repositories
     {
         Task<IEnumerable<Group>> FindByNameAsync(string filterName);
         Task<(IEnumerable<Group> records, int total)> GetPaginationAsync(QueryResource pagination, FilterGroupResource filterResource);
-
         Task<IEnumerable<Person>> GetListPersonByGroupIdAsync(int groupId);
     }
 }

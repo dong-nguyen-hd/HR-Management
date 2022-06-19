@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Business.Resources.Group;
+using System.ComponentModel.DataAnnotations;
 
 namespace Business.Resources.Account
 {
@@ -16,5 +17,7 @@ namespace Business.Resources.Account
 
         [Display(Name = "Last Activity")]
         public DateTime LastActivity { get; set; }
+
+        public List<GroupResource> Groups { get; set; }
     }
 }

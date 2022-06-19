@@ -2,6 +2,7 @@
 using Business.Communication;
 using Business.Data;
 using Business.Domain.Models;
+using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Extensions;
 using Business.Resources;
@@ -19,16 +20,19 @@ namespace API.Controllers
     {
         #region Property
         private readonly IAccountService _accountService;
+        private readonly IAccountRepository _accountRepository;
         private readonly IImageService _imageService;
         #endregion
 
         #region Constructor
         public AccountController(IAccountService accountService,
+            IAccountRepository accountRepository,
             IImageService imageService,
             IMapper mapper,
             IOptionsMonitor<ResponseMessage> responseMessage) : base(accountService, mapper, responseMessage)
         {
             this._accountService = accountService;
+            this._accountRepository = accountRepository;
             this._imageService = imageService;
         }
         #endregion
@@ -64,6 +68,23 @@ namespace API.Controllers
                 return Ok(result);
 
             return BadRequest(result);
+        }
+
+        [HttpGet("with-group/{id:int}")]
+        [Authorize(Roles = $"{Role.EditorQTDA}")]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetByIdIncludeGroupAsync(int id)
+        {
+            Log.Information($"{User.Identity?.Name}: get account and group data with account-Id is {id}.");
+
+            var result = await _accountRepository.GetByIdIncludeGroupAsync(id);
+
+            if (result is null)
+                return NoContent();
+
+            return Ok(new BaseResponse<AccountResource>(Mapper.Map<Account, AccountResource>(result)));
         }
 
         [HttpPut("reset-avatar/{id:int}")]
@@ -155,28 +176,6 @@ namespace API.Controllers
             Log.Information($"{User.Identity?.Name}: create account is {resource.UserName}.");
 
             resource.Role = (int)eRole.Viewer;
-
-            var result = await _accountService.InsertAsync(resource);
-
-            if (!result.Success)
-                return BadRequest(result);
-
-            return StatusCode(201, result);
-        }
-
-        [HttpPost("modify-group/{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
-        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
-        public new async Task<IActionResult> ModifyListGroupAsync(int id, [FromBody] CreateAccountResource resource)
-        {
-            Log.Information($"{User.Identity?.Name}: create account is {resource.UserName}.");
-
-            if (resource.Role == (int)eRole.Admin)
-            {
-                if (!User.IsInRole(eRole.Admin.ToDescriptionString()))
-                    return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
-            }
 
             var result = await _accountService.InsertAsync(resource);
 
