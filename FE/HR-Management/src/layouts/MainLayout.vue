@@ -94,6 +94,7 @@
             </q-item>
 
             <q-item
+            v-show="getRole == 'admin' || getRole == 'editor-qtda'"
               @click="isShowInfor = false"
               clickable
               v-ripple
@@ -144,6 +145,22 @@
               clickable
               v-ripple
               to="/list-account-admin"
+              exact
+              active-class="isActive"
+              class="q-pl-lg"
+            >
+              <q-item-section avatar>
+                <q-icon name="account_circle" />
+              </q-item-section>
+              <q-item-section>Account</q-item-section>
+            </q-item>
+
+            <q-item
+              v-show="getRole == 'editor-qtda'"
+              @click="isShowInfor = false"
+              clickable
+              v-ripple
+              to="/list-account-qtda"
               exact
               active-class="isActive"
               class="q-pl-lg"

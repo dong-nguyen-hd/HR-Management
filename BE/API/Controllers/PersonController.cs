@@ -116,7 +116,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}")]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreatePersonResource resource)

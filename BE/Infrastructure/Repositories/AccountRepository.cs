@@ -26,9 +26,9 @@ namespace Infrastructure.Repositories
             return await queryable.SingleOrDefaultAsync();
         }
 
-        public async Task<(IEnumerable<Account> records, int total)> GetPaginationAsync(QueryResource pagination, FilterAccountResource filterResource)
+        public async Task<(IEnumerable<Account> records, int total)> GetPaginationAsync(QueryResource pagination, FilterAccountResource filterResource, eRole? role)
         {
-            var queryable = ConditionFilter(filterResource);
+            var queryable = ConditionFilter(filterResource, role);
 
             var total = await queryable.CountAsync();
 
@@ -41,7 +41,7 @@ namespace Infrastructure.Repositories
             return (records, total);
         }
 
-        private IQueryable<Account> ConditionFilter(FilterAccountResource filterResource)
+        private IQueryable<Account> ConditionFilter(FilterAccountResource filterResource, eRole? role)
         {
             var queryable = Context.Accounts.AsQueryable();
 
@@ -55,6 +55,12 @@ namespace Infrastructure.Repositories
                     eRole filterRole = (eRole)filterResource.Role;
                     queryable = queryable.Where(x => x.Role.Equals(filterRole.ToDescriptionString()));
                 }
+            }
+
+            if (role != null)
+            {
+                if (role == eRole.EditorQTDA)
+                    queryable = queryable.Where(x => x.Role.Equals(Role.Viewer));
             }
 
             return queryable;

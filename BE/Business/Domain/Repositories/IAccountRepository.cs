@@ -1,4 +1,5 @@
-﻿using Business.Domain.Models;
+﻿using Business.Data;
+using Business.Domain.Models;
 using Business.Resources;
 using Business.Resources.Account;
 using Business.Resources.Authentication;
@@ -7,7 +8,12 @@ namespace Business.Domain.Repositories
 {
     public interface IAccountRepository : IBaseRepository<Account>
     {
-        Task<(IEnumerable<Account> records, int total)> GetPaginationAsync(QueryResource pagination, FilterAccountResource filterResource);
+        Task<(IEnumerable<Account> records, int total)> GetPaginationAsync(QueryResource pagination, FilterAccountResource filterResource, eRole? role);
+
+        /// <summary>
+        /// Get total account-records in database
+        /// </summary>
+        /// <returns></returns>
         Task<int> TotalRecordAsync();
 
         /// <summary>

@@ -44,6 +44,11 @@ const routes = [
         path: "/list-account-admin",
         component: () => import("pages/Account/ListAccount.vue"),
       },
+      {
+        name: "List Account QTDA",
+        path: "/list-account-qtda",
+        component: () => import("pages/Account/ListAccountQTDA.vue"),
+      },
     ],
   },
 

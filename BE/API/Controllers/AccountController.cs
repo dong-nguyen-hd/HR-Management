@@ -93,7 +93,9 @@ namespace API.Controllers
 
             QueryResource pagintation = new QueryResource(page, pageSize);
 
-            var result = await _accountService.GetPaginationAsync(pagintation, null);
+            var identifier = (User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Role).Value;
+            eRole? currentRole = (eRole)ConvertStringToRole(identifier);
+            var result = await _accountService.GetPaginationAsync(pagintation, null, currentRole);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -115,7 +117,9 @@ namespace API.Controllers
 
             QueryResource pagintation = new QueryResource(page, pageSize);
 
-            var result = await _accountService.GetPaginationAsync(pagintation, filterResource);
+            var identifier = (User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Role).Value;
+            eRole? currentRole = (eRole)ConvertStringToRole(identifier);
+            var result = await _accountService.GetPaginationAsync(pagintation, filterResource, currentRole);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -127,18 +131,30 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateAccountResource resource)
         {
             Log.Information($"{User.Identity?.Name}: create account is {resource.UserName}.");
 
-            if (resource.Role == (int)eRole.Admin)
-            {
-                if (!User.IsInRole(eRole.Admin.ToDescriptionString()))
-                    return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
-            }
+            var result = await _accountService.InsertAsync(resource);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return StatusCode(201, result);
+        }
+
+        [HttpPost("qtda")]
+        [Authorize(Roles = $"{Role.EditorQTDA}")]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
+        public new async Task<IActionResult> CreateAccountViewerAsync([FromBody] CreateAccountResource resource)
+        {
+            Log.Information($"{User.Identity?.Name}: create account is {resource.UserName}.");
+
+            resource.Role = (int)eRole.Viewer;
 
             var result = await _accountService.InsertAsync(resource);
 
@@ -191,6 +207,21 @@ namespace API.Controllers
             Log.Information($"{User.Identity?.Name}: update account with Id is {id}.");
 
             if (id == -1) return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+
+            return await base.UpdateAsync(id, resource);
+        }
+
+        [HttpPut("qtda/{id:int}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
+        public new async Task<IActionResult> UpdateAccountViewerAsync(int id, [FromBody] UpdateAccountResource resource)
+        {
+            Log.Information($"{User.Identity?.Name}: update account with Id is {id}.");
+
+            if (id == -1) return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+
+            resource.Role = (int)eRole.Viewer;
 
             return await base.UpdateAsync(id, resource);
         }
@@ -255,6 +286,22 @@ namespace API.Controllers
             return await base.DeleteAsync(id);
         }
 
+        [HttpDelete("qtda/{id:int}")]
+        [Authorize(Roles = $"{Role.EditorQTDA}")]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
+        public new async Task<IActionResult> DeleteAccountViewerAsync(int id)
+        {
+            Log.Information($"{User.Identity?.Name}: delete account with Id is {id}.");
+
+            var result = await _accountService.RemoveAccountViewerAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
         [HttpPost("delete-range")]
         [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
@@ -271,6 +318,20 @@ namespace API.Controllers
 
             return await base.DeleteRangeAsync(ids);
         }
+
+        #region Private work
+        private static eRole? ConvertStringToRole(string roleString)
+        {
+            foreach (eRole item in Enum.GetValues(typeof(eRole)))
+            {
+                if (roleString.Equals(item.ToDescriptionString()))
+                    return item;
+            }
+
+            return null;
+        }
+        #endregion
+
         #endregion
     }
 }
