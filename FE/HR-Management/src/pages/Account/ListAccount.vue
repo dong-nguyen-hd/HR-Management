@@ -21,7 +21,7 @@
               :disable="accountProcess"
               label="Cancel"
               color="primary"
-              v-close-popup
+              @click="closeModifyPopup"
             />
             <q-btn
               flat
@@ -149,7 +149,7 @@
               :disable="accountProcess"
               label="Cancel"
               color="primary"
-              v-close-popup
+              @click="closeModifyPopup"
             />
             <q-btn
               v-show="!showEdit"
@@ -280,7 +280,7 @@
 
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
-              <div>
+              <div v-show="props.value != -1">
                 <q-btn
                   style="width: 60px"
                   dense
@@ -290,7 +290,7 @@
                   @click="openEdit(props.value)"
                 />
               </div>
-              <div class="q-mt-sm">
+              <div class="q-mt-sm" v-show="preventDeleteSelfAccount(props.value)">
                 <q-btn
                   style="width: 60px"
                   dense
@@ -355,8 +355,9 @@ export default defineComponent({
 
       role: {
         admin: 1,
-        editor: 2,
-        viewer: 3,
+        editorQTNS: 2,
+        editorQTDA: 3,
+        viewer: 4,
       },
       arrRole: [
         {
@@ -364,12 +365,16 @@ export default defineComponent({
           value: 1,
         },
         {
-          label: "editor",
+          label: "editor-qtns",
           value: 2,
         },
         {
-          label: "viewer",
+          label: "editor-qtda",
           value: 3,
+        },
+        {
+          label: "viewer",
+          value: 4,
         },
       ],
 
@@ -391,7 +396,7 @@ export default defineComponent({
         password: "1234@dongnguyen",
         name: "",
         email: "",
-        role: 3,
+        role: 4,
       },
 
       filter: {
@@ -471,7 +476,7 @@ export default defineComponent({
       this.tempAccountResource.name = "";
       this.tempAccountResource.userName = "";
       this.tempAccountResource.password = this.tempPwd;
-      this.tempAccountResource.role = 3;
+      this.tempAccountResource.role = 4;
       this.tempAccountResource.email = "";
 
       this.showInsert = true;
@@ -493,13 +498,17 @@ export default defineComponent({
         let isValid = await this.validateToken();
         if (!isValid) this.$router.replace("/login");
 
-        this.tempAccountResource.password = MD5(
-          this.tempAccountResource.password
-        ).toString();
+        let payload = {
+          name: this.tempAccountResource.name,
+          userName: this.tempAccountResource.userName,
+          password: MD5(this.tempAccountResource.password).toString(),
+          role: this.tempAccountResource.role,
+          email: this.tempAccountResource.email,
+        }
 
         // Request API
         let result = await api
-          .post(`/api/v1/account`, this.tempAccountResource)
+          .post(`/api/v1/account`, payload)
           .then((response) => {
             return response.data;
           })
@@ -540,6 +549,12 @@ export default defineComponent({
       } finally {
         this.accountProcess = false;
       }
+    },
+    closeModifyPopup(){
+      this.showDelete = false;
+      this.showEdit = false;
+      this.showInsert = false;
+      this.show = false;
     },
     async getAccount() {
       try {
@@ -694,7 +709,6 @@ export default defineComponent({
     },
     openEdit(id) {
       this.editObj = this.listAccount.find((x) => x.id == id);
-      this.showEdit = true;
 
       this.tempAccountResource.name = this.editObj.name;
       this.tempAccountResource.userName = this.editObj.userName;
@@ -704,6 +718,7 @@ export default defineComponent({
       );
       this.tempAccountResource.email = this.editObj.email;
 
+      this.showEdit = true;
       this.show = true;
     },
     async saveUpdate() {
@@ -722,13 +737,17 @@ export default defineComponent({
         let isValid = await this.validateToken();
         if (!isValid) this.$router.replace("/login");
 
-        this.tempAccountResource.password = MD5(
-          this.tempAccountResource.password
-        ).toString();
+        let payload = {
+          name: this.tempAccountResource.name,
+          password: MD5(this.tempAccountResource.password).toString(),
+          userName: this.tempAccountResource.userName,
+          role: this.tempAccountResource.role,
+          email: this.tempAccountResource.email,
+        }
 
         // Request API
         let result = await api
-          .put(`/api/v1/account/${this.editObj.id}`, this.tempAccountResource)
+          .put(`/api/v1/account/${this.editObj.id}`, payload)
           .then((response) => {
             return response.data;
           })
@@ -745,7 +764,6 @@ export default defineComponent({
           });
 
         if (result.success) {
-          console.log(JSON.stringify(result));
           let index = this.listAccount.findIndex(
             (x) => x.id == this.editObj.id
           );
@@ -759,7 +777,7 @@ export default defineComponent({
 
           this.$q.notify({
             type: "positive",
-            message: "Successfully added!",
+            message: "Successfully updated!",
           });
         } else {
           this.$q.notify({
@@ -776,17 +794,26 @@ export default defineComponent({
     },
     getColorRole(roleName) {
       if (roleName == "admin") return "green-10";
-      if (roleName == "editor") return "cyan-10";
-      if (roleName == "viewer") return "blue-10";
+      if (roleName == "editor-qtns") return "red-10";
+      if (roleName == "editor-qtda") return "purple-10";
+      if (roleName == "viewer") return "lime-10";
     },
     convertRoleStringToNumber(stringRole) {
       if (stringRole == "admin") return this.role.admin;
-      if (stringRole == "editor") return this.role.editor;
+      if (stringRole == "editor-qtns") return this.role.editorQTNS;
+      if (stringRole == "editor-qtda") return this.role.editorQTDA;
       if (stringRole == "viewer") return this.role.viewer;
     },
+    preventDeleteSelfAccount(id){
+      let idAccount = this.getInformation?.id;
+
+      if(id == idAccount || id == -1) return false;
+
+      return true;
+    }
   },
   computed: {
-    ...mapGetters("auth", ["getRole"]),
+    ...mapGetters("auth", ["getRole", "getInformation"]),
 
     getNameDelete() {
       return this.deleteObj ? this.showName(this.deleteObj.userName) : "";
@@ -820,91 +847,5 @@ export default defineComponent({
       width: 100%;
     }
   }
-}
-
-.height-view {
-  min-height: 52px;
-  border: 1px solid $primary;
-  border-bottom: 0;
-}
-
-.height-view-sub {
-  min-height: 44px;
-  border: 1px solid $primary;
-  border-bottom: 0;
-}
-
-.border-right {
-  border-right: 1px solid $primary;
-}
-
-.education-view {
-  min-height: 71px;
-  border: 1px solid $primary;
-  border-bottom: 0;
-}
-
-.border-image-view {
-  border-top: 1px solid $primary;
-  border-right: 1px solid $primary;
-}
-
-.project-view {
-  border: 1px solid $primary;
-  border-bottom: 0;
-}
-
-.project-bottom-view {
-  border-bottom: 1px solid $primary;
-}
-
-.project-height-view {
-  min-height: 30px;
-}
-</style>
-
-<style lang="scss">
-.table-content {
-  .q-table__top,
-  .q-table__bottom,
-  thead tr:first-child th {
-    /* bg color is important for th; just specify one */
-    background-color: $accent !important;
-  }
-
-  thead tr th {
-    position: sticky;
-    z-index: 99;
-    font-size: 14px !important;
-    font-family: Poppins-Medium !important;
-  }
-
-  tbody tr td {
-    font-size: 14px !important;
-  }
-
-  thead tr:first-child th {
-    top: 0;
-  }
-
-  /* this is when the loading indicator appears */
-  &.q-table--loading thead tr:last-child th {
-    /* height of all previous header rows */
-    top: 0;
-  }
-}
-
-/* Scroll bar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: $accent;
-}
-
-::-webkit-scrollbar-corner {
-  background: $grey;
 }
 </style>

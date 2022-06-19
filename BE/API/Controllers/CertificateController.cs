@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Communication;
+using Business.Data;
 using Business.Domain.Models;
 using Business.Domain.Services;
 using Business.Resources;
@@ -24,7 +25,7 @@ namespace API.Controllers
 
         #region Action
         [HttpPost]
-        [Authorize(Roles = "editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateCertificateResource resource)
@@ -35,7 +36,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = "editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateCertificateResource resource)
@@ -46,7 +47,7 @@ namespace API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> ChangeOrderIndexAsync([FromBody] List<int> ids)
@@ -57,7 +58,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CertificateResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)

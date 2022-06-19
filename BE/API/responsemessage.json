@@ -23,6 +23,7 @@
       "Account_Not_Permitted": "Account not permitted",
       "Account_Id_NoData": "Id is not existent",
       "Account_NoData": "Account is not existent",
+      "Account_Existent": "Account is existent",
       "Account_Saving_Error": "An error occurred when saving the Account",
       "Account_Updating_Error": "An error occurred when updating the Account",
       "Account_Deleting_Error": "An error occurred when deleting the Account",

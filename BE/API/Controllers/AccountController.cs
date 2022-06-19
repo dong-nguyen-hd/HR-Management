@@ -35,7 +35,7 @@ namespace API.Controllers
 
         #region Action
         [HttpPut("image/{id:int}")]
-        [Authorize(Roles = "viewer, editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), 200)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), 400)]
         public async Task<IActionResult> SaveImageAsync(int id, [FromForm] IFormFile image)
@@ -67,7 +67,7 @@ namespace API.Controllers
         }
 
         [HttpPut("reset-avatar/{id:int}")]
-        [Authorize(Roles = "editor, admin, viewer")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ResetAvatarAsync(int id)
@@ -83,7 +83,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status400BadRequest)]
@@ -105,7 +105,7 @@ namespace API.Controllers
         }
 
         [HttpPost("pagination")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status400BadRequest)]
@@ -127,7 +127,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateAccountResource resource)
@@ -149,7 +149,7 @@ namespace API.Controllers
         }
 
         [HttpPost("modify-group/{id:int}")]
-        [Authorize(Roles = "editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> ModifyListGroupAsync(int id, [FromBody] CreateAccountResource resource)
@@ -171,7 +171,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
@@ -183,18 +183,20 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateAccountResource resource)
         {
             Log.Information($"{User.Identity?.Name}: update account with Id is {id}.");
 
+            if (id == -1) return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+
             return await base.UpdateAsync(id, resource);
         }
 
         [HttpPut("self-update/{id:int}")]
-        [Authorize(Roles = "admin, editor, viewer")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SelfUpdateAsync(int id, [FromBody] SelfUpdateAccountResource resource)
@@ -215,7 +217,7 @@ namespace API.Controllers
         }
 
         [HttpPut("change-password/{id:int}")]
-        [Authorize(Roles = "admin, editor, viewer")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdatePasswordAsync(int id, [FromBody] UpdatePasswordAccountResource resource)
@@ -240,18 +242,21 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
         {
             Log.Information($"{User.Identity?.Name}: delete account with Id is {id}.");
 
+            if (id == -1) // id -1 is admin account
+                return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
+
             return await base.DeleteAsync(id);
         }
 
         [HttpPost("delete-range")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteRangeAsync(List<int> ids)
@@ -260,6 +265,9 @@ namespace API.Controllers
 
             if (ids.Count <= 0)
                 return BadRequest(new BaseResponse<AccountResource>(false));
+
+            if (ids.Contains(-1)) // id - 1 is admin account
+                return BadRequest(new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Not_Permitted"]));
 
             return await base.DeleteRangeAsync(ids);
         }

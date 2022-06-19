@@ -33,6 +33,11 @@ namespace Business.Services
         {
             try
             {
+                // Validate position name is existent?
+                var isExistent = await _accountRepository.ValidateUserNameAsync(createAccountResource.UserName);
+                if (!isExistent)
+                    return new BaseResponse<AccountResource>(ResponseMessage.Values["Account_Existent"]);
+
                 // Mapping Resource to Account
                 var tempAccount = Mapper.Map<CreateAccountResource, Account>(createAccountResource);
 
@@ -97,7 +102,7 @@ namespace Business.Services
                 tempAccount.LastActivity = DateTime.UtcNow;
 
 
-                tempAccount.Tokens.Clear(); // Remove all token after when change password
+                tempAccount?.Tokens?.Clear(); // Remove all token after when change password
                 await UnitOfWork.CompleteAsync();
 
                 return new BaseResponse<AccountResource>(Mapper.Map<AccountResource>(tempAccount));

@@ -29,11 +29,13 @@ namespace Business.Mapping.Account
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
         }
 
+        #region Private work
         private static string GetRole(int @enum)
         {
             eRole roleEnum = (eRole)@enum;
 
             return roleEnum.ToDescriptionString();
         }
+        #endregion
     }
 }

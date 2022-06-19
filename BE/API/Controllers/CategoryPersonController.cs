@@ -2,6 +2,7 @@
 using Business.Communication;
 using Business.Domain.Models;
 using Business.Domain.Services;
+using Business.Data;
 using Business.Resources;
 using Business.Resources.CategoryPerson;
 using Microsoft.AspNetCore.Authorization;
@@ -24,7 +25,7 @@ namespace API.Controllers
 
         #region Action
         [HttpPost]
-        [Authorize(Roles = "editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<CategoryPersonResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<CategoryPersonResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateCategoryPersonResource resource)
@@ -35,7 +36,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = "editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<CategoryPersonResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CategoryPersonResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateCategoryPersonResource resource)
@@ -46,7 +47,7 @@ namespace API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "editor, admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<CategoryPersonResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CategoryPersonResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> ChangeOrderIndexAsync([FromBody] List<int> ids)
@@ -57,7 +58,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<CategoryPersonResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CategoryPersonResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
