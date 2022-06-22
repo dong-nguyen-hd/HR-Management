@@ -242,7 +242,7 @@
                   <q-td :props="props">
                     <div style="display: inline">
                       <q-btn
-                        style="width: 60px"
+                        style="width: 70px"
                         dense
                         color="negative"
                         text-color="white"
@@ -700,6 +700,10 @@ export default defineComponent({
 
         if (result.success) {
           this.listProject = result.resource.groups;
+
+          this.listProject.forEach((row, index) => {
+          row.index = index + 1;
+        });
         } else {
           this.$q.notify({
             type: "negative",
@@ -711,50 +715,93 @@ export default defineComponent({
       }
     },
     async addProject() {
-       let isValid = await this.validateToken();
-        if (!isValid) this.$router.replace("/login");
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
 
-        let payload ={
-            accountId: this.tempAddAccountId,
-            groupId: this.tempAddProjectId
-        }
+      let payload = {
+        accountId: this.tempAddAccountId,
+        groupId: this.tempAddProjectId,
+      };
 
-        // Request API
-        let result = await api
-          .post(`/api/v1/group/add-account`, payload)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
+      // Request API
+      let result = await api
+        .post(`/api/v1/group/add-account`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        if (this.listProject.length >= 10) this.listProject.pop();
+        this.listProject.unshift(result.resource);
+
+        this.listProject.forEach((row, index) => {
+          row.index = index + 1;
+        });
+
+        this.tempAddProjectId = null;
+
+        this.$q.notify({
+            type: "positive",
+            message: "Successfully added!",
           });
-
-        if (result.success) {
-          if (this.listProject.length >= 10) this.listProject.pop();
-          this.listProject.unshift(result.resource);
-
-          this.listProject.forEach((row, index) => {
-            row.index = index + 1;
-          });
-
-          this.tempAddProjectId = null;
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
-    removeProject(id) {
-      console.log(id);
+    async removeProject(id) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      let payload = {
+        accountId: this.tempAddAccountId,
+        groupId: id,
+      };
+
+      // Request API
+      let result = await api
+        .post(`/api/v1/group/remove-account`, payload)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+       await this.openProject(this.tempAddAccountId);
+
+       this.$q.notify({
+            type: "positive",
+            message: "Successfully removed!",
+          });
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
     closeProject() {
       this.tempAddProjectId = null;

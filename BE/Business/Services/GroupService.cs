@@ -49,7 +49,33 @@ namespace Business.Services
                 if (tempGroup is null)
                     return new BaseResponse<GroupResource>(ResponseMessage.Values["Group_NoData"]);
 
-                tempAccount.Groups.Add(tempGroup);
+
+                tempAccount.Groups = new() { tempGroup };
+                await UnitOfWork.CompleteAsync();
+
+                return new BaseResponse<GroupResource>(Mapper.Map<Group, GroupResource>(tempGroup));
+            }
+            catch (Exception ex)
+            {
+                throw new MessageResultException(ResponseMessage.Values["Group_Saving_Error"], ex);
+            }
+        }
+
+        public async Task<BaseResponse<GroupResource>> RemoveGroupFromAccountAsync(int accountId, int groupId)
+        {
+            try
+            {
+                // Validate account-Id is existent?
+                var tempAccount = await _accountRepository.GetByIdIncludeGroupAsync(accountId, true);
+                if (tempAccount is null)
+                    return new BaseResponse<GroupResource>(ResponseMessage.Values["Account_NoData"]);
+
+                // Validate group-Id is existent?
+                var tempGroup = await _groupRepository.GetByIdAsync(groupId);
+                if (tempGroup is null)
+                    return new BaseResponse<GroupResource>(ResponseMessage.Values["Group_NoData"]);
+
+                tempAccount.Groups.Remove(tempGroup);
                 await UnitOfWork.CompleteAsync();
 
                 return new BaseResponse<GroupResource>(Mapper.Map<Group, GroupResource>(tempGroup));

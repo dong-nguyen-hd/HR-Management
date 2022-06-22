@@ -9,5 +9,6 @@ namespace Business.Domain.Services
     {
         Task<PaginationResponse<IEnumerable<GroupResource>>> GetPaginationAsync(QueryResource pagination, FilterGroupResource filterResource);
         Task<BaseResponse<GroupResource>> AddGroupToAccountAsync(int accountId, int groupId);
+        Task<BaseResponse<GroupResource>> RemoveGroupFromAccountAsync(int accountId, int groupId);
     }
 }

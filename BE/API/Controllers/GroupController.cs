@@ -148,6 +148,22 @@ namespace API.Controllers
             return StatusCode(201, result);
         }
 
+        [HttpPost("remove-account")]
+        [Authorize(Roles = $"{Role.EditorQTDA}")]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RemoveGroupFromAccountAsync([FromBody] GroupIdResource resource)
+        {
+            Log.Information($"{User.Identity?.Name}: remove group-id '{resource.GroupId}' from account-id '{resource.AccountId}'.");
+
+            var result = await _groupService.RemoveGroupFromAccountAsync(resource.AccountId, resource.GroupId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
         [HttpPut("{id:int}")]
         [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]
