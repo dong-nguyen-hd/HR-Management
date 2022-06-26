@@ -146,7 +146,8 @@ export default {
 
         if (result.success) {
           await this.login(result);
-          this.$router.replace("/list-employee");
+          if (this.getRole == "viewer") this.$router.replace("/project-view");
+          else this.$router.replace("/list-employee");
         } else {
           this.$q.notify({
             type: "negative",
@@ -162,11 +163,12 @@ export default {
     },
   },
   computed: {
-    ...mapGetters("auth", ["isAuthenticated"]),
+    ...mapGetters("auth", ["isAuthenticated", "getRole"]),
   },
   created() {
     if (this.isAuthenticated) {
-      this.$router.replace("/list-employee");
+      if (this.getRole == "viewer") this.$router.replace("/project-view");
+      else this.$router.replace("/list-employee");
     }
   },
   mounted() {
@@ -175,7 +177,8 @@ export default {
   watch: {
     isAuthenticated: function () {
       if (this.isAuthenticated) {
-        this.$router.replace("/list-employee");
+        if (this.getRole == "viewer") this.$router.replace("/project-view");
+        else this.$router.replace("/list-employee");
       }
     },
   },
@@ -269,9 +272,7 @@ export default {
   }
 }
 
-/*------------------------------------------------------------------
-[ Responsive ]*/
-
+// start - responsive
 @media (min-width: 1024px) {
   .wrap-login {
     width: calc(100% - 38%);
@@ -337,4 +338,5 @@ export default {
     width: 80%;
   }
 }
+// end - responsive
 </style>

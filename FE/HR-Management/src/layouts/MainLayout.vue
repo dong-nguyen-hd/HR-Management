@@ -79,99 +79,117 @@
       <!-- drawer content -->
       <div class="left-side-bar bg-primary">
         <q-list dark separator>
-            <q-item
-              clickable
-              v-ripple
-              to="/list-employee"
-              exact
-              active-class="isActive"
-              class="q-pl-lg"
-            >
-              <q-item-section avatar>
-                <q-icon name="summarize" />
-              </q-item-section>
-              <q-item-section>Employee</q-item-section>
-            </q-item>
+          <q-item
+            v-show="getRole != 'viewer'"
+            clickable
+            v-ripple
+            to="/list-employee"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="summarize" />
+            </q-item-section>
+            <q-item-section>Employee</q-item-section>
+          </q-item>
 
-            <q-item
+          <q-item
             v-show="getRole == 'admin' || getRole == 'editor-qtda'"
-              @click="isShowInfor = false"
-              clickable
-              v-ripple
-              to="/project"
-              exact
-              active-class="isActive"
-              class="q-pl-lg"
-            >
-              <q-item-section avatar>
-                <q-icon name="business_center" />
-              </q-item-section>
-              <q-item-section>Project</q-item-section>
-            </q-item>
+            @click="isShowInfor = false"
+            clickable
+            v-ripple
+            to="/project"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="business_center" />
+            </q-item-section>
+            <q-item-section>Project</q-item-section>
+          </q-item>
 
-            <q-item
-              @click="isShowInfor = false"
-              clickable
-              v-ripple
-              to="/category"
-              exact
-              active-class="isActive"
-              class="q-pl-lg"
-            >
-              <q-item-section avatar>
-                <q-icon name="category" />
-              </q-item-section>
-              <q-item-section>Category</q-item-section>
-            </q-item>
+          <q-item
+            v-show="getRole == 'viewer'"
+            @click="isShowInfor = false"
+            clickable
+            v-ripple
+            to="/project-view"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="business_center" />
+            </q-item-section>
+            <q-item-section>Project</q-item-section>
+          </q-item>
 
-            <q-item
-              @click="isShowInfor = false"
-              clickable
-              v-ripple
-              to="/position"
-              exact
-              active-class="isActive"
-              class="q-pl-lg"
-            >
-              <q-item-section avatar>
-                <q-icon name="badge" />
-              </q-item-section>
-              <q-item-section>Position</q-item-section>
-            </q-item>
+          <q-item
+            v-show="getRole != 'viewer'"
+            @click="isShowInfor = false"
+            clickable
+            v-ripple
+            to="/category"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="category" />
+            </q-item-section>
+            <q-item-section>Category</q-item-section>
+          </q-item>
 
-            <q-item
-              v-show="getRole == 'admin'"
-              @click="isShowInfor = false"
-              clickable
-              v-ripple
-              to="/list-account-admin"
-              exact
-              active-class="isActive"
-              class="q-pl-lg"
-            >
-              <q-item-section avatar>
-                <q-icon name="account_circle" />
-              </q-item-section>
-              <q-item-section>Account</q-item-section>
-            </q-item>
+          <q-item
+            v-show="getRole != 'viewer'"
+            @click="isShowInfor = false"
+            clickable
+            v-ripple
+            to="/position"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="badge" />
+            </q-item-section>
+            <q-item-section>Position</q-item-section>
+          </q-item>
 
-            <q-item
-              v-show="getRole == 'editor-qtda'"
-              @click="isShowInfor = false"
-              clickable
-              v-ripple
-              to="/list-account-qtda"
-              exact
-              active-class="isActive"
-              class="q-pl-lg"
-            >
-              <q-item-section avatar>
-                <q-icon name="account_circle" />
-              </q-item-section>
-              <q-item-section>Account</q-item-section>
-            </q-item>
+          <q-item
+            v-show="getRole == 'admin'"
+            @click="isShowInfor = false"
+            clickable
+            v-ripple
+            to="/list-account-admin"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="account_circle" />
+            </q-item-section>
+            <q-item-section>Account</q-item-section>
+          </q-item>
 
-          </q-list>
+          <q-item
+            v-show="getRole == 'editor-qtda'"
+            @click="isShowInfor = false"
+            clickable
+            v-ripple
+            to="/list-account-qtda"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="account_circle" />
+            </q-item-section>
+            <q-item-section>Account</q-item-section>
+          </q-item>
+        </q-list>
       </div>
     </q-drawer>
 

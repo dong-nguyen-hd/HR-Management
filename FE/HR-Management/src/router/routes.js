@@ -40,6 +40,11 @@ const routes = [
         component: () => import("pages/Project/ListProject.vue"),
       },
       {
+        name: "List View Project",
+        path: "/project-view",
+        component: () => import("pages/Project/ListViewProject.vue"),
+      },
+      {
         name: "List Account",
         path: "/list-account-admin",
         component: () => import("pages/Account/ListAccount.vue"),

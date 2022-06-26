@@ -4,6 +4,7 @@ using Business.Extensions.Validation;
 using Business.Resources.CategoryPerson;
 using Business.Resources.Certificate;
 using Business.Resources.Education;
+using Business.Resources.Position;
 using Business.Resources.Project;
 using Business.Resources.WorkHistory;
 using Newtonsoft.Json;
@@ -60,6 +61,8 @@ namespace Business.Resources.Person
         [MaxLength(50)]
         [Display(Name = "Order Index")]
         public List<int> OrderIndex { get; set; }
+
+        public PositionResource Position { get; set; }
 
         [Display(Name = "Work-History")]
         public List<WorkHistoryResource> WorkHistory { get; set; }
