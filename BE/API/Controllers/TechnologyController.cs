@@ -33,7 +33,7 @@ namespace API.Controllers
 
         #region Action
         [HttpGet("search")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<TechnologyResource>>), StatusCodes.Status400BadRequest)]
@@ -50,7 +50,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateTechnologyResource resource)
@@ -61,7 +61,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateTechnologyResource resource)
@@ -72,7 +72,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<TechnologyResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)

@@ -115,6 +115,7 @@ export const useRefreshToken = async ({ dispatch, commit }) => {
     localStorage.setItem("hraccounttoken", JSON.stringify(result.resource));
 
     commit("setToken", result.resource);
+    commit("setRole", result.resource.role);
     dispatch("setHeaderJWT");
   } else {
     commit("removeToken");

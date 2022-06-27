@@ -11,3 +11,7 @@ export const removeToken = (state) => {
 export const setInformation = (state, payload) => {
     state.information = payload;
 }
+
+export const setRole = (state, payload) => {
+    state.role = payload;
+}

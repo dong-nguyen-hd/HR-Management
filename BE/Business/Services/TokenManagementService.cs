@@ -76,7 +76,16 @@ namespace Business.Services
                 tempAccount.Tokens.Add(refreshToken);
                 await _unitOfWork.CompleteAsync();
 
-                return new BaseResponse<TokenResource>(new TokenResource() { Id = refreshToken.Id, AccessToken = accessToken, ExpireTime = refreshToken.ExpireTime, RefreshToken = refreshToken.RefreshToken });
+                var result = new TokenResource()
+                {
+                    Id = refreshToken.Id,
+                    AccessToken = accessToken,
+                    ExpireTime = refreshToken.ExpireTime,
+                    RefreshToken = refreshToken.RefreshToken,
+                    Role = tempAccount.Role
+                };
+
+                return new BaseResponse<TokenResource>(result);
             }
             catch (Exception ex)
             {

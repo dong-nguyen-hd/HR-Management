@@ -92,7 +92,7 @@ namespace API.Controllers
         }
 
         [HttpGet("list-person-edit/{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
@@ -121,7 +121,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateGroupResource resource)
@@ -165,7 +165,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateGroupResource resource)
@@ -176,7 +176,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<GroupResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)

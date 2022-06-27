@@ -3,7 +3,7 @@ export function getInformation(state) {
 }
 
 export function getRole(state) {
-  return state.information.role;
+  return state.role;
 }
 
 export function getToken(state) {

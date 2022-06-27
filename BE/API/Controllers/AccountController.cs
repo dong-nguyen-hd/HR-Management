@@ -104,7 +104,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status400BadRequest)]
@@ -128,7 +128,7 @@ namespace API.Controllers
         }
 
         [HttpPost("pagination")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<AccountResource>>), StatusCodes.Status400BadRequest)]
@@ -198,7 +198,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateAccountResource resource)
@@ -211,7 +211,7 @@ namespace API.Controllers
         }
 
         [HttpPut("qtda/{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAccountViewerAsync(int id, [FromBody] UpdateAccountResource resource)
@@ -272,7 +272,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
@@ -302,7 +302,7 @@ namespace API.Controllers
         }
 
         [HttpPost("delete-range")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteRangeAsync(List<int> ids)

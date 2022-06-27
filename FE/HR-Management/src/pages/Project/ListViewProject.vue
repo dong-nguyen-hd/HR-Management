@@ -845,7 +845,7 @@ export default defineComponent({
   white-space: initial;
 }
 
-// view component
+// start - view component
 .height-view {
   min-height: 52px;
   border: 1px solid $primary;
@@ -885,5 +885,51 @@ export default defineComponent({
 .project-height-view {
   min-height: 30px;
 }
-// view component
+// end -view component
+</style>
+
+<style lang="scss">
+.table-content {
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: $accent !important;
+  }
+
+  thead tr th {
+    position: sticky;
+    z-index: 99;
+    font-size: 14px !important;
+    font-family: Poppins-Medium !important;
+  }
+
+  tbody tr td {
+    font-size: 14px !important;
+  }
+
+  thead tr:first-child th {
+    top: 0;
+  }
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 0;
+  }
+}
+
+/* Scroll bar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $accent;
+}
+
+::-webkit-scrollbar-corner {
+  background: $grey;
+}
 </style>

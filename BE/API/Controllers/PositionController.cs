@@ -25,7 +25,7 @@ namespace API.Controllers
 
         #region Action
         [HttpGet]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<PositionResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<PositionResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<PositionResource>>), StatusCodes.Status400BadRequest)]
@@ -37,7 +37,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
@@ -49,7 +49,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreatePositionResource resource)
@@ -60,7 +60,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdatePositionResource resource)
@@ -71,7 +71,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<PositionResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)

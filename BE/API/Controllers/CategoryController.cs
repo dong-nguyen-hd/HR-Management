@@ -35,7 +35,7 @@ namespace API.Controllers
 
         #region Action
         [HttpGet]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status400BadRequest)]
@@ -47,7 +47,7 @@ namespace API.Controllers
         }
 
         [HttpPost("pagination")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status400BadRequest)]
@@ -69,7 +69,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
@@ -81,7 +81,7 @@ namespace API.Controllers
         }
 
         [HttpGet("search")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<CategoryResource>>), StatusCodes.Status400BadRequest)]
@@ -98,7 +98,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateCategoryResource resource)
@@ -109,7 +109,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateCategoryResource resource)
@@ -120,7 +120,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<CategoryResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)

@@ -23,5 +23,7 @@ namespace Business.Resources.Authentication
 
         [Display(Name = "Access Token")]
         public string AccessToken { get; set; }
+
+        public string Role { get; set; }
     }
 }

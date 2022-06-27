@@ -25,7 +25,7 @@ namespace API.Controllers
 
         #region Action
         [HttpPost]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<ProjectResource>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse<ProjectResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> CreateAsync([FromBody] CreateProjectResource resource)
@@ -36,7 +36,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<ProjectResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<ProjectResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateProjectResource resource)
@@ -47,7 +47,7 @@ namespace API.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<ProjectResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<ProjectResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> ChangeOrderIndexAsync([FromBody] List<int> ids)
@@ -58,7 +58,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<ProjectResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<ProjectResource>), StatusCodes.Status400BadRequest)]
         public new async Task<IActionResult> DeleteAsync(int id)
