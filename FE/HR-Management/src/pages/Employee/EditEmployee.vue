@@ -2401,6 +2401,7 @@ export default defineComponent({
       if (index == 1) {
         this.tempCategoryPersonResource.categoryId = 0;
         this.tempCategoryPersonResource.technologies = [];
+        this.tempCategoryPersonResource.personId = this.employeeInfor.id;
       }
 
       if (index == 2) {
@@ -2409,6 +2410,7 @@ export default defineComponent({
         this.tempProjectResource.startDate = "";
         this.tempProjectResource.endDate = null;
         this.tempProjectResource.groupId = 0;
+        this.tempProjectResource.personId = this.employeeInfor.id;
       }
 
       if (index == 3) {
@@ -2416,6 +2418,7 @@ export default defineComponent({
         this.tempWorkHistoryResource.position = "";
         this.tempWorkHistoryResource.startDate = null;
         this.tempWorkHistoryResource.endDate = null;
+        this.tempWorkHistoryResource.personId = this.employeeInfor.id;
       }
 
       if (index == 4) {
@@ -2423,6 +2426,7 @@ export default defineComponent({
         this.tempEducationResource.major = "";
         this.tempEducationResource.startDate = null;
         this.tempEducationResource.endDate = null;
+        this.tempEducationResource.personId = this.employeeInfor.id;
       }
 
       if (index == 5) {
@@ -2430,6 +2434,7 @@ export default defineComponent({
         this.tempCertificateResource.provider = "";
         this.tempCertificateResource.startDate = null;
         this.tempCertificateResource.endDate = null;
+        this.tempCertificateResource.personId = this.employeeInfor.id;
       }
 
       this.dialogToggle[index] = true;

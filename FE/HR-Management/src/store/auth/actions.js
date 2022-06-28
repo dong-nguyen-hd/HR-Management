@@ -111,11 +111,12 @@ export const useRefreshToken = async ({ dispatch, commit }) => {
     });
 
   if (result.success) {
+    commit("setRole", result.resource.role);
+    
     // Assign data to localStorage
     localStorage.setItem("hraccounttoken", JSON.stringify(result.resource));
-
     commit("setToken", result.resource);
-    commit("setRole", result.resource.role);
+
     dispatch("setHeaderJWT");
   } else {
     commit("removeToken");

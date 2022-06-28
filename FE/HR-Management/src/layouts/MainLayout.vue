@@ -235,6 +235,9 @@ export default defineComponent({
       else return this.getInformation?.name;
     },
   },
+  async created() {
+    console.log(this.getRole);
+  },
 });
 </script>
 

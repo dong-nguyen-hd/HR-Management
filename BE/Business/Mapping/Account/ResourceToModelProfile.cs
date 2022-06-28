@@ -21,7 +21,7 @@ namespace Business.Mapping.Account
             CreateMap<UpdateAccountResource, Domain.Models.Account>()
                 .ForMember(x => x.Password, opt => opt.MapFrom(src => src.Password.HashingPassword(Constant.IterationCount)))
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()))
-                .ForMember(x => x.LastActivity, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(x => x.LastActivity, opt => opt.Ignore())
                 .ForMember(x => x.Role, opt => opt.MapFrom(src => GetRole(src.Role)));
 
             CreateMap<SelfUpdateAccountResource, Domain.Models.Account>()
