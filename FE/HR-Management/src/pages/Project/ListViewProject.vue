@@ -227,10 +227,10 @@
                     v-for="(workHistory, index) in viewObj.workHistory"
                     :key="index"
                   >
-                    <div class="col-1 q-pl-md flex items-center border-right">
+                    <div class="col-1 q-pa-md flex items-center border-right">
                       {{ index + 1 }}
                     </div>
-                    <div class="col q-pl-md flex items-center border-right">
+                    <div class="col q-pa-md flex items-center border-right">
                       <span
                         >{{
                           convertDateTimeToDate(
@@ -249,10 +249,10 @@
                         }}</span
                       >
                     </div>
-                    <div class="col q-pl-md flex items-center border-right">
+                    <div class="col q-pa-md flex items-center border-right">
                       {{ workHistory.companyName }}
                     </div>
-                    <div class="col q-pl-md flex items-center">
+                    <div class="col q-pa-md flex items-center">
                       {{ workHistory.position }}
                     </div>
                   </div>
@@ -353,10 +353,10 @@
                     v-for="(project, index) in viewObj.project"
                     :key="index"
                   >
-                    <div class="col-1 q-pl-md flex items-center border-right">
+                    <div class="col-1 q-pa-md flex items-center border-right">
                       {{ index + 1 }}
                     </div>
-                    <div class="col q-pl-md flex items-center border-right">
+                    <div class="col q-pa-md flex items-center border-right">
                       {{ convertDateTimeToDate(project.startDate, "MMM YYYY") }}
                       -
                       {{
@@ -365,17 +365,17 @@
                           : "Now"
                       }}
                     </div>
-                    <div class="col q-pl-md flex items-center border-right">
+                    <div class="col q-pa-md flex items-center border-right">
                       {{ project.position }}
                     </div>
                     <div class="col-5">
                       <div
-                        class="q-pl-md project-bottom-view flex items-center project-height-view"
+                        class="q-pa-md project-bottom-view flex items-center project-height-view"
                       >
                         <span class="text-bold">{{ project.name }}</span>
                       </div>
                       <div
-                        class="q-pl-md project-bottom-view flex items-center project-height-view"
+                        class="q-pa-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
                           ><span class="text-bold">Description: </span
@@ -383,7 +383,7 @@
                         >
                       </div>
                       <div
-                        class="q-pl-md project-bottom-view flex items-center project-height-view"
+                        class="q-pa-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
                           ><span class="text-bold">Responsibilities: </span
@@ -391,7 +391,7 @@
                         >
                       </div>
                       <div
-                        class="q-pl-md project-bottom-view flex items-center project-height-view"
+                        class="q-pa-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
                           ><span class="text-bold">Team size: </span
@@ -399,7 +399,7 @@
                         >
                       </div>
                       <div
-                        class="q-pl-md flex items-center project-height-view"
+                        class="q-pa-md flex items-center project-height-view"
                       >
                         <span
                           ><span class="text-bold">Technologies used: </span

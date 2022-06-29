@@ -83,12 +83,14 @@ namespace API.Controllers
         {
             Log.Information($"{User.Identity?.Name}: get list person with group-id is {id}.");
 
-            var result = await _groupRepository.GetListPersonByGroupIdAsync(id);
+            var result = await _groupService.GetListPersonByGroupIdAsync(id);
 
             if (result is null)
                 return NoContent();
 
-            return Ok(new BaseResponse<IEnumerable<PersonResourceView>>(Mapper.Map<IEnumerable<Person>, IEnumerable<PersonResourceView>>(result)));
+            var mapObj = Mapper.Map<IEnumerable<PersonResource>, IEnumerable<PersonResourceView>>(result.Resource);
+
+            return Ok(new BaseResponse<IEnumerable<PersonResourceView>>(mapObj));
         }
 
         [HttpGet("list-person-edit/{id:int}")]
@@ -100,12 +102,12 @@ namespace API.Controllers
         {
             Log.Information($"{User.Identity?.Name}: get list person with group-id is {id}.");
 
-            var result = await _groupRepository.GetListPersonByGroupIdAsync(id);
+            var result = await _groupService.GetListPersonByGroupIdAsync(id);
 
             if (result is null)
                 return NoContent();
 
-            return Ok(new BaseResponse<IEnumerable<PersonResource>>(Mapper.Map<IEnumerable<Person>, IEnumerable<PersonResource>>(result)));
+            return Ok(new BaseResponse<IEnumerable<PersonResource>>(result.Resource));
         }
 
         [HttpGet("{id:int}")]

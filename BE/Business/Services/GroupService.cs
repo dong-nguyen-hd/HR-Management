@@ -7,6 +7,7 @@ using Business.Domain.Services;
 using Business.Extensions;
 using Business.Resources;
 using Business.Resources.Group;
+using Business.Resources.Person;
 using Business.Resources.Technology;
 using Microsoft.Extensions.Options;
 
@@ -59,6 +60,17 @@ namespace Business.Services
             {
                 throw new MessageResultException(ResponseMessage.Values["Group_Saving_Error"], ex);
             }
+        }
+
+        public async Task<BaseResponse<IEnumerable<PersonResource>>> GetListPersonByGroupIdAsync(int groupId)
+        {
+            var totalTechnology = await _technologyService.GetAllAsync();
+            var people = await _groupRepository.GetListPersonByGroupIdAsync(groupId);
+
+            // Mapping
+            var personResource = ConvertPersonResource(totalTechnology.Resource, people);
+
+            return new BaseResponse<IEnumerable<PersonResource>>(personResource);
         }
 
         public async Task<BaseResponse<GroupResource>> RemoveGroupFromAccountAsync(int accountId, int groupId)
@@ -171,6 +183,41 @@ namespace Business.Services
                 tempGroupResource.Technologies = totalTechnology.IntersectTechnology(group.Technologies);
 
             return tempGroupResource;
+        }
+
+        private IEnumerable<PersonResource> ConvertPersonResource(IEnumerable<TechnologyResource> totalTechnology, IEnumerable<Person> totalPerson)
+        {
+            List<PersonResource> listPersonResource = new List<PersonResource>(totalPerson.Count());
+
+            foreach (var person in totalPerson)
+            {
+                var tempPersonResource = ConvertPersonResource(totalTechnology, person);
+
+                listPersonResource.Add(tempPersonResource);
+            }
+
+            return listPersonResource;
+        }
+
+        private PersonResource ConvertPersonResource(IEnumerable<TechnologyResource> totalTechnology, Person person)
+        {
+            var tempPersonResource = Mapper.Map<Person, PersonResource>(person);
+
+            // Project mapping
+            var listProject = person.Projects.ToList();
+            var countProject = listProject.Count;
+            for (int i = 0; i < countProject; i++)
+                if (!string.IsNullOrEmpty(listProject?[i]?.Group?.Technologies))
+                    tempPersonResource.Project[i].Technologies = totalTechnology.IntersectTechnology(listProject[i]?.Group.Technologies);
+
+            // Category-Person mapping
+            var listCategoryPerson = person.CategoryPersons.ToList();
+            var countCategoryPerson = listCategoryPerson.Count;
+            for (int i = 0; i < countCategoryPerson; i++)
+                if (!string.IsNullOrEmpty(listCategoryPerson?[i].Technologies))
+                    tempPersonResource.CategoryPerson[i].Technologies = totalTechnology.IntersectTechnology(listCategoryPerson[i].Technologies);
+
+            return tempPersonResource;
         }
         #endregion
 
