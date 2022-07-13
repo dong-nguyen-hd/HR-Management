@@ -16,8 +16,11 @@
         public DateTime CreatedAt { get; set; }
         public bool IsDeleted { get; set; }
         public string OrderIndex { get; set; }
+
         public int PositionId { get; set; }
         public Position Position { get; set; }
+        public int DepartmentId { get; set; }
+        public Department Department { get; set; }
         public int? GroupId { get; set; }
         public Group Group { get; set; }
         public HashSet<Certificate> Certificates { get; set; }
@@ -25,5 +28,7 @@
         public HashSet<Education> Educations { get; set; }
         public HashSet<Project> Projects { get; set; }
         public HashSet<WorkHistory> WorkHistories { get; set; }
+        public HashSet<Pay> Pays { get; set; }
+        public HashSet<Timesheet> Timesheets { get; set; }
     }
 }

@@ -1,0 +1,7 @@
+# Except default image
+Images/*
+!default.jpg
+
+# Except base timesheet
+Timesheet/*
+!base.xlsx

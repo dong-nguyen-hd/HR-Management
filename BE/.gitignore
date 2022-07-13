@@ -4,9 +4,6 @@
 # Logs folder
 Logs/
 
-# Image
-wwwroot/!default.jpg
-
 # Migrations-folder
 Migrations/
 

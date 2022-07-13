@@ -19,6 +19,7 @@
     <Folder Include="Logs\" />
     <Folder Include="wwwroot\Images\Thumbnail\" />
     <Folder Include="wwwroot\Images\Original\" />
+    <Folder Include="wwwroot\Timesheet\" />
   </ItemGroup>
 
   <ItemGroup>
