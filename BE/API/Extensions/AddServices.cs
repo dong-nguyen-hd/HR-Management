@@ -48,6 +48,8 @@ namespace API.Extensions
 
             services.AddScoped<ITokenManagementService, TokenManagementService>();
 
+            services.AddScoped<ITimesheetService, TimesheetService>();
+
             services.AddScoped<ITokenRepository, TokenRepository>();
 
             services.AddScoped<IImageService, ImageService>(); // ImageCrossPlatformService (use for other OSs except Windows)

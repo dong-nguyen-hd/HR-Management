@@ -4,6 +4,7 @@ using Business.Resources.Information;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Business.Data;
 
 namespace API.Controllers
 {
@@ -33,8 +34,8 @@ namespace API.Controllers
         {
             var path = new
             {
-                OriginalImagePath = _uriService.GetRouteUri($"{_hostResource.OriginalImagePath}default.jpg"),
-                ThumbnailImagePath = _uriService.GetRouteUri($"{_hostResource.ThumbnailImagePath}default.jpg")
+                OriginalImagePath = _uriService.GetRouteUri($"{_hostResource.OriginalImagePath}{Constant.DefaultAvatar}"),
+                ThumbnailImagePath = _uriService.GetRouteUri($"{_hostResource.ThumbnailImagePath}{Constant.DefaultAvatar}")
             };
 
             return Ok(new BaseResponse<object>(path));

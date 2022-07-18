@@ -8,10 +8,14 @@
       "Updating_Error": "An error occurred when updating",
       "Deleting_Error": "An error occurred when deleting",
       "Swapping_Error": "An error occurred when swapping",
+      "Not_Support_File": "Not Support file extension",
+      "File_Empty": "File is empty",
 
       "Token_Invalid": "User name or password is incorrect",
       "Token_Not_Permitted": "Refresh Token not permitted",
       "Token_Saving_Error": "An error occurred when saving the Token",
+
+      "Timesheet_Invalid": "An error occurred when reading the Timesheet",
 
       "Image_NoData": "There is no image.",
       "Image_Format_Error": "Image format is not supported.",
