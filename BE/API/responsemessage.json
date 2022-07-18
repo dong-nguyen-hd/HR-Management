@@ -82,6 +82,12 @@
       "Position_NoData": "Position is not existent.",
       "Position_Existent": "Position is existent",
 
+      "Department_Saving_Error": "An error occurred when saving the Position",
+      "Department_Deleting_Error": "An error occurred when deleting the Position",
+      "Department_Updating_Error": "An error occurred when updating the Position",
+      "Department_NoData": "Position is not existent.",
+      "Department_Existent": "Position is existent",
+
       "WorkHistory_Saving_Error": "An error occurred when saving the Work-History",
       "WorkHistory_Deleting_Error": "An error occurred when deleting the Work-History",
       "WorkHistory_Swapping_Error": "An error occurred when swapping the Work-History",
