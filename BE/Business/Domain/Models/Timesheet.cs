@@ -3,6 +3,7 @@
     public class Timesheet
     {
         public int Id { get; set; }
+        public float TotalWorkDay { get; set; }
         public float WorkDay { get; set; }
         public float? Absent { get; set; }
         public float? Holiday { get; set; }

@@ -12,6 +12,7 @@ namespace Infrastructure.Contexts.Config
         public void Configure(EntityTypeBuilder<Timesheet> entity)
         {
             entity.ToTable("Timesheet");
+            entity.Property(x => x.TotalWorkDay).HasColumnType("decimal(3,1)");
             entity.Property(x => x.WorkDay).HasColumnType("decimal(2,1)");
             entity.Property(x => x.Absent).HasColumnType("decimal(2,1)");
             entity.Property(x => x.Holiday).HasColumnType("decimal(2,1)");
