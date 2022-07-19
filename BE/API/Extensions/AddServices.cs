@@ -49,6 +49,7 @@ namespace API.Extensions
             services.AddScoped<ITokenManagementService, TokenManagementService>();
 
             services.AddScoped<ITimesheetService, TimesheetService>();
+            services.AddScoped<ITimesheetRepository, TimesheetRepository>();
 
             services.AddScoped<ITokenRepository, TokenRepository>();
 

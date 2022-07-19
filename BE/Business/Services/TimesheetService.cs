@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Communication;
+using Business.Domain.Models;
 using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
@@ -7,6 +8,7 @@ using Business.Resources.Information;
 using Business.Resources.Timesheet;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 
 namespace Business.Services
@@ -18,10 +20,16 @@ namespace Business.Services
         protected readonly IUnitOfWork UnitOfWork;
         private readonly HostResource _hostResource;
         private readonly IWebHostEnvironment _env;
+        private readonly IPersonRepository _personRepository;
+        private readonly ITimesheetRepository _timesheetRepository;
+
+        private Timesheet _element = new();
+        private List<Timesheet> _listElement = new();
         #endregion
 
         #region Constructor
-        public TimesheetService(
+        public TimesheetService(IPersonRepository personRepository,
+            ITimesheetRepository timesheetRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
             IWebHostEnvironment env,
@@ -32,6 +40,8 @@ namespace Business.Services
             this.UnitOfWork = unitOfWork;
             this._hostResource = hostResource.CurrentValue;
             this._env = env;
+            this._personRepository = personRepository;
+            this._timesheetRepository = timesheetRepository;
         }
         #endregion
 
@@ -45,19 +55,45 @@ namespace Business.Services
                 // Get the first worksheet in the workbook
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                var year = (double?)worksheet.Cells[3, 2].Value;
-                var month = (double?)worksheet.Cells[3, 4].Value;
+                int? year = worksheet.Cells[3, 2].GetValue<int?>();
+                int? month = worksheet.Cells[3, 4].GetValue<int?>();
 
                 if (year == null || month == null)
                     return new BaseResponse<TimesheetResource>(ResponseMessage.Values["Timesheet_Invalid"]);
 
-                Console.WriteLine($"Timesheet - Year: {year}");
-                Console.WriteLine($"Timesheet - Month: {month}");
+                // Calculate timesheet
+                string[] timesheet = new string[31];
+                var totalRow = worksheet.Dimension.Rows;
+                for (int row = 7; row < totalRow; row++)
+                {
+                    string staffId = worksheet.Cells[row, 2].GetValue<string>();
+                    if (string.IsNullOrEmpty(staffId)) continue;
 
-                //int col = 2; // Column 2 is the item description
-                //for (int row = 2; row < 5; row++)
-                //    Console.WriteLine("\tCell({0},{1}).Value={2}", row, col, worksheet.Cells[row, col].Value);
+                    var person = await _personRepository.GetByStaffIdAsync(staffId.Trim());
+                    if (person is null) continue;
 
+                    int day = 0;
+                    for (int tempCol = 6; tempCol < 37; tempCol++)
+                    {
+                        timesheet[day] = worksheet.Cells[row, tempCol].GetValue<string>();
+                        ConvertValueCell(timesheet[day]);
+
+                        day++;
+                    }
+
+                    _element.TimesheetJSON = JsonConvert.SerializeObject(timesheet);
+                    _element.Date = new DateTime((int)year, (int)month, 1);
+                    _element.Person = person;
+                    _element.PersonId = person.Id;
+                    _listElement.Add(_element);
+                    _element = new();
+                }
+
+                // Add timesheets to db
+                await _timesheetRepository.AddRangeAsync(_listElement);
+                await UnitOfWork.CompleteAsync();
+
+                // Save as new file
                 string newPath = GetRootPath($"{year}-{month}.xlsx");
                 if (File.Exists(newPath))
                     File.Delete(newPath);
@@ -75,6 +111,36 @@ namespace Business.Services
             string rootPath = string.Concat(_env.WebRootPath, timesheetPath);
 
             return rootPath;
+        }
+
+        private void ConvertValueCell(string valueCell)
+        {
+            if (string.IsNullOrEmpty(valueCell)) return;
+
+            var cleanValue = valueCell.Trim().ToUpper();
+
+            if (cleanValue.Equals("-") || cleanValue.Equals("O"))
+                return;
+
+            if (cleanValue.Equals("W"))
+                _element.WorkDay += 1f;
+
+            if (cleanValue.Equals("R"))
+                _element.WorkDay += 0.5f;
+
+            if (cleanValue.Equals("A"))
+                _element.Absent += 1f;
+
+            if (cleanValue.Equals("H"))
+                _element.Holiday += 1f;
+
+            if (cleanValue.Equals("S"))
+                _element.UnpaidLeave += 1f;
+
+            if (cleanValue.Equals("V"))
+                _element.PaidLeave += 1f;
+
+            _element.TotalWorkDay += 1;
         }
         #endregion
 

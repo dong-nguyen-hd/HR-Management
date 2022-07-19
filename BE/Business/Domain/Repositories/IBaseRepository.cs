@@ -7,6 +7,7 @@ namespace Business.Domain.Repositories
         Task<Entity> GetByIdAsync(int entityId);
         Task<IEnumerable<Entity>> GetWithPrimaryKeyAsync(List<int> keyValues);
         Task InsertAsync(Entity entity);
+        Task AddRangeAsync(IEnumerable<Entity> entities);
         void Remove(Entity entity);
         int RemoveRange(IEnumerable<Entity> entities);
         void Update(Entity entity);
