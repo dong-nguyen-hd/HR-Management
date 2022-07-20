@@ -3,6 +3,7 @@ using Business.Extensions;
 using Business.Extensions.Validation;
 using Business.Resources.CategoryPerson;
 using Business.Resources.Certificate;
+using Business.Resources.Department;
 using Business.Resources.Education;
 using Business.Resources.Group;
 using Business.Resources.Position;
@@ -74,6 +75,7 @@ namespace Business.Resources.Person
         public List<int> OrderIndex { get; set; }
 
         public PositionResource Position { get; set; }
+        public DepartmentResource Department { get; set; }
         public GroupResource Group { get; set; }
 
         [Display(Name = "Work-History")]

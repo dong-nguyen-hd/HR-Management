@@ -1,17 +1,17 @@
 ﻿using AutoMapper;
 using Business.Extensions;
-using Business.Resources.Position;
+using Business.Resources.Department;
 
-namespace Business.Mapping.Position
+namespace Business.Mapping.Department
 {
     public class ResourceToModelProfile : Profile
     {
         public ResourceToModelProfile()
         {
-            CreateMap<CreatePositionResource, Domain.Models.Position>()
+            CreateMap<CreateDepartmentResource, Domain.Models.Department>()
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
 
-            CreateMap<UpdatePositionResource, Domain.Models.Position>()
+            CreateMap<UpdateDepartmentResource, Domain.Models.Department>()
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name.RemoveSpaceCharacter()));
         }
     }

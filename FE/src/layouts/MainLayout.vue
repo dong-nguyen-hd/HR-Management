@@ -159,6 +159,22 @@
           </q-item>
 
           <q-item
+            v-show="getRole != 'viewer'"
+            @click="isShowInfor = false"
+            clickable
+            v-ripple
+            to="/department"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="workspaces" />
+            </q-item-section>
+            <q-item-section>Department</q-item-section>
+          </q-item>
+
+          <q-item
             v-show="getRole == 'admin'"
             @click="isShowInfor = false"
             clickable

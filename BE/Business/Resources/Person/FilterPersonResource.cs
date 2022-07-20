@@ -12,8 +12,11 @@ namespace Business.Resources.Person
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
-        [Display(Name = "Office Id")]
+        [Display(Name = "Position Id")]
         public int? PositionId { get; set; }
+
+        [Display(Name = "Department Id")]
+        public int? DepartmentId { get; set; }
 
         [Display(Name = "Last Day")]
         public DateTime? LastDay { get; set; }

@@ -40,6 +40,10 @@ namespace Business.Resources.Person
         [Display(Name = "Position Id")]
         public int PositionId { get; set; }
 
+        [Required]
+        [Display(Name = "Department Id")]
+        public int DepartmentId { get; set; }
+
         [Display(Name = "Group Id")]
         public int? GroupId { get; set; }
 
