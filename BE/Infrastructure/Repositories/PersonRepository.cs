@@ -128,8 +128,6 @@ namespace Infrastructure.Repositories
         public async Task<int> TotalRecordAsync() =>
             await Context.People.CountAsync();
 
-        public async Task<Person> GetByStaffIdAsync(string staffId) =>
-            await Context.People.AsNoTracking().SingleOrDefaultAsync(x => x.StaffId.Equals(staffId));
         #endregion
     }
 }

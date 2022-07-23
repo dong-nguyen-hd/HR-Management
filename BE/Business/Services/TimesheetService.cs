@@ -62,6 +62,7 @@ namespace Business.Services
                     return new BaseResponse<TimesheetResource>(ResponseMessage.Values["Timesheet_Invalid"]);
 
                 // Calculate timesheet
+                var people = await _personRepository.GetAllAsync();
                 string[] timesheet = new string[31];
                 var totalRow = worksheet.Dimension.Rows;
                 for (int row = 7; row < totalRow; row++)
@@ -69,7 +70,8 @@ namespace Business.Services
                     string staffId = worksheet.Cells[row, 2].GetValue<string>();
                     if (string.IsNullOrEmpty(staffId)) continue;
 
-                    var person = await _personRepository.GetByStaffIdAsync(staffId.Trim());
+                    var person = GetPersonByStaffId(people, staffId);
+
                     if (person is null) continue;
 
                     int day = 0;
@@ -124,6 +126,16 @@ namespace Business.Services
             string rootPath = string.Concat(_env.WebRootPath, timesheetPath);
 
             return rootPath;
+        }
+
+        private Person GetPersonByStaffId(IEnumerable<Person> people, string staffId)
+        {
+            string tempStaffId = staffId.Trim();
+
+            foreach (var person in people)
+                if (person.StaffId.Equals(tempStaffId)) return person;
+
+            return null;
         }
 
         private void ConvertValueCell(string valueCell)
