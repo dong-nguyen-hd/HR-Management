@@ -51,6 +51,9 @@ namespace API.Extensions
             services.AddScoped<ITimesheetService, TimesheetService>();
             services.AddScoped<ITimesheetRepository, TimesheetRepository>();
 
+            services.AddScoped<IDepartmentService, DepartmentService>();
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+
             services.AddScoped<ITokenRepository, TokenRepository>();
 
             services.AddScoped<IImageService, ImageService>(); // ImageCrossPlatformService (use for other OSs except Windows)

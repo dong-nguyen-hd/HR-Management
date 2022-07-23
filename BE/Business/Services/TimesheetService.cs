@@ -104,6 +104,19 @@ namespace Business.Services
             return new BaseResponse<TimesheetResource>(true);
         }
 
+        public async Task<BaseResponse<TimesheetResource>> GetTimesheetByPersonIdAsync(int personId)
+        {
+            var timesheet = await _timesheetRepository.GetTimesheetByPersonIdAsync(personId);
+
+            if (timesheet is null)
+                return new BaseResponse<TimesheetResource>(ResponseMessage.Values["NoData"]);
+
+            // Mapping
+            var resource = Mapper.Map<Timesheet, TimesheetResource>(timesheet);
+
+            return new BaseResponse<TimesheetResource>(resource);
+        }
+
         #region Private work
         private string GetRootPath(string timesheetFileName)
         {

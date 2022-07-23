@@ -174,14 +174,6 @@ export default {
   mounted() {
     const $q = useQuasar();
   },
-  watch: {
-    isAuthenticated: function () {
-      if (this.isAuthenticated) {
-        if (this.getRole == "viewer") this.$router.replace("/project-view");
-        else this.$router.replace("/list-employee");
-      }
-    },
-  },
 };
 </script>
 

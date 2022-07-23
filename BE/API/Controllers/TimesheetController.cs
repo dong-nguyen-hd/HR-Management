@@ -1,9 +1,12 @@
 ﻿using Business.Communication;
+using Business.Data;
 using Business.Domain.Services;
 using Business.Resources;
+using Business.Resources.Timesheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace API.Controllers
 {
@@ -27,7 +30,7 @@ namespace API.Controllers
 
         #region Action
         [HttpPost("import")]
-        [AllowAnonymous]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}")]
         [ProducesResponseType(typeof(BaseResponse<>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ImportAsync([FromForm] IFormFile file)
@@ -53,6 +56,26 @@ namespace API.Controllers
                 return Ok(result);
 
             return BadRequest(result);
+        }
+
+        [HttpGet("person-id/{id:int}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorKT}")]
+        [ProducesResponseType(typeof(BaseResponse<TimesheetResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<TimesheetResource>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<TimesheetResource>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetTimesheetByPersonIdAsync(int personId)
+        {
+            Log.Information($"{User.Identity?.Name}: get a timesheet by person-id-{personId} data.");
+
+            var result = await _timesheetService.GetTimesheetByPersonIdAsync(personId);
+
+            if (result.Resource is null)
+                return NoContent();
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
         #endregion
 

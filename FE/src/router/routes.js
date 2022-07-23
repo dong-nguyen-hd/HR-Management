@@ -10,6 +10,11 @@ const routes = [
     meta: { requireLogin: true },
     children: [
       {
+        name: "List Employee QTNS",
+        path: "/list-employee-qtns",
+        component: () => import("src/pages/Employee/ListEmployeeForQTNS.vue"),
+      },
+      {
         name: "List Employee",
         path: "/list-employee",
         component: () => import("src/pages/Employee/ListEmployee.vue"),

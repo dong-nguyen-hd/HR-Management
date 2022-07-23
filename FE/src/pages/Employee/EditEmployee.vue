@@ -170,24 +170,24 @@
               ></q-input>
             </div>
 
-            <div class="position q-mt-sm q-px-lg">
+            <div class="department q-mt-sm q-px-lg">
               <q-select
                 standout
-                ref="positionRef"
+                ref="departmentRef"
                 tabindex="7"
-                v-model="employeeInfor.positionId"
-                :options="tempListPosition"
-                label="Position:"
+                v-model="employeeInfor.departmentId"
+                :options="tempListDepartment"
+                label="Department:"
                 option-value="id"
                 option-label="name"
                 emit-value
                 map-options
                 options-selected-class="text-accent"
-                @filter="filterPosition"
+                @filter="filterDepartment"
                 fill-input
                 hide-selected
                 use-input
-                :rules="[(val) => !!val || 'Position is required']"
+                :rules="[(val) => !!val || 'Department is required']"
                 hide-bottom-space
                 :label-color="labelColorFocus[5]"
                 @focus="labelColorFocus[5] = 'white'"
@@ -202,19 +202,51 @@
               </q-select>
             </div>
 
+            <div class="position q-mt-sm q-px-lg">
+              <q-select
+                standout
+                ref="positionRef"
+                tabindex="8"
+                v-model="employeeInfor.positionId"
+                :options="tempListPosition"
+                label="Position:"
+                option-value="id"
+                option-label="name"
+                emit-value
+                map-options
+                options-selected-class="text-accent"
+                @filter="filterPosition"
+                fill-input
+                hide-selected
+                use-input
+                :rules="[(val) => !!val || 'Position is required']"
+                hide-bottom-space
+                :label-color="labelColorFocus[6]"
+                @focus="labelColorFocus[6] = 'white'"
+                @blur="labelColorFocus[6] = ''"
+                ><template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+            </div>
+
             <div class="email q-mt-sm q-px-lg">
               <q-input
                 ref="emailRef"
-                tabindex="8"
+                tabindex="9"
                 standout
                 clearable
                 maxlength="500"
                 v-model="employeeInfor.email"
                 type="email"
                 label="Email:"
-                :label-color="labelColorFocus[6]"
-                @focus="labelColorFocus[6] = 'white'"
-                @blur="labelColorFocus[6] = ''"
+                :label-color="labelColorFocus[7]"
+                @focus="labelColorFocus[7] = 'white'"
+                @blur="labelColorFocus[7] = ''"
                 hide-bottom-space
               >
               </q-input>
@@ -226,14 +258,14 @@
                 mask="#########################"
                 standout
                 clearable
-                tabindex="9"
+                tabindex="10"
                 maxlength="25"
                 v-model="employeeInfor.phone"
                 type="text"
                 label="Phone:"
-                :label-color="labelColorFocus[7]"
-                @focus="labelColorFocus[7] = 'white'"
-                @blur="labelColorFocus[7] = ''"
+                :label-color="labelColorFocus[8]"
+                @focus="labelColorFocus[8] = 'white'"
+                @blur="labelColorFocus[8] = ''"
                 hide-bottom-space
               >
               </q-input>
@@ -243,7 +275,7 @@
               <q-select
                 standout
                 ref="workRef"
-                tabindex="10"
+                tabindex="11"
                 clearable
                 v-model="employeeInfor.groupId"
                 :options="tempListWork"
@@ -258,9 +290,9 @@
                 hide-selected
                 use-input
                 hide-bottom-space
-                :label-color="labelColorFocus[8]"
-                @focus="labelColorFocus[8] = 'white'"
-                @blur="labelColorFocus[8] = ''"
+                :label-color="labelColorFocus[9]"
+                @focus="labelColorFocus[9] = 'white'"
+                @blur="labelColorFocus[9] = ''"
                 ><template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -2036,6 +2068,7 @@ export default defineComponent({
         description: "",
         phone: null,
         dateOfBirth: "",
+        departmentId: null,
         positionId: null,
         groupId: null,
         gender: "",
@@ -2129,7 +2162,9 @@ export default defineComponent({
       tempListSkillCategory: [],
       tempListCategory: [],
       listCategory: [],
+      tempListDepartment: [],
       tempListPosition: [],
+      listDepartment: [],
       listPosition: [],
       tempListGroup: [],
       tempListWork: [],
@@ -2272,6 +2307,41 @@ export default defineComponent({
         });
       }
     },
+    async getDepartment() {
+      // Request API
+      let result = await api
+        .get("/api/v1/department")
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.listDepartment = result.resource;
+
+        // Mode edit
+        if (this.employeeInfor.departmentId) {
+          this.tempListDepartment = this.listDepartment.filter(
+            (v) => v.id == this.employeeInfor.departmentId
+          );
+        }
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
+    },
     async getPosition() {
       // Request API
       let result = await api
@@ -2342,6 +2412,18 @@ export default defineComponent({
       this.$q.notify({
         type: "negative",
         message: `Image size must lower than 5 MB`,
+      });
+    },
+    filterDepartment(val, update, abort) {
+      update(() => {
+        if (!val) {
+          this.tempListDepartment = this.listDepartment.slice(0, 5);
+        } else {
+          let needle = val.toLowerCase();
+          this.tempListDepartment = this.listDepartment.filter(
+            (v) => v.name.toLowerCase().indexOf(needle) > -1
+          );
+        }
       });
     },
     filterPosition(val, update, abort) {
@@ -3745,6 +3827,17 @@ export default defineComponent({
     },
     async saveAll() {
       try {
+        if (
+          !this.$refs.firstNameRef.validate() ||
+          !this.$refs.lastNameRef.validate() ||
+          !this.$refs.dobRef.validate() ||
+          !this.$refs.genderRef.validate() ||
+          !this.$refs.departmentRef.validate() ||
+          !this.$refs.positionRef.validate()
+        ) {
+          return null;
+        }
+
         this.loadingSave = true;
 
         let result = await Promise.all([
@@ -3885,6 +3978,7 @@ export default defineComponent({
     await Promise.all([
       this.findCategory(false, true),
       this.findGroup(false, true),
+      this.getDepartment(),
       this.getPosition(),
       this.getAvatarUrl(),
     ]);

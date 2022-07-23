@@ -14,7 +14,10 @@ namespace Business.Data
         EditorQTDA,
 
         [Description(Role.Viewer)]
-        Viewer
+        Viewer,
+
+        [Description(Role.EditorKT)]
+        EditorKT,
     }
 
     public class Role
@@ -23,6 +26,7 @@ namespace Business.Data
         public const string Admin = "admin";
         public const string EditorQTNS = "editor-qtns";
         public const string EditorQTDA = "editor-qtda";
+        public const string EditorKT = "editor-kt";
         public const string Viewer = "viewer";
         #endregion
     }

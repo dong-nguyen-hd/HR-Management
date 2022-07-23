@@ -83,6 +83,21 @@
             v-show="getRole != 'viewer'"
             clickable
             v-ripple
+            to="/list-employee-qtns"
+            exact
+            active-class="isActive"
+            class="q-pl-lg"
+          >
+            <q-item-section avatar>
+              <q-icon name="summarize" />
+            </q-item-section>
+            <q-item-section>Employee 2</q-item-section>
+          </q-item>
+
+          <q-item
+            v-show="getRole != 'viewer'"
+            clickable
+            v-ripple
             to="/list-employee"
             exact
             active-class="isActive"

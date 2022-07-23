@@ -27,6 +27,7 @@ namespace Infrastructure.Repositories
                 .Skip((pagination.Page - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .Include(y => y.Position)
+                .Include(y => y.Department)
                 .Include(y => y.WorkHistories.OrderByDescending(z => z.OrderIndex))
                 .Include(y => y.CategoryPersons.OrderByDescending(z => z.OrderIndex))
                 .ThenInclude(z => z.Category)
