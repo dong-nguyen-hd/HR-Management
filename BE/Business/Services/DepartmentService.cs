@@ -27,22 +27,22 @@ namespace Business.Services
         #endregion
 
         #region Method
-        public override async Task<BaseResponse<DepartmentResource>> InsertAsync(CreateDepartmentResource createLocationResource)
+        public override async Task<BaseResponse<DepartmentResource>> InsertAsync(CreateDepartmentResource createDepartmentResource)
         {
             try
             {
                 // Validate department name is existent?
-                var hasValue = await _departmentRepository.FindByNameAsync(createLocationResource.Name, true);
+                var hasValue = await _departmentRepository.FindByNameAsync(createDepartmentResource.Name, true);
                 if (hasValue.Count > 0)
                     return new BaseResponse<DepartmentResource>(ResponseMessage.Values["Department_Existent"]);
 
                 // Mapping Resource to Department
-                var Department = Mapper.Map<CreateDepartmentResource, Department>(createLocationResource);
+                var department = Mapper.Map<CreateDepartmentResource, Department>(createDepartmentResource);
 
-                await _departmentRepository.InsertAsync(Department);
+                await _departmentRepository.InsertAsync(department);
                 await UnitOfWork.CompleteAsync();
 
-                return new BaseResponse<DepartmentResource>(Mapper.Map<Department, DepartmentResource>(Department));
+                return new BaseResponse<DepartmentResource>(Mapper.Map<Department, DepartmentResource>(department));
             }
             catch (Exception ex)
             {

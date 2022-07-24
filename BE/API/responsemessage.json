@@ -16,6 +16,7 @@
       "Token_Saving_Error": "An error occurred when saving the Token",
 
       "Timesheet_Invalid": "An error occurred when reading the Timesheet",
+      "Timesheet_NoData": "Timesheet is not existent.",
 
       "Image_NoData": "There is no image.",
       "Image_Format_Error": "Image format is not supported.",
@@ -91,6 +92,12 @@
       "Department_Updating_Error": "An error occurred when updating the Position",
       "Department_NoData": "Position is not existent.",
       "Department_Existent": "Position is existent",
+
+      "Pay_Saving_Error": "An error occurred when saving the Pay",
+      "Pay_Deleting_Error": "An error occurred when deleting the Pay",
+      "Pay_Updating_Error": "An error occurred when updating the Pay",
+      "Pay_NoData": "Pay is not existent.",
+      "Pay_Existent": "Pay is existent",
 
       "WorkHistory_Saving_Error": "An error occurred when saving the Work-History",
       "WorkHistory_Deleting_Error": "An error occurred when deleting the Work-History",

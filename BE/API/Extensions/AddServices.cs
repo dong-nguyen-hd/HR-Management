@@ -54,6 +54,9 @@ namespace API.Extensions
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 
+            services.AddScoped<IPayService, PayService>();
+            services.AddScoped<IPayRepository, PayRepository>();
+
             services.AddScoped<ITokenRepository, TokenRepository>();
 
             services.AddScoped<IImageService, ImageService>(); // ImageCrossPlatformService (use for other OSs except Windows)

@@ -27,22 +27,22 @@ namespace Business.Services
         #endregion
 
         #region Method
-        public override async Task<BaseResponse<PositionResource>> InsertAsync(CreatePositionResource createLocationResource)
+        public override async Task<BaseResponse<PositionResource>> InsertAsync(CreatePositionResource createPositionResource)
         {
             try
             {
                 // Validate position name is existent?
-                var hasValue = await _positionRepository.FindByNameAsync(createLocationResource.Name, true);
+                var hasValue = await _positionRepository.FindByNameAsync(createPositionResource.Name, true);
                 if (hasValue.Count > 0)
                     return new BaseResponse<PositionResource>(ResponseMessage.Values["Position_Existent"]);
 
                 // Mapping Resource to Position
-                var Position = Mapper.Map<CreatePositionResource, Position>(createLocationResource);
+                var position = Mapper.Map<CreatePositionResource, Position>(createPositionResource);
 
-                await _positionRepository.InsertAsync(Position);
+                await _positionRepository.InsertAsync(position);
                 await UnitOfWork.CompleteAsync();
 
-                return new BaseResponse<PositionResource>(Mapper.Map<Position, PositionResource>(Position));
+                return new BaseResponse<PositionResource>(Mapper.Map<Position, PositionResource>(position));
             }
             catch (Exception ex)
             {

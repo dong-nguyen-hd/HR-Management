@@ -30,7 +30,8 @@ namespace API.Controllers
 
         #region Action
         [HttpPost("import")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}")]
+        //[Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(BaseResponse<>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ImportAsync([FromForm] IFormFile file)
