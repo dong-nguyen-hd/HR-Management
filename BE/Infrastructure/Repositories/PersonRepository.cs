@@ -114,6 +114,7 @@ namespace Infrastructure.Repositories
         public override async Task<Person> GetByIdAsync(int id) =>
             await Context.People
                 .AsSplitQuery()
+                .Include(y => y.Department)
                 .Include(y => y.Position)
                 .Include(y => y.WorkHistories.OrderByDescending(z => z.OrderIndex))
                 .Include(y => y.CategoryPersons.OrderByDescending(z => z.OrderIndex))

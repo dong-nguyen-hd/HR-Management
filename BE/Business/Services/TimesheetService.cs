@@ -77,7 +77,7 @@ namespace Business.Services
                     int day = 0;
                     for (int tempCol = 6; tempCol < 37; tempCol++)
                     {
-                        timesheet[day] = worksheet.Cells[row, tempCol].GetValue<string>();
+                        timesheet[day] = worksheet.Cells[row, tempCol].GetValue<string>()?.Trim().ToUpper();
                         ConvertValueCell(timesheet[day]);
 
                         day++;
@@ -92,7 +92,7 @@ namespace Business.Services
                 }
 
                 // Add timesheets to db
-                await _timesheetRepository.AddRangeAsync(_listElement);
+                _timesheetRepository.AttachRange(_listElement);
                 await UnitOfWork.CompleteAsync();
 
                 // Save as new file
@@ -106,9 +106,9 @@ namespace Business.Services
             return new BaseResponse<TimesheetResource>(true);
         }
 
-        public async Task<BaseResponse<TimesheetResource>> GetTimesheetByPersonIdAsync(int personId)
+        public async Task<BaseResponse<TimesheetResource>> GetTimesheetByPersonIdAsync(int personId, DateTime date)
         {
-            var timesheet = await _timesheetRepository.GetTimesheetByPersonIdAsync(personId);
+            var timesheet = await _timesheetRepository.GetTimesheetByPersonIdAsync(personId, date);
 
             if (timesheet is null)
                 return new BaseResponse<TimesheetResource>(ResponseMessage.Values["NoData"]);

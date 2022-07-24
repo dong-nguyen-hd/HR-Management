@@ -33,6 +33,9 @@ namespace Infrastructure.Repositories
         public virtual async Task AddRangeAsync(IEnumerable<Entity> entities) =>
             await _entities.AddRangeAsync(entities);
 
+        public virtual void AttachRange(IEnumerable<Entity> entities) =>
+            _entities.AttachRange(entities);
+
         /// <summary>
         /// Soft-delete by change value of status true -> false
         /// </summary>

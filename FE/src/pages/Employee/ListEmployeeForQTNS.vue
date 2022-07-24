@@ -111,62 +111,102 @@
         </q-layout>
       </q-dialog>
 
+      <q-dialog v-model="showTimesheet" full-width full-height>
+        <q-layout view="hHh lpR fFf" container class="bg-white">
+          <q-header class="bg-accent">
+            <q-toolbar>
+              <q-toolbar-title></q-toolbar-title>
+              <q-btn
+                flat
+                round
+                dense
+                icon="close"
+                @click="showTimesheet = false"
+              />
+            </q-toolbar>
+          </q-header>
+
+          <q-page-container>
+            <q-page>
+              <div class="fit absolute">
+                <q-splitter class="fit" v-model="splitterModel">
+                  <template v-slot:before>
+                    <div class="q-pa-md row justify-center">
+                      <q-date
+                        landscape
+                        v-model="dateTimesheet"
+                        :events="addEventsTimesheet"
+                        :event-color="addColorTimesheet"
+                        @navigation="changeDateTimesheet"
+                      />
+                    </div>
+                  </template>
+
+                  <template v-slot:after>
+                    <div class="q-pa-md">
+                      <div class="text-h4 q-mb-md">
+                        {{ convertDateTimeToDate(timesheet.date, "YYYY/MM") }}
+                      </div>
+                      <div>
+                        Total work day: {{ timesheet.workDay }} /
+                        {{ timesheet.totalWorkDay }}
+                      </div>
+                      <div class="column">
+                        <q-chip color="light-green-6" text-color="white">
+                          FULL DAY
+                        </q-chip>
+                        <q-chip color="amber-6" text-color="white">
+                          1/2 DAY
+                        </q-chip>
+                        <q-chip color="lime-6" text-color="white">
+                          ABSENT: {{ timesheet.absent }}
+                        </q-chip>
+                        <q-chip color="blue-6" text-color="white">
+                          HOLIDAY: {{ timesheet.holiday }}
+                        </q-chip>
+                        <q-chip color="cyan-6" text-color="white">
+                          DAY OFF
+                        </q-chip>
+                        <q-chip color="grey-6" text-color="white">
+                          UNPAID LEAVE: {{ timesheet.unpaidLeave }}
+                        </q-chip>
+                        <q-chip color="yellow-6" text-color="white">
+                          PAID LEAVE: {{ timesheet.paidLeave }}
+                        </q-chip>
+                      </div>
+                    </div>
+                  </template>
+                </q-splitter>
+              </div>
+            </q-page>
+          </q-page-container>
+        </q-layout>
+      </q-dialog>
+
       <div
         class="table-component full-height full-width flex flex-center q-px-md"
       >
         <div class="new-item q-mb-md flex justify-end full-width">
-          <div v-show="!filter.available">
-            <q-input
-              dense
-              readonly
-              clearable
-              standout
-              v-model="filter.lastDay"
-              type="text"
-              placeholder="YYYY-MM-DD"
-              stack-label
-              label="Day finish project:"
-              label-color="white"
-              bg-color="primary"
-              input-class="text-white"
-              hide-bottom-space
-            >
-              <template v-slot:append>
-                <q-icon name="event" class="cursor-pointer" color="white">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-date
-                      v-model="filter.lastDay"
-                      mask="YYYY-MM-DD"
-                      @update:model-value="getEmployeeWithFilter(false)"
-                    >
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          @click="clearLastDay"
-                          label="Clear"
-                          color="primary"
-                          flat
-                        />
+          <q-file
+            outlined
+            dense
+            class="q-ml-md"
+            style="overflow: hidden; max-height: 40px"
+            input-style="width: 170px;"
+            max-total-size="10485760"
+            v-model="timesheetFile"
+            accept=".xlsx"
+            :display-value="
+              timesheetFile ? 'Timesheet is uploaded' : 'Upload timesheet here!'
+            "
+            @update:model-value="importTimesheet"
+          >
+            <template v-slot:prepend>
+              <q-icon name="attach_file" />
+            </template>
+          </q-file>
 
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </div>
           <q-btn
-            v-show="getRole == 'editor-qtns' || getRole == 'admin'"
             class="q-ml-md"
             @click="openInsert"
             color="primary"
@@ -209,7 +249,7 @@
                   @blur="
                     labelColorFocus[0] = 'white';
                     labelNameFocus[0] = props.col.label;
-                    widthOfStaffId = '100px';
+                    widthOfStaffId = '80px';
                   "
                 >
                   <template v-slot:append>
@@ -229,49 +269,6 @@
             </q-th>
           </template>
 
-          <template v-slot:header-cell-position="props">
-            <q-th :props="props">
-              <div :style="`width: ${widthOfPosition};`">
-                <q-select
-                  @update:model-value="getEmployeeWithFilter(false)"
-                  dense
-                  standout
-                  dark
-                  clearable
-                  v-model="filter.positionId"
-                  :options="tempListPosition"
-                  :label="props.col.label"
-                  option-value="id"
-                  option-label="name"
-                  emit-value
-                  map-options
-                  options-selected-class="text-accent"
-                  @filter="filterPosition"
-                  input-debounce="100"
-                  fill-input
-                  hide-selected
-                  use-input
-                  :label-color="labelColorFocus[1]"
-                  @focus="
-                    labelColorFocus[1] = 'black';
-                    widthOfPosition = '160px';
-                  "
-                  @blur="
-                    labelColorFocus[1] = 'white';
-                    widthOfPosition = !filter.positionId ? '120px' : '160px';
-                  "
-                  ><template v-slot:no-option>
-                    <q-item>
-                      <q-item-section class="text-grey">
-                        No results
-                      </q-item-section>
-                    </q-item>
-                  </template>
-                </q-select>
-              </div>
-            </q-th>
-          </template>
-
           <template v-slot:header-cell-fullName="props">
             <q-th :props="props">
               <div :style="`min-width: ${widthOfFullName};`">
@@ -283,17 +280,17 @@
                   debounce="400"
                   v-model="filter.firstName"
                   input-class="text-right"
-                  :label="labelNameFocus[2]"
-                  :label-color="labelColorFocus[2]"
+                  :label="labelNameFocus[1]"
+                  :label-color="labelColorFocus[1]"
                   @focus="
-                    labelColorFocus[2] = 'black';
-                    labelNameFocus[2] = 'Search by first name';
+                    labelColorFocus[1] = 'black';
+                    labelNameFocus[1] = 'Search by first name';
                     widthOfFullName = '170px';
                   "
                   @blur="
-                    labelColorFocus[2] = 'white';
-                    labelNameFocus[2] = props.col.label;
-                    widthOfFullName = '130px';
+                    labelColorFocus[1] = 'white';
+                    labelNameFocus[1] = props.col.label;
+                    widthOfFullName = '100px';
                   "
                 >
                   <template v-slot:append>
@@ -313,6 +310,94 @@
             </q-th>
           </template>
 
+          <template v-slot:header-cell-department="props">
+            <q-th :props="props">
+              <div :style="`min-width: ${widthOfDepartment};`">
+                <q-select
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  dense
+                  standout
+                  dark
+                  clearable
+                  v-model="filter.departmentId"
+                  :options="tempListDepartment"
+                  :label="props.col.label"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  @filter="filterDepartment"
+                  input-debounce="100"
+                  fill-input
+                  hide-selected
+                  use-input
+                  :label-color="labelColorFocus[2]"
+                  @focus="
+                    labelColorFocus[2] = 'black';
+                    widthOfDepartment = '120px';
+                  "
+                  @blur="
+                    labelColorFocus[2] = 'white';
+                    widthOfDepartment = !filter.departmentId
+                      ? '100px'
+                      : '120px';
+                  "
+                  ><template v-slot:no-option>
+                    <q-item>
+                      <q-item-section class="text-grey">
+                        No results
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+            </q-th>
+          </template>
+
+          <template v-slot:header-cell-position="props">
+            <q-th :props="props">
+              <div :style="`min-width: ${widthOfPosition};`">
+                <q-select
+                  @update:model-value="getEmployeeWithFilter(false)"
+                  dense
+                  standout
+                  dark
+                  clearable
+                  v-model="filter.positionId"
+                  :options="tempListPosition"
+                  :label="props.col.label"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  options-selected-class="text-accent"
+                  @filter="filterPosition"
+                  input-debounce="100"
+                  fill-input
+                  hide-selected
+                  use-input
+                  :label-color="labelColorFocus[3]"
+                  @focus="
+                    labelColorFocus[3] = 'black';
+                    widthOfPosition = '120px';
+                  "
+                  @blur="
+                    labelColorFocus[3] = 'white';
+                    widthOfPosition = !filter.positionId ? '100px' : '120px';
+                  "
+                  ><template v-slot:no-option>
+                    <q-item>
+                      <q-item-section class="text-grey">
+                        No results
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+              </div>
+            </q-th>
+          </template>
+
           <template v-slot:body-cell-avatar="props">
             <q-td :props="props">
               <q-avatar>
@@ -323,28 +408,34 @@
 
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
-              <div>
-                <q-btn
-                  style="width: 60px"
-                  dense
-                  color="white"
-                  text-color="black"
-                  label="Edit"
-                  @click="openEdit(props.value)"
-                />
-              </div>
-              <div class="q-mt-sm">
-                <q-btn
-                  style="width: 60px"
-                  dense
+              <q-fab
+                color="white"
+                text-color="black"
+                icon="add"
+                direction="left"
+              >
+                <q-fab-action
                   color="negative"
-                  label="delete"
+                  text-color="white"
+                  icon="delete"
                   @click="
                     idDelete = props.value;
                     showDelete = true;
                   "
                 />
-              </div>
+                <q-fab-action
+                  color="positive"
+                  text-color="white"
+                  icon="edit"
+                  @click="openEdit(props.value)"
+                />
+                <q-fab-action
+                  color="info"
+                  text-color="white"
+                  icon="event"
+                  @click="openShowTimesheet(props.value)"
+                />
+              </q-fab>
             </q-td>
           </template>
 
@@ -382,12 +473,29 @@ export default defineComponent({
   data() {
     return {
       labelColorFocus: ["white", "white", "white", "white"],
-      labelNameFocus: ["Staff ID", "", "Full Name", "Skills"],
+      labelNameFocus: ["Staff ID", "Full Name", "Department", "Position"],
 
-      widthOfStaffId: "100px",
-      widthOfPosition: "120px",
+      widthOfStaffId: "80px",
       widthOfFullName: "130px",
-      widthOfSkill: "150px",
+      widthOfDepartment: "100px",
+      widthOfPosition: "100px",
+
+      timesheetFile: null,
+      splitterModel: 50,
+      dateTimesheet: "",
+      timesheet: {
+        absent: 0,
+        date: "",
+        holiday: 0,
+        id: 0,
+        paidLeave: 0,
+        timesheetJSON: "",
+        totalWorkDay: 0,
+        unpaidLeave: 0,
+        workDay: 0,
+      },
+      showTimesheet: false,
+      personTimesheetId: 0,
 
       loadingData: false,
 
@@ -402,17 +510,11 @@ export default defineComponent({
       showInsert: false,
       statusInsert: false,
 
-      showView: false,
-      viewObj: null,
-
       filter: {
         staffId: null,
         positionId: null,
         departmentId: null,
         firstName: null,
-        available: false,
-        lastDay: null,
-        technologyId: [],
       },
 
       pagination: {
@@ -431,8 +533,6 @@ export default defineComponent({
       listDepartment: [],
       tempListPosition: [],
       listPosition: [],
-      tempListSkill: [],
-      listSkill: [],
       listEmployee: [],
       headerTable: [
         {
@@ -555,8 +655,6 @@ export default defineComponent({
           ? props.pagination
           : { page: 1, rowsPerPage: this.pagination.rowsPerPage };
 
-        if (!this.filter.lastDay) this.filter.lastDay = null;
-
         // Request API
         let result = await api
           .post(
@@ -588,6 +686,34 @@ export default defineComponent({
         }
       } finally {
         this.loadingData = false;
+      }
+    },
+    async getDepartment() {
+      // Request API
+      let result = await api
+        .get("/api/v1/department")
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.listDepartment = result.resource;
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
       }
     },
     async getPosition() {
@@ -639,6 +765,18 @@ export default defineComponent({
       if (text.length > 20) return `${text.slice(0, 20)}...`;
       else return text;
     },
+    filterDepartment(val, update, abort) {
+      update(() => {
+        if (!val) {
+          this.tempListDepartment = this.listDepartment.slice(0, 5);
+        } else {
+          let needle = val.toLowerCase();
+          this.tempListDepartment = this.listDepartment.filter(
+            (v) => v.name.toLowerCase().indexOf(needle) > -1
+          );
+        }
+      });
+    },
     filterPosition(val, update, abort) {
       update(() => {
         if (!val) {
@@ -649,12 +787,6 @@ export default defineComponent({
             (v) => v.name.toLowerCase().indexOf(needle) > -1
           );
         }
-      });
-    },
-    filterSkill(val, update, abort) {
-      update(async () => {
-        if (val.length < 2) this.tempListSkill = this.listSkill;
-        else await this.findTechnology(val, false);
       });
     },
     async deleteEmployee() {
@@ -759,22 +891,114 @@ export default defineComponent({
 
       return result?.resource;
     },
-    openViewDialog(id) {
-      this.viewObj = this.listEmployee.find((x) => x.id == id);
-      this.showView = true;
+    async importTimesheet() {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      let fd = new FormData();
+      fd.append("file", this.timesheetFile);
+
+      // Request API import timesheet
+      let result = await api
+        .post(`/api/v1/timesheet/import`, fd)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success) {
+        this.$q.notify({
+          type: "positive",
+          message: "Successfully uploaded",
+        });
+      } else {
+        this.$q.notify({
+          type: "negative",
+          message: result.message[0],
+        });
+      }
     },
-    converGender(value) {
-      if (value == 1) return "Male";
-      if (value == 2) return "Female";
-      if (value == 3) return "Sexless";
+    async openShowTimesheet(id, dateInput = "") {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      this.personTimesheetId = id;
+
+      if (!dateInput) {
+        dateInput = this.convertDateTimeToDate(Date.now(), "YYYY/MM/DD");
+        this.dateTimesheet = dateInput;
+      }
+
+      this.timesheet.date = dateInput;
+      this.timesheet.timesheetJSON = "";
+
+      this.showTimesheet = true;
+
+      // Request API import timesheet
+      let result = await api
+        .get(`/api/v1/timesheet?personId=${id}&date=${dateInput}`)
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.success && result.resource) {
+        this.timesheet = Object.assign({}, result.resource);
+        this.timesheet.timesheetJSON = JSON.parse(this.timesheet.timesheetJSON);
+      }
+    },
+    async changeDateTimesheet(view) {
+      let dateString = `${view.year}/${view.month}/1`;
+      let date = this.convertDateTimeToDate(dateString);
+      await this.openShowTimesheet(this.personTimesheetId, date);
+    },
+    addEventsTimesheet(date) {
+      if (!this.timesheet.timesheetJSON) return false;
+      let parts = this.convertDateTimeToDate(date, "YYYY/M/D").split("/");
+
+      let indexOfDay = parseInt(parts[2]);
+      let dayValue = this.timesheet.timesheetJSON[indexOfDay - 1];
+      if (dayValue != "-" && dayValue != "O") {
+        return true;
+      } else return false;
+    },
+    addColorTimesheet(date) {
+      let parts = this.convertDateTimeToDate(date, "YYYY/M/D").split("/");
+
+      let indexOfDay = parseInt(parts[2]);
+      let dayValue = this.timesheet.timesheetJSON[indexOfDay - 1];
+
+      if (dayValue == "W") return "light-green-6";
+      if (dayValue == "R") return "amber-6";
+      if (dayValue == "A") return "lime-6";
+      if (dayValue == "H") return "blue-6";
+      if (dayValue == "S") return "grey-6";
+      if (dayValue == "V") return "yellow-6";
+
+      return "white";
     },
     convertDateTimeToDate(dateTime, stringFormat = "YYYY-MM-DD") {
       return date.formatDate(dateTime, stringFormat);
-    },
-    async clearLastDay() {
-      this.filter.lastDay = null;
-
-      await this.getEmployeeWithFilter(false);
     },
   },
   computed: {
@@ -795,6 +1019,7 @@ export default defineComponent({
     await Promise.all([
       this.getEmployee(),
       this.getPosition(),
+      this.getDepartment(),
     ]);
   },
   mounted() {

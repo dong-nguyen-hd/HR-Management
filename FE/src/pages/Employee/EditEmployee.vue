@@ -3917,6 +3917,8 @@ export default defineComponent({
       extend(true, this.employeeInfor, this.employeeTransfer);
       // Set position
       this.employeeInfor.positionId = this.employeeInfor?.position?.id;
+      // Set department
+      this.employeeInfor.departmentId = this.employeeInfor?.department?.id;
       // Set self-project
       this.employeeInfor.groupId = this.employeeInfor?.group?.id;
       this.tempListWork.push(this.employeeInfor.group);

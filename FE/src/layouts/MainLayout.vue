@@ -244,7 +244,7 @@ export default defineComponent({
     };
   },
   methods: {
-    ...mapActions("auth", ["logOut"]),
+    ...mapActions("auth", ["logOut", "init"]),
 
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
@@ -267,7 +267,8 @@ export default defineComponent({
     },
   },
   async created() {
-    console.log(this.getRole);
+    this.init();
+    this.getRole;
   },
 });
 </script>

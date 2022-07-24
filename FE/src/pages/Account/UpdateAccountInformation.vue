@@ -235,6 +235,9 @@ export default defineComponent({
       }
     },
     async requestUpdateImage() {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+      
       let fd = new FormData();
       fd.append("image", this.imageFile);
 

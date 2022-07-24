@@ -58,19 +58,15 @@ namespace API.Controllers
             return BadRequest(result);
         }
 
-        [HttpGet("person-id/{id:int}")]
+        [HttpGet()]
         [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorKT}")]
         [ProducesResponseType(typeof(BaseResponse<TimesheetResource>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse<TimesheetResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<TimesheetResource>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetTimesheetByPersonIdAsync(int personId)
+        public async Task<IActionResult> GetTimesheetByPersonIdAsync(int personId, DateTime date)
         {
             Log.Information($"{User.Identity?.Name}: get a timesheet by person-id-{personId} data.");
 
-            var result = await _timesheetService.GetTimesheetByPersonIdAsync(personId);
-
-            if (result.Resource is null)
-                return NoContent();
+            var result = await _timesheetService.GetTimesheetByPersonIdAsync(personId, date);
 
             if (!result.Success)
                 return BadRequest(result);

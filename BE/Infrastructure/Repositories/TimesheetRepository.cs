@@ -12,8 +12,11 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        public async Task<Timesheet> GetTimesheetByPersonIdAsync(int personId) =>
-            await Context.Timesheets.SingleOrDefaultAsync(x => x.PersonId == personId);
+        public async Task<Timesheet> GetTimesheetByPersonIdAsync(int personId, DateTime date) =>
+            await Context.Timesheets.AsNoTracking()
+            .Where(x => x.PersonId == personId && x.Date.Year == date.Year && x.Date.Month == date.Month)
+            .OrderByDescending(x => x.Id)
+            .FirstOrDefaultAsync();
         #endregion
     }
 }
