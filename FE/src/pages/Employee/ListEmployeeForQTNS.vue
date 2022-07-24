@@ -131,8 +131,9 @@
               <div class="fit absolute">
                 <q-splitter class="fit" v-model="splitterModel">
                   <template v-slot:before>
-                    <div class="q-pa-md row justify-center">
+                    <div class="q-pa-md row fit justify-center">
                       <q-date
+                        class="fit"
                         landscape
                         v-model="dateTimesheet"
                         :events="addEventsTimesheet"
