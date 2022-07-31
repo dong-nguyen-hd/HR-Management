@@ -10,14 +10,16 @@ This project building on **.NET 6**, using for Human Resource Management for IT 
 * [Swagger UI - Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)
 * [Cronos](https://github.com/HangfireIO/Cronos)
 * [Serilog](https://serilog.net/)
-* [x Unit Test](https://xunit.net/)
+* [EPPlus](https://github.com/EPPlusSoftware/EPPlus)
+* [xUnit Test](https://xunit.net/)
 * [Quasar](https://quasar.dev/)
 
 ## Features
-* Human resources management with following information: personal, work history, project, certificate, education, skill,...
+* Human resources management with following information: personal, work history, project, certificate, education, skill, timesheet, salary,...
 * Support: authentication-authorization with token-base (JWT).
 * Archiving accounts into database, hashing password-salt with PBKDF2 algorithm.
 * Storing and resizing image.
+* Import excel file.
 * Getting data with pagination.
 * Logging information to console and file.
 
@@ -27,7 +29,7 @@ This project building on **.NET 6**, using for Human Resource Management for IT 
 
 ## Design Patterns
 
-* Unit Of Work
+* Unit of Work
 * Generic Repository
 * Request-Reply
 * Inversion of Control / Dependency injection
