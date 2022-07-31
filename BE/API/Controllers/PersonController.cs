@@ -70,7 +70,7 @@ namespace API.Controllers
 
             QueryResource pagintation = new QueryResource(page, pageSize);
 
-            var result = await _personService.GetPaginationAsync(pagintation, null);
+            var result = await _personService.GetPaginationAsync(pagintation, new FilterPersonResource());
 
             if (!result.Success)
                 return BadRequest(result);

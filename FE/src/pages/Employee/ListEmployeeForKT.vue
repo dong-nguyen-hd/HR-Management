@@ -1,220 +1,45 @@
 <template>
   <q-page class="full-height full-width flex flex-center">
     <div class="container full-height full-width">
-      <q-dialog v-model="showDelete" :persistent="deleteProcess">
-        <q-card>
-          <q-card-section class="row items-center">
-            <span class="text-h6">Delete {{ getNameDelete }}?</span>
-          </q-card-section>
-
-          <q-separator />
-
-          <q-card-section>
-            <span
-              >This can’t be undone and it will be removed from database.</span
-            >
-          </q-card-section>
-
-          <q-card-actions align="right">
-            <q-btn
-              flat
-              :disable="deleteProcess"
-              label="Cancel"
-              color="primary"
-              v-close-popup
-            />
-            <q-btn
-              flat
-              label="Delete"
-              color="negative"
-              @click="deleteEmployee"
-              :loading="deleteProcess"
-            />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-
-      <q-dialog v-model="showEdit" persistent full-width full-height>
-        <q-layout view="hHh lpR fFf" container class="bg-white">
-          <q-header class="bg-accent">
-            <q-toolbar>
-              <q-toolbar-title></q-toolbar-title>
-              <q-btn
-                class="q-mr-lg"
-                flat
-                round
-                dense
-                icon="visibility"
-                @click="openViewDialog(editObj.id)"
-              />
-              <q-btn flat round dense icon="close" @click="closeEditDialog" />
-            </q-toolbar>
-          </q-header>
-
-          <q-page-container>
-            <q-page>
-              <edit-employee
-                v-if="showEdit"
-                @updateSuccess="updateReceive"
-                :statusUpdateTransfer="statusUpdate"
-                :employeeTransfer="editObj"
-              />
-            </q-page>
-          </q-page-container>
-
-          <q-footer class="bg-accent text-white">
-            <q-toolbar class="flex flex-center">
-              <q-btn
-                :loading="statusUpdate"
-                dense
-                color="primary"
-                label="Save"
-                class="q-px-lg"
-                @click="saveUpdate"
-              />
-            </q-toolbar>
-          </q-footer>
-        </q-layout>
-      </q-dialog>
-
-      <q-dialog v-model="showInsert" persistent full-width full-height>
-        <q-layout view="hHh lpR fFf" container class="bg-white">
-          <q-header class="bg-accent">
-            <q-toolbar>
-              <q-toolbar-title></q-toolbar-title>
-              <q-btn flat round dense icon="close" @click="closeInsertDialog" />
-            </q-toolbar>
-          </q-header>
-
-          <q-page-container>
-            <q-page>
-              <new-employee
-                v-if="showInsert"
-                @insertSuccess="insertReceive"
-                :statusInsertTransfer="statusInsert"
-              />
-            </q-page>
-          </q-page-container>
-
-          <q-footer class="bg-accent text-white">
-            <q-toolbar class="flex flex-center">
-              <q-btn
-                :loading="statusInsert"
-                dense
-                color="primary"
-                label="Save"
-                class="q-px-lg"
-                @click="saveInsert"
-              />
-            </q-toolbar>
-          </q-footer>
-        </q-layout>
-      </q-dialog>
-
-      <q-dialog v-model="showTimesheet" full-width full-height>
-        <q-layout view="hHh lpR fFf" container class="bg-white">
-          <q-header class="bg-accent">
-            <q-toolbar>
-              <q-toolbar-title></q-toolbar-title>
-              <q-btn
-                flat
-                round
-                dense
-                icon="close"
-                @click="showTimesheet = false"
-              />
-            </q-toolbar>
-          </q-header>
-
-          <q-page-container>
-            <q-page>
-              <div class="fit absolute">
-                <q-splitter class="fit" v-model="splitterModel">
-                  <template v-slot:before>
-                    <div class="q-pa-md row fit justify-center">
-                      <q-date
-                        class="fit"
-                        landscape
-                        v-model="dateTimesheet"
-                        :events="addEventsTimesheet"
-                        :event-color="addColorTimesheet"
-                        @navigation="changeDateTimesheet"
-                      />
-                    </div>
-                  </template>
-
-                  <template v-slot:after>
-                    <div class="q-pa-md">
-                      <div class="text-h4 q-mb-md">
-                        {{ convertDateTimeToDate(timesheet.date, "YYYY/MM") }}
-                      </div>
-                      <div>
-                        Total work day: {{ timesheet.workDay }} /
-                        {{ timesheet.totalWorkDay }}
-                      </div>
-                      <div class="column">
-                        <q-chip color="light-green-6" text-color="white">
-                          FULL DAY
-                        </q-chip>
-                        <q-chip color="amber-6" text-color="white">
-                          1/2 DAY
-                        </q-chip>
-                        <q-chip color="red-6" text-color="white">
-                          ABSENT: {{ timesheet.absent }}
-                        </q-chip>
-                        <q-chip color="indigo-6" text-color="white">
-                          HOLIDAY: {{ timesheet.holiday }}
-                        </q-chip>
-                        <q-chip color="cyan-6" text-color="white">
-                          DAY OFF
-                        </q-chip>
-                        <q-chip color="grey-6" text-color="white">
-                          UNPAID LEAVE: {{ timesheet.unpaidLeave }}
-                        </q-chip>
-                        <q-chip color="yellow-6" text-color="white">
-                          PAID LEAVE: {{ timesheet.paidLeave }}
-                        </q-chip>
-                      </div>
-                    </div>
-                  </template>
-                </q-splitter>
-              </div>
-            </q-page>
-          </q-page-container>
-        </q-layout>
-      </q-dialog>
-
       <div
         class="table-component full-height full-width flex flex-center q-px-md"
       >
         <div class="new-item q-mb-md flex justify-end full-width">
-          <q-file
-            outlined
-            :loading="loadingUploadTimesheet"
+          <q-input
             dense
-            class="q-ml-md"
-            style="overflow: hidden; max-height: 40px"
-            input-style="width: 170px;"
-            max-total-size="10485760"
-            v-model="timesheetFile"
-            accept=".xlsx"
-            :display-value="
-              timesheetFile ? 'Timesheet is uploaded' : 'Upload timesheet here!'
-            "
-            @update:model-value="importTimesheet"
+            readonly
+            clearable
+            standout
+            v-model="filter.date"
+            type="text"
+            placeholder="YYYY-MM-DD"
+            stack-label
+            label="Date:"
+            label-color="white"
+            bg-color="primary"
+            input-class="text-white"
+            hide-bottom-space
           >
-            <template v-slot:prepend>
-              <q-icon name="attach_file" />
+            <template v-slot:append>
+              <q-icon name="event" class="cursor-pointer" color="white">
+                <q-popup-proxy
+                  cover
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-date
+                    v-model="filter.date"
+                    mask="YYYY-MM-DD"
+                    @update:model-value="getEmployeeWithFilter(false)"
+                  >
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-date>
+                </q-popup-proxy>
+              </q-icon>
             </template>
-          </q-file>
-
-          <q-btn
-            class="q-ml-md"
-            @click="openInsert"
-            color="primary"
-            label="New employee"
-            unelevated
-          />
+          </q-input>
         </div>
 
         <q-table
@@ -410,34 +235,23 @@
 
           <template v-slot:body-cell-action="props">
             <q-td :props="props">
-              <q-fab
-                color="white"
-                text-color="black"
-                icon="add"
-                direction="left"
-              >
-                <q-fab-action
+              <div>
+                <q-btn
+                  style="width: 60px"
+                  dense
+                  color="white"
+                  text-color="black"
+                  label="new"
+                />
+              </div>
+              <div class="q-mt-sm">
+                <q-btn
+                  style="width: 60px"
+                  dense
                   color="negative"
-                  text-color="white"
-                  icon="delete"
-                  @click="
-                    idDelete = props.value;
-                    showDelete = true;
-                  "
+                  label="delete"
                 />
-                <q-fab-action
-                  color="positive"
-                  text-color="white"
-                  icon="edit"
-                  @click="openEdit(props.value)"
-                />
-                <q-fab-action
-                  color="info"
-                  text-color="white"
-                  icon="event"
-                  @click="openShowTimesheet(props.value)"
-                />
-              </q-fab>
+              </div>
             </q-td>
           </template>
 
@@ -461,16 +275,9 @@ import { defineComponent } from "vue";
 import { mapActions, mapGetters } from "vuex";
 import { useQuasar, date } from "quasar";
 import { api } from "src/boot/axios";
-import EditEmployee from "src/pages/Employee/EditEmployee.vue";
-import NewEmployee from "src/pages/Employee/NewEmployee.vue";
 
 export default defineComponent({
-  name: "List Employee",
-
-  components: {
-    "edit-employee": EditEmployee,
-    "new-employee": NewEmployee,
-  },
+  name: "List Employee For KT",
 
   data() {
     return {
@@ -498,7 +305,6 @@ export default defineComponent({
       },
       showTimesheet: false,
       personTimesheetId: 0,
-      loadingUploadTimesheet: false,
 
       loadingData: false,
 
@@ -515,9 +321,10 @@ export default defineComponent({
 
       filter: {
         staffId: null,
+        firstName: null,
         positionId: null,
         departmentId: null,
-        firstName: null,
+        date: null,
       },
 
       pagination: {
@@ -613,40 +420,6 @@ export default defineComponent({
         this.statusInsert = false;
       }
     },
-    async getEmployee() {
-      try {
-        this.loadingData = true;
-
-        // Request API
-        let result = await api
-          .get(`/api/v1/person?page=1&pageSize=10`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
-
-        if (result.success) {
-          this.mappingPagination(result);
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
-      } finally {
-        this.loadingData = false;
-      }
-    },
     async getEmployeeWithFilter(props) {
       try {
         this.loadingData = true;
@@ -661,7 +434,7 @@ export default defineComponent({
         // Request API
         let result = await api
           .post(
-            `/api/v1/person/pagination?page=${page}&pageSize=${rowsPerPage}`,
+            `/api/v1/person/pagination-salary?page=${page}&pageSize=${rowsPerPage}`,
             this.filter
           )
           .then((response) => {
@@ -681,6 +454,7 @@ export default defineComponent({
 
         if (result.success) {
           this.mappingPagination(result);
+          console.log(result.resource);
         } else {
           this.$q.notify({
             type: "negative",
@@ -898,8 +672,6 @@ export default defineComponent({
       let isValid = await this.validateToken();
       if (!isValid) this.$router.replace("/login");
 
-      this.loadingUploadTimesheet = true;
-
       let fd = new FormData();
       fd.append("file", this.timesheetFile);
 
@@ -932,8 +704,6 @@ export default defineComponent({
           message: result.message[0],
         });
       }
-
-      this.loadingUploadTimesheet = false;
     },
     async openShowTimesheet(id, dateInput = "") {
       let isValid = await this.validateToken();
@@ -985,7 +755,7 @@ export default defineComponent({
 
       let indexOfDay = parseInt(parts[2]);
       let dayValue = this.timesheet.timesheetJSON[indexOfDay - 1];
-      if (dayValue != "-") {
+      if (dayValue != "-" && dayValue != "O") {
         return true;
       } else return false;
     },
@@ -997,11 +767,10 @@ export default defineComponent({
 
       if (dayValue == "W") return "light-green-6";
       if (dayValue == "R") return "amber-6";
-      if (dayValue == "A") return "red-6";
-      if (dayValue == "H") return "indigo-6";
+      if (dayValue == "A") return "lime-6";
+      if (dayValue == "H") return "blue-6";
       if (dayValue == "S") return "grey-6";
       if (dayValue == "V") return "yellow-6";
-      if (dayValue == "O") return "cyan-6";
 
       return "white";
     },
@@ -1021,11 +790,13 @@ export default defineComponent({
     },
   },
   async created() {
+    this.filter.date = this.convertDateTimeToDate(Date.now());
+
     let isValid = await this.validateToken();
     if (!isValid) this.$router.replace("/login");
 
     await Promise.all([
-      this.getEmployee(),
+      this.getEmployeeWithFilter(),
       this.getPosition(),
       this.getDepartment(),
     ]);
