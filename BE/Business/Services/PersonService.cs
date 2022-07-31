@@ -126,6 +126,20 @@ namespace Business.Services
             return resource;
         }
 
+        public async Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, FilterPersonSalaryResource filterResource)
+        {
+            var paginationPerson = await _personRepository.GetPaginationWithSalaryAsync(pagination, filterResource);
+
+            // Mapping
+            var tempResource = Mapper.Map<IEnumerable<Person>, IEnumerable<PersonResource>>(paginationPerson.records);
+            var resource = new PaginationResponse<IEnumerable<PersonResource>>(tempResource);
+
+            // Using extension-method for pagination
+            resource.CreatePaginationResponse(pagination, paginationPerson.total);
+
+            return resource;
+        }
+
         #region Private work
         private IEnumerable<PersonResource> ConvertPersonResource(IEnumerable<TechnologyResource> totalTechnology, IEnumerable<Person> totalPerson)
         {

@@ -12,7 +12,11 @@ namespace Infrastructure.Repositories
         #endregion
 
         #region Method
-        
+        public async Task<Pay> GetByPersonIdAsync(int personId, DateTime date) =>
+            await Context.Pays.AsNoTracking()
+            .Where(x => x.PersonId == personId && x.Date.Year == date.Year && x.Date.Month == date.Month)
+            .OrderByDescending(x => x.Id)
+            .FirstOrDefaultAsync();
         #endregion
     }
 }

@@ -8,5 +8,6 @@ namespace Business.Domain.Services
     public interface IPersonService : IBaseService<PersonResource, CreatePersonResource, UpdatePersonResource, Person>
     {
         Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, FilterPersonResource filterResource);
+        Task<PaginationResponse<IEnumerable<PersonResource>>> GetPaginationAsync(QueryResource pagination, FilterPersonSalaryResource filterResource);
     }
 }

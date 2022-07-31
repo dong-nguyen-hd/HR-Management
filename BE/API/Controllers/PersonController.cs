@@ -103,6 +103,28 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("pagination-salary")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorKT}")]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PersonResource>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PersonResource>>), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(BaseResponse<IEnumerable<PersonResource>>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetPaginationWithFilterAsync([FromQuery] int page, [FromQuery] int pageSize, [FromBody] FilterPersonSalaryResource filterResource)
+        {
+            Log.Information($"{User.Identity?.Name}: get pagination-salary person.");
+
+            QueryResource pagintation = new QueryResource(page, pageSize);
+
+            var result = await _personService.GetPaginationAsync(pagintation, filterResource);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            if (result.Resource is null)
+                return NoContent();
+
+            return Ok(result);
+        }
+
         [HttpGet("{id:int}")]
         [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
         [ProducesResponseType(typeof(BaseResponse<PersonResource>), StatusCodes.Status200OK)]

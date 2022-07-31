@@ -5,7 +5,7 @@ namespace Business.Resources.Pay
     public class UpdatePayResource
     {
         [Range(0, double.MaxValue)]
-        public decimal Salary { get; set; }
+        public decimal BaseSalary { get; set; }
 
         [Range(0, double.MaxValue)]
         public decimal Allowance { get; set; }

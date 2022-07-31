@@ -15,6 +15,7 @@ namespace Business.Mapping.Person
                 .ForMember(x => x.Avatar, opt => opt.MapFrom<CustomResolver>())
                 .ForMember(x => x.OrderIndex, opt => opt.MapFrom(src => ConvertList(src.OrderIndex)))
                 .ForMember(x => x.Position, opt => opt.MapFrom(src => src.Position))
+                .ForMember(x => x.Pay, opt => opt.MapFrom(src => src.Pays.FirstOrDefault()))
                 .ForMember(x => x.Group, opt => opt.MapFrom(src => src.Group))
                 .ForMember(x => x.Available, opt => opt.MapFrom(src => src.GroupId == null ? true : false))
                 .ForMember(x => x.WorkHistory, opt => opt.MapFrom(src => src.WorkHistories))

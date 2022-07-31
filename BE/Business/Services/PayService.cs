@@ -6,6 +6,7 @@ using Business.Domain.Repositories;
 using Business.Domain.Services;
 using Business.Resources;
 using Business.Resources.Pay;
+using Business.Resources.Timesheet;
 using Microsoft.Extensions.Options;
 
 namespace Business.Services
@@ -34,13 +35,18 @@ namespace Business.Services
         {
             try
             {
+                var workDayResource = await _timesheetRepository.GetTotalWorkDayAsync(createPayResource.PersonId, createPayResource.Date);
+                if (workDayResource is null)
+                    return new BaseResponse<PayResource>(ResponseMessage.Values["Timesheet_NoData"]);
+
                 // Mapping Resource to Pay
                 var pay = Mapper.Map<CreatePayResource, Pay>(createPayResource);
+                var payResource = CalculateSalary(pay, workDayResource);
 
                 await _payRepository.InsertAsync(pay);
                 await UnitOfWork.CompleteAsync();
 
-                return new BaseResponse<PayResource>(true);
+                return new BaseResponse<PayResource>(payResource);
             }
             catch (Exception ex)
             {
@@ -48,18 +54,34 @@ namespace Business.Services
             }
         }
 
-        public async Task<BaseResponse<PayResource>> GetPayByMonthAsync(int personId, DateTime date)
-        {
-            // Get timesheet belong to person
-            var timesheet = await _timesheetRepository.GetTimesheetByPersonIdAsync(personId, date);
-            if (timesheet is null)
-                return new BaseResponse<PayResource>(ResponseMessage.Values["Timesheet_NoData"]);
-
-            return null;
-        }
-
         #region Private work
-       
+        private PayResource CalculateSalary(Pay src, WorkDayResource workDayResource)
+        {
+            src.WorkDay = workDayResource.WorkDay;
+            src.TotalWorkDay = workDayResource.TotalWorkDay;
+
+            decimal grossWithoutBonus = (decimal)workDayResource.WorkDay * src.BaseSalary / (decimal)workDayResource.TotalWorkDay;
+            Receivables receivables = new(grossWithoutBonus);
+
+            src.PIT = receivables.PIT;
+            src.HealthInsurance = receivables.HealthInsurance;
+            src.SocialInsurance = receivables.SocialInsurance;
+
+            var payResource = Mapper.Map<Pay, PayResource>(src);
+
+            payResource.PITPercent = receivables.PIT;
+            payResource.HealthInsurancePercent = receivables.HealthInsurance;
+            payResource.SocialInsurancePercent = receivables.SocialInsurance;
+
+            payResource.SocialInsurance = grossWithoutBonus / 100 * (decimal)receivables.SocialInsurance;
+            payResource.HealthInsurance = grossWithoutBonus / 100 * (decimal)receivables.HealthInsurance;
+            payResource.PIT = grossWithoutBonus / 100 * (decimal)receivables.PIT;
+
+            payResource.Gross = grossWithoutBonus + src.Bonus + src.Allowance;
+            payResource.NET = (payResource.SocialInsurance + payResource.HealthInsurance + payResource.PIT) * grossWithoutBonus + src.Bonus + src.Allowance;
+
+            return payResource;
+        }
         #endregion
 
         #endregion

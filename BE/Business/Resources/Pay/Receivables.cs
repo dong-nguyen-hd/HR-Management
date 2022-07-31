@@ -3,28 +3,28 @@
     public class Receivables
     {
         #region Property
-        public byte PIT { get; } // Personal income tax
-        public byte SocialInsurance { get; } = 5; // unit %
-        public byte HealthInsurance { get; } = 1; // unit %
+        public float PIT { get; } // Personal income tax
+        public float SocialInsurance { get; } = 5; // unit %
+        public float HealthInsurance { get; } = 1; // unit %
         #endregion
 
         #region Constructor
         public Receivables(decimal gross)
         {
             if (0 < gross && gross <= 5_000_000m)
-                this.PIT = 5;
+                this.PIT = 5f;
             if (5_000_000m < gross && gross <= 10_000_000m)
-                this.PIT = 10;
+                this.PIT = 10f;
             if (10_000_000m < gross && gross <= 18_000_000m)
-                this.PIT = 15;
+                this.PIT = 15f;
             if (18_000_000m < gross && gross <= 32_000_000m)
-                this.PIT = 20;
+                this.PIT = 20f;
             if (32_000_000m < gross && gross <= 52_000_000m)
-                this.PIT = 25;
+                this.PIT = 25f;
             if (52_000_000m < gross && gross <= 80_000_000m)
-                this.PIT = 30;
+                this.PIT = 30f;
             if (gross > 80_000_000m)
-                this.PIT = 35;
+                this.PIT = 35f;
         }
         #endregion
     }

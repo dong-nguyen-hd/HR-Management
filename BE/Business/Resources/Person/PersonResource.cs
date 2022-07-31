@@ -6,6 +6,7 @@ using Business.Resources.Certificate;
 using Business.Resources.Department;
 using Business.Resources.Education;
 using Business.Resources.Group;
+using Business.Resources.Pay;
 using Business.Resources.Position;
 using Business.Resources.Project;
 using Business.Resources.WorkHistory;
@@ -75,6 +76,7 @@ namespace Business.Resources.Person
         public List<int> OrderIndex { get; set; }
 
         public PositionResource Position { get; set; }
+        public PayResource Pay { get; set; }
         public DepartmentResource Department { get; set; }
         public GroupResource Group { get; set; }
 
