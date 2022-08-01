@@ -23,35 +23,41 @@ namespace Business.Mapping.Pay
         {
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
-            return grossWithoutBonus / 100 * (decimal)src.SocialInsurance;
+            decimal socialInsurance = grossWithoutBonus / 100 * (decimal)src.SocialInsurance;
+            return Math.Round(socialInsurance, 3);
         }
 
         private static decimal CalculatePIT(Domain.Models.Pay src)
         {
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
-            return grossWithoutBonus / 100 * (decimal)src.PIT;
+            decimal pit = grossWithoutBonus / 100 * (decimal)src.PIT;
+            return Math.Round(pit, 3);
         }
 
         private static decimal CalculateHealthInsurance(Domain.Models.Pay src)
         {
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
-            return grossWithoutBonus / 100 * (decimal)src.HealthInsurance;
+            decimal healthInsurance = grossWithoutBonus / 100 * (decimal)src.HealthInsurance;
+            return Math.Round(healthInsurance, 3);
         }
 
         private static decimal CalculateGross(Domain.Models.Pay src)
         {
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
-            return grossWithoutBonus + src.Bonus + src.Allowance;
+            decimal gross = grossWithoutBonus + src.Bonus + src.Allowance;
+            return Math.Round(gross, 3);
         }
 
         private static decimal CalculateNET(Domain.Models.Pay src)
         {
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
-            return (CalculateSocialInsurance(src) + CalculateHealthInsurance(src) + CalculatePIT(src)) * grossWithoutBonus + src.Bonus + src.Allowance;
+            decimal baseNet = (decimal)((src.PIT + src.SocialInsurance + src.HealthInsurance) / 100) * grossWithoutBonus;
+            decimal net = grossWithoutBonus - baseNet + src.Bonus + src.Allowance;
+            return Math.Round(net, 3);
         }
         #endregion
     }

@@ -1,6 +1,133 @@
 <template>
   <q-page class="full-height full-width flex flex-center">
     <div class="container full-height full-width">
+      <q-dialog v-model="insertPay" :persistent="getPersistentPay">
+        <q-card style="width: 400px">
+          <q-card-section class="row items-center">
+            <span class="text-h6">Create Salary</span>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section>
+            <div class="q-mt-sm">
+              <q-input
+                standout
+                v-model="insertPayObj.firstName"
+                type="text"
+                label="First Name:"
+                readonly
+              >
+              </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-input
+                readonly
+                standout
+                v-model="insertPayResource.date"
+                type="text"
+                placeholder="YYYY-MM-DD"
+                stack-label
+                label="Date:"
+                label-color="white"
+                bg-color="primary"
+                input-class="text-white"
+              >
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer" color="white">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date
+                        v-model="insertPayResource.date"
+                        mask="YYYY-MM-DD"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-input
+                ref="oneRef"
+                standout
+                maxlength="250"
+                v-model="insertPayResource.baseSalary"
+                type="number"
+                label="Base salary:"
+                :label-color="colorFocusPay[0]"
+                @focus="colorFocusPay[0] = 'white'"
+                @blur="colorFocusPay[0] = ''"
+                :rules="[(val) => !!val || 'Base salary is required']"
+                lazy-rules="ondemand"
+                hide-bottom-space
+              >
+              </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-input
+                ref="twoRef"
+                standout
+                maxlength="250"
+                v-model="insertPayResource.allowance"
+                type="number"
+                label="Allowance:"
+                :label-color="colorFocusPay[1]"
+                @focus="colorFocusPay[1] = 'white'"
+                @blur="colorFocusPay[1] = ''"
+              >
+              </q-input>
+            </div>
+
+            <div class="q-mt-sm">
+              <q-input
+                ref="threeRef"
+                standout
+                maxlength="250"
+                v-model="insertPayResource.bonus"
+                type="number"
+                label="Bonus:"
+                :label-color="colorFocusPay[2]"
+                @focus="colorFocusPay[2] = 'white'"
+                @blur="colorFocusPay[2] = ''"
+              >
+              </q-input>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              :disable="payProcess"
+              label="Cancel"
+              color="primary"
+              v-close-popup
+            />
+            <q-btn
+              flat
+              label="Create"
+              color="info"
+              @click="createPay"
+              :loading="payProcess"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
       <div
         class="table-component full-height full-width flex flex-center q-px-md"
       >
@@ -242,6 +369,8 @@
                   color="white"
                   text-color="black"
                   label="new"
+                  v-show="!showOrHide(props.value)"
+                  @click="openInsertPay(props.value)"
                 />
               </div>
               <div class="q-mt-sm">
@@ -250,6 +379,7 @@
                   dense
                   color="negative"
                   label="delete"
+                  v-show="showOrHide(props.value)"
                 />
               </div>
             </q-td>
@@ -258,6 +388,54 @@
           <template v-slot:body-cell-fullName="props">
             <q-td :props="props">
               {{ showName(props.value) }}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-allowance="props">
+            <q-td :props="props">
+              {{ props.value ? props.value.allowance : '' }}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-bonus="props">
+            <q-td :props="props">
+              {{ props.value ? props.value.bonus : '' }}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-baseSalary="props">
+            <q-td :props="props">
+              {{ props.value ? props.value.baseSalary : '' }}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-net="props">
+            <q-td :props="props">
+              {{ props.value ? props.value.net : '' }}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-gross="props">
+            <q-td :props="props">
+              {{ props.value ? props.value.gross : '' }}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-healthInsurance="props">
+            <q-td :props="props">
+              {{ props.value ? props.value.healthInsurance : '' }}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-socialInsurance="props">
+            <q-td :props="props">
+              {{ props.value ? props.value.socialInsurance : '' }}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-pit="props">
+            <q-td :props="props">
+              {{ props.value ? props.value.pit : '' }}
             </q-td>
           </template>
 
@@ -284,40 +462,28 @@ export default defineComponent({
       labelColorFocus: ["white", "white", "white", "white"],
       labelNameFocus: ["Staff ID", "Full Name", "Department", "Position"],
 
+      colorFocusPay: [],
+
       widthOfStaffId: "80px",
       widthOfFullName: "130px",
       widthOfDepartment: "100px",
       widthOfPosition: "100px",
 
-      timesheetFile: null,
-      splitterModel: 50,
-      dateTimesheet: "",
-      timesheet: {
-        absent: 0,
-        date: "",
-        holiday: 0,
-        id: 0,
-        paidLeave: 0,
-        timesheetJSON: "",
-        totalWorkDay: 0,
-        unpaidLeave: 0,
-        workDay: 0,
-      },
-      showTimesheet: false,
-      personTimesheetId: 0,
-
       loadingData: false,
 
-      showDelete: false,
-      idDelete: null,
-      deleteProcess: false,
+      insertPay: false,
+      getPersistentPay: false,
+      payProcess: false,
+      insertPayObj: null,
+      personId: 0,
 
-      showEdit: false,
-      editObj: null,
-      statusUpdate: false,
-
-      showInsert: false,
-      statusInsert: false,
+      insertPayResource: {
+        baseSalary: 0,
+        allowance: 0,
+        bonus: 0,
+        date: "",
+        personId: 0,
+      },
 
       filter: {
         staffId: null,
@@ -382,6 +548,54 @@ export default defineComponent({
           field: (row) => row.position.name,
         },
         {
+          name: "net",
+          align: "center",
+          label: "NET",
+          field: (row) => row.pay,
+        },
+        {
+          name: "gross",
+          align: "center",
+          label: "Gross",
+          field: (row) => row.pay,
+        },
+        {
+          name: "baseSalary",
+          align: "center",
+          label: "Base Salary",
+          field: (row) => row.pay,
+        },
+        {
+          name: "allowance",
+          align: "center",
+          label: "Allowance",
+          field: (row) => row.pay,
+        },
+        {
+          name: "bonus",
+          align: "center",
+          label: "Bonus",
+          field: (row) => row.pay,
+        },
+        {
+          name: "pit",
+          align: "center",
+          label: "PIT",
+          field: (row) => row.pay,
+        },
+        {
+          name: "socialInsurance",
+          align: "center",
+          label: "Social Insurance",
+          field: (row) => row.pay,
+        },
+        {
+          name: "healthInsurance",
+          align: "center",
+          label: "Health Insurance",
+          field: (row) => row.pay,
+        },
+        {
           name: "action",
           align: "center",
           label: "Actions",
@@ -393,33 +607,6 @@ export default defineComponent({
   methods: {
     ...mapActions("auth", ["useRefreshToken", "validateToken"]),
 
-    openInsert() {
-      this.showInsert = true;
-    },
-    closeInsertDialog() {
-      this.showInsert = false;
-      this.statusInsert = false;
-    },
-    saveInsert() {
-      this.statusInsert = true;
-    },
-    async insertReceive(value) {
-      if (value) {
-        this.statusInsert = false;
-
-        let result = await this.getEmployeeById(value);
-        if (this.listEmployee.length >= 10) this.listEmployee.pop();
-        this.listEmployee.unshift(result);
-        this.listEmployee.forEach((row, index) => {
-          row.index = index + 1;
-        });
-
-        // Update pagination
-        this.pagination.rowsNumber = this.pagination.rowsNumber + 1;
-      } else {
-        this.statusInsert = false;
-      }
-    },
     async getEmployeeWithFilter(props) {
       try {
         this.loadingData = true;
@@ -454,7 +641,6 @@ export default defineComponent({
 
         if (result.success) {
           this.mappingPagination(result);
-          console.log(result.resource);
         } else {
           this.$q.notify({
             type: "negative",
@@ -466,6 +652,9 @@ export default defineComponent({
       }
     },
     async getDepartment() {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
       // Request API
       let result = await api
         .get("/api/v1/department")
@@ -494,6 +683,9 @@ export default defineComponent({
       }
     },
     async getPosition() {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
       // Request API
       let result = await api
         .get("/api/v1/position")
@@ -566,84 +758,6 @@ export default defineComponent({
         }
       });
     },
-    async deleteEmployee() {
-      try {
-        this.deleteProcess = true;
-
-        let isValid = await this.validateToken();
-        if (!isValid) this.$router.replace("/login");
-
-        // Request API
-        let result = await api
-          .delete(`/api/v1/person/${this.idDelete}`)
-          .then((response) => {
-            return response.data;
-          })
-          .catch(function (error) {
-            // Checking if throw error
-            if (error.response) {
-              // Server response
-              return error.response.data;
-            } else {
-              // Server not working
-              let temp = { success: false, message: ["Server Error!"] };
-              return temp;
-            }
-          });
-
-        if (result.success) {
-          await this.getEmployeeWithFilter(false);
-
-          this.$q.notify({
-            type: "positive",
-            message: "Successfully deleted!",
-          });
-        } else {
-          this.$q.notify({
-            type: "negative",
-            message: result.message[0],
-          });
-        }
-      } finally {
-        this.deleteProcess = false;
-        this.showDelete = false;
-      }
-    },
-    openEdit(id) {
-      this.editObj = this.listEmployee.find((x) => x.id == id);
-      this.showEdit = true;
-    },
-    saveUpdate() {
-      this.statusUpdate = true;
-    },
-    async updateReceive(value) {
-      if (value) {
-        let result = await this.getEmployeeById(this.editObj.id);
-
-        this.statusUpdate = false;
-        this.showEdit = false;
-
-        let index = this.listEmployee.findIndex((x) => x.id == this.editObj.id);
-        let numberIndex = this.listEmployee[index].index;
-        this.listEmployee[index] = Object.assign({}, result);
-        this.listEmployee[index].index = numberIndex;
-        this.editObj = null;
-      } else {
-        this.statusUpdate = false;
-      }
-    },
-    async closeEditDialog() {
-      let result = await this.getEmployeeById(this.editObj.id);
-
-      let index = this.listEmployee.findIndex((x) => x.id == this.editObj.id);
-      let numberIndex = this.listEmployee[index].index;
-      this.listEmployee[index] = Object.assign({}, result);
-      this.listEmployee[index].index = numberIndex;
-      this.editObj = null;
-
-      this.statusUpdate = false;
-      this.showEdit = false;
-    },
     async getEmployeeById(id) {
       let isValid = await this.validateToken();
       if (!isValid) this.$router.replace("/login");
@@ -668,114 +782,105 @@ export default defineComponent({
 
       return result?.resource;
     },
-    async importTimesheet() {
-      let isValid = await this.validateToken();
-      if (!isValid) this.$router.replace("/login");
-
-      let fd = new FormData();
-      fd.append("file", this.timesheetFile);
-
-      // Request API import timesheet
-      let result = await api
-        .post(`/api/v1/timesheet/import`, fd)
-        .then((response) => {
-          return response.data;
-        })
-        .catch(function (error) {
-          // Checking if throw error
-          if (error.response) {
-            // Server response
-            return error.response.data;
-          } else {
-            // Server not working
-            let temp = { success: false, message: ["Server Error!"] };
-            return temp;
-          }
-        });
-
-      if (result.success) {
-        this.$q.notify({
-          type: "positive",
-          message: "Successfully uploaded",
-        });
-      } else {
-        this.$q.notify({
-          type: "negative",
-          message: result.message[0],
-        });
-      }
-    },
-    async openShowTimesheet(id, dateInput = "") {
-      let isValid = await this.validateToken();
-      if (!isValid) this.$router.replace("/login");
-
-      this.personTimesheetId = id;
-
-      if (!dateInput) {
-        dateInput = this.convertDateTimeToDate(Date.now(), "YYYY/MM/DD");
-        this.dateTimesheet = dateInput;
-      }
-
-      this.timesheet.date = dateInput;
-      this.timesheet.timesheetJSON = "";
-
-      this.showTimesheet = true;
-
-      // Request API import timesheet
-      let result = await api
-        .get(`/api/v1/timesheet?personId=${id}&date=${dateInput}`)
-        .then((response) => {
-          return response.data;
-        })
-        .catch(function (error) {
-          // Checking if throw error
-          if (error.response) {
-            // Server response
-            return error.response.data;
-          } else {
-            // Server not working
-            let temp = { success: false, message: ["Server Error!"] };
-            return temp;
-          }
-        });
-
-      if (result.success && result.resource) {
-        this.timesheet = Object.assign({}, result.resource);
-        this.timesheet.timesheetJSON = JSON.parse(this.timesheet.timesheetJSON);
-      }
-    },
-    async changeDateTimesheet(view) {
-      let dateString = `${view.year}/${view.month}/1`;
-      let date = this.convertDateTimeToDate(dateString);
-      await this.openShowTimesheet(this.personTimesheetId, date);
-    },
-    addEventsTimesheet(date) {
-      if (!this.timesheet.timesheetJSON) return false;
-      let parts = this.convertDateTimeToDate(date, "YYYY/M/D").split("/");
-
-      let indexOfDay = parseInt(parts[2]);
-      let dayValue = this.timesheet.timesheetJSON[indexOfDay - 1];
-      if (dayValue != "-" && dayValue != "O") {
-        return true;
-      } else return false;
-    },
-    addColorTimesheet(date) {
-      let parts = this.convertDateTimeToDate(date, "YYYY/M/D").split("/");
-
-      let indexOfDay = parseInt(parts[2]);
-      let dayValue = this.timesheet.timesheetJSON[indexOfDay - 1];
-
-      if (dayValue == "W") return "light-green-6";
-      if (dayValue == "R") return "amber-6";
-      if (dayValue == "A") return "lime-6";
-      if (dayValue == "H") return "blue-6";
-      if (dayValue == "S") return "grey-6";
-      if (dayValue == "V") return "yellow-6";
-
-      return "white";
-    },
     convertDateTimeToDate(dateTime, stringFormat = "YYYY-MM-DD") {
       return date.formatDate(dateTime, stringFormat);
+    },
+    async openInsertPay(id) {
+      let isValid = await this.validateToken();
+      if (!isValid) this.$router.replace("/login");
+
+      let tempDate = new Date();
+      tempDate.setDate(1);
+      tempDate.setMonth(tempDate.getMonth() - 1);
+
+      // Request API
+      let result = await api
+        .get(
+          `/api/v1/pay?personId=${id}&date=${this.convertDateTimeToDate(
+            tempDate
+          )}`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch(function (error) {
+          // Checking if throw error
+          if (error.response) {
+            // Server response
+            return error.response.data;
+          } else {
+            // Server not working
+            let temp = { success: false, message: ["Server Error!"] };
+            return temp;
+          }
+        });
+
+      if (result.resource)
+        this.insertPayResource.baseSalary = result.resource.baseSalary;
+
+      this.insertPayResource.date = this.convertDateTimeToDate(Date.now());
+      this.insertPayObj = null;
+      this.insertPayObj = this.listEmployee.find((x) => x.id == id);
+      this.insertPayResource.personId = id;
+      this.insertPayResource.allowance = 0;
+      this.insertPayResource.bonus = 0;
+
+      this.insertPay = true;
+    },
+    async createPay() {
+      try {
+        if (
+          !this.$refs.oneRef.validate() ||
+          !this.$refs.twoRef.validate() ||
+          !this.$refs.threeRef.validate()
+        )
+          return null;
+
+        this.payProcess = true;
+
+        let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        // Request API
+        let result = await api
+          .post(`/api/v1/pay`, this.insertPayResource)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          this.getEmployeeWithFilter();
+          (this.insertPay = false),
+            this.$q.notify({
+              type: "positive",
+              message: "Successfully added!",
+            });
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } finally {
+        this.payProcess = false;
+      }
+    },
+    showOrHide(id) {
+      let tempPerson = this.listEmployee.find((x) => x.id == id);
+
+      if (tempPerson.pay) return true;
+      else return false;
     },
   },
   computed: {
@@ -820,46 +925,6 @@ export default defineComponent({
       width: 100%;
     }
   }
-}
-
-.height-view {
-  min-height: 52px;
-  border: 1px solid $primary;
-  border-bottom: 0;
-}
-
-.height-view-sub {
-  min-height: 44px;
-  border: 1px solid $primary;
-  border-bottom: 0;
-}
-
-.border-right {
-  border-right: 1px solid $primary;
-}
-
-.education-view {
-  min-height: 71px;
-  border: 1px solid $primary;
-  border-bottom: 0;
-}
-
-.border-image-view {
-  border-top: 1px solid $primary;
-  border-right: 1px solid $primary;
-}
-
-.project-view {
-  border: 1px solid $primary;
-  border-bottom: 0;
-}
-
-.project-bottom-view {
-  border-bottom: 1px solid $primary;
-}
-
-.project-height-view {
-  min-height: 30px;
 }
 </style>
 

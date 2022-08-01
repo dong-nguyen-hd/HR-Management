@@ -41,10 +41,20 @@ namespace Business.Services
 
                 // Mapping Resource to Pay
                 var pay = Mapper.Map<CreatePayResource, Pay>(createPayResource);
-                var payResource = CalculateSalary(pay, workDayResource);
+                pay.WorkDay = workDayResource.WorkDay;
+                pay.TotalWorkDay = workDayResource.TotalWorkDay;
+
+                decimal grossWithoutBonus = (decimal)workDayResource.WorkDay * pay.BaseSalary / (decimal)workDayResource.TotalWorkDay;
+                Receivables receivables = new(grossWithoutBonus);
+
+                pay.PIT = receivables.PIT;
+                pay.HealthInsurance = receivables.HealthInsurance;
+                pay.SocialInsurance = receivables.SocialInsurance;
 
                 await _payRepository.InsertAsync(pay);
                 await UnitOfWork.CompleteAsync();
+
+                var payResource = Mapper.Map<Pay, PayResource>(pay);
 
                 return new BaseResponse<PayResource>(payResource);
             }
@@ -53,36 +63,6 @@ namespace Business.Services
                 throw new MessageResultException(ResponseMessage.Values["Pay_Saving_Error"], ex);
             }
         }
-
-        #region Private work
-        private PayResource CalculateSalary(Pay src, WorkDayResource workDayResource)
-        {
-            src.WorkDay = workDayResource.WorkDay;
-            src.TotalWorkDay = workDayResource.TotalWorkDay;
-
-            decimal grossWithoutBonus = (decimal)workDayResource.WorkDay * src.BaseSalary / (decimal)workDayResource.TotalWorkDay;
-            Receivables receivables = new(grossWithoutBonus);
-
-            src.PIT = receivables.PIT;
-            src.HealthInsurance = receivables.HealthInsurance;
-            src.SocialInsurance = receivables.SocialInsurance;
-
-            var payResource = Mapper.Map<Pay, PayResource>(src);
-
-            payResource.PITPercent = receivables.PIT;
-            payResource.HealthInsurancePercent = receivables.HealthInsurance;
-            payResource.SocialInsurancePercent = receivables.SocialInsurance;
-
-            payResource.SocialInsurance = grossWithoutBonus / 100 * (decimal)receivables.SocialInsurance;
-            payResource.HealthInsurance = grossWithoutBonus / 100 * (decimal)receivables.HealthInsurance;
-            payResource.PIT = grossWithoutBonus / 100 * (decimal)receivables.PIT;
-
-            payResource.Gross = grossWithoutBonus + src.Bonus + src.Allowance;
-            payResource.NET = (payResource.SocialInsurance + payResource.HealthInsurance + payResource.PIT) * grossWithoutBonus + src.Bonus + src.Allowance;
-
-            return payResource;
-        }
-        #endregion
 
         #endregion
     }
