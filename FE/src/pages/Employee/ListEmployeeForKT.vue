@@ -1,7 +1,40 @@
 <template>
   <q-page class="full-height full-width flex flex-center">
     <div class="container full-height full-width">
-      <q-dialog v-model="insertPay" :persistent="getPersistentPay">
+      <q-dialog v-model="deletePay" :persistent="payProcess">
+        <q-card>
+          <q-card-section class="row items-center">
+            <span class="text-h6">Delete salary?</span>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section>
+            <span
+              >This can’t be undone and it will be removed from database.</span
+            >
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              :disable="payProcess"
+              label="Cancel"
+              color="primary"
+              v-close-popup
+            />
+            <q-btn
+              flat
+              label="Delete"
+              color="negative"
+              @click="deletePayAsync"
+              :loading="payProcess"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
+      <q-dialog v-model="insertPay" :persistent="payProcess">
         <q-card style="width: 400px">
           <q-card-section class="row items-center">
             <span class="text-h6">Create Salary</span>
@@ -119,7 +152,7 @@
             />
             <q-btn
               flat
-              label="Create"
+              label="Add"
               color="info"
               @click="createPay"
               :loading="payProcess"
@@ -380,6 +413,7 @@
                   color="negative"
                   label="delete"
                   v-show="showOrHide(props.value)"
+                  @click="openDeletePay(props.value)"
                 />
               </div>
             </q-td>
@@ -393,49 +427,53 @@
 
           <template v-slot:body-cell-allowance="props">
             <q-td :props="props">
-              {{ props.value ? props.value.allowance : '' }}
+              {{ props.value ? numberWithSpaces(props.value.allowance) : "" }}
             </q-td>
           </template>
 
           <template v-slot:body-cell-bonus="props">
             <q-td :props="props">
-              {{ props.value ? props.value.bonus : '' }}
+              {{ props.value ? numberWithSpaces(props.value.bonus) : "" }}
             </q-td>
           </template>
 
           <template v-slot:body-cell-baseSalary="props">
             <q-td :props="props">
-              {{ props.value ? props.value.baseSalary : '' }}
+              {{ props.value ? numberWithSpaces(props.value.baseSalary) : "" }}
             </q-td>
           </template>
 
           <template v-slot:body-cell-net="props">
             <q-td :props="props">
-              {{ props.value ? props.value.net : '' }}
+              {{ props.value ? numberWithSpaces(props.value.net) : "" }}
             </q-td>
           </template>
 
           <template v-slot:body-cell-gross="props">
             <q-td :props="props">
-              {{ props.value ? props.value.gross : '' }}
+              {{ props.value ? numberWithSpaces(props.value.gross) : "" }}
             </q-td>
           </template>
 
           <template v-slot:body-cell-healthInsurance="props">
             <q-td :props="props">
-              {{ props.value ? props.value.healthInsurance : '' }}
+              {{
+                props.value ? numberWithSpaces(props.value.healthInsurance) : ""
+              }}
             </q-td>
           </template>
 
           <template v-slot:body-cell-socialInsurance="props">
             <q-td :props="props">
-              {{ props.value ? props.value.socialInsurance : '' }}
+              {{
+                props.value ? numberWithSpaces(props.value.socialInsurance) : ""
+              }}
             </q-td>
           </template>
 
           <template v-slot:body-cell-pit="props">
             <q-td :props="props">
-              {{ props.value ? props.value.pit : '' }}
+              {{ props.value ? numberWithSpaces(props.value.pit) : "" }}
             </q-td>
           </template>
 
@@ -472,10 +510,10 @@ export default defineComponent({
       loadingData: false,
 
       insertPay: false,
-      getPersistentPay: false,
+      deletePay: false,
+      idDelete: 0,
       payProcess: false,
       insertPayObj: null,
-      personId: 0,
 
       insertPayResource: {
         baseSalary: 0,
@@ -789,7 +827,7 @@ export default defineComponent({
       let isValid = await this.validateToken();
       if (!isValid) this.$router.replace("/login");
 
-      let tempDate = new Date();
+      let tempDate = new Date(this.filter.date);
       tempDate.setDate(1);
       tempDate.setMonth(tempDate.getMonth() - 1);
 
@@ -818,7 +856,7 @@ export default defineComponent({
       if (result.resource)
         this.insertPayResource.baseSalary = result.resource.baseSalary;
 
-      this.insertPayResource.date = this.convertDateTimeToDate(Date.now());
+      this.insertPayResource.date = this.filter.date;
       this.insertPayObj = null;
       this.insertPayObj = this.listEmployee.find((x) => x.id == id);
       this.insertPayResource.personId = id;
@@ -882,6 +920,62 @@ export default defineComponent({
       if (tempPerson.pay) return true;
       else return false;
     },
+    numberWithSpaces(x, isFloat = true) {
+      if (isFloat) {
+        let parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        return parts.join(".");
+      } else {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      }
+    },
+    openDeletePay(id) {
+      this.idDelete = id;
+      this.deletePay = true;
+    },
+    async deletePayAsync() {
+      try {
+        this.deleteProcess = true;
+
+        let isValid = await this.validateToken();
+        if (!isValid) this.$router.replace("/login");
+
+        // Request API
+        let result = await api
+          .delete(`/api/v1/pay/${this.idDelete}`)
+          .then((response) => {
+            return response.data;
+          })
+          .catch(function (error) {
+            // Checking if throw error
+            if (error.response) {
+              // Server response
+              return error.response.data;
+            } else {
+              // Server not working
+              let temp = { success: false, message: ["Server Error!"] };
+              return temp;
+            }
+          });
+
+        if (result.success) {
+          await this.getEmployeeWithFilter();
+          this.deletePay = false;
+
+          this.$q.notify({
+            type: "positive",
+            message: "Successfully deleted!",
+          });
+        } else {
+          this.$q.notify({
+            type: "negative",
+            message: result.message[0],
+          });
+        }
+      } finally {
+        this.deleteProcess = false;
+      }
+    }
   },
   computed: {
     ...mapGetters("auth", ["getRole", "getInformation"]),

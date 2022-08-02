@@ -24,6 +24,7 @@ namespace Business.Mapping.Pay
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
             decimal socialInsurance = grossWithoutBonus / 100 * (decimal)src.SocialInsurance;
+
             return Math.Round(socialInsurance, 3);
         }
 
@@ -32,6 +33,7 @@ namespace Business.Mapping.Pay
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
             decimal pit = grossWithoutBonus / 100 * (decimal)src.PIT;
+
             return Math.Round(pit, 3);
         }
 
@@ -40,6 +42,7 @@ namespace Business.Mapping.Pay
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
             decimal healthInsurance = grossWithoutBonus / 100 * (decimal)src.HealthInsurance;
+
             return Math.Round(healthInsurance, 3);
         }
 
@@ -48,6 +51,7 @@ namespace Business.Mapping.Pay
             decimal grossWithoutBonus = (decimal)src.WorkDay * src.BaseSalary / (decimal)src.TotalWorkDay;
 
             decimal gross = grossWithoutBonus + src.Bonus + src.Allowance;
+
             return Math.Round(gross, 3);
         }
 
@@ -57,6 +61,7 @@ namespace Business.Mapping.Pay
 
             decimal baseNet = (decimal)((src.PIT + src.SocialInsurance + src.HealthInsurance) / 100) * grossWithoutBonus;
             decimal net = grossWithoutBonus - baseNet + src.Bonus + src.Allowance;
+
             return Math.Round(net, 3);
         }
         #endregion
