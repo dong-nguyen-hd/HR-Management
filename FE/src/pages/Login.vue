@@ -30,7 +30,7 @@ License: CC BY 3.0
                     alt="Human Resource Management"
                   />
                 </div>
-                Welcome!
+                {{ $t('welcome') }}
               </div>
               <q-input
                 class="q-pb-sm"
@@ -39,11 +39,11 @@ License: CC BY 3.0
                 hide-bottom-space
                 outlined
                 v-model="account.userName"
-                placeholder="User name"
+                :placeholder="$t('userName')"
                 lazy-rules="ondemand"
                 :rules="[
                   (val) =>
-                    (val && val.length > 0) || 'User name can not be empty!',
+                    (val && val.length > 0) || $t('userNameNotEmpty'),
                 ]"
               >
                 <template v-slot:prepend>
@@ -59,14 +59,14 @@ License: CC BY 3.0
                 outlined
                 type="password"
                 v-model="account.password"
-                placeholder="Password"
+                :placeholder="$t('password')"
                 lazy-rules="ondemand"
                 :rules="[
                   (val) =>
-                    (val && val.length > 0) || 'Password can not be empty!',
+                    (val && val.length > 0) || $t('passwordNotEmpty'),
                   (val) =>
                     (val && val.length > 5) ||
-                    'Password must be more than 5 characters',
+                    $t('passwordLengthInvalid'),
                 ]"
               >
                 <template v-slot:prepend>
@@ -79,7 +79,7 @@ License: CC BY 3.0
                 class="btn-login"
                 tabindex="3"
                 rounded
-                label="Login"
+                :label="$t('btnLogin')"
                 type="submit"
                 color="primary"
               />
@@ -90,7 +90,7 @@ License: CC BY 3.0
         <div class="bottom-login display-center">
           <a href="https://github.com/dong-nguyen-hd" target="_blank">
             <q-icon size="18px" name="fab fa-github" />
-            Dong Nguyen
+            {{ $t('myself') }}
           </a>
         </div>
       </div>

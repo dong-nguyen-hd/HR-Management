@@ -6,7 +6,7 @@
       </div>
 
       <div class="text-h2" style="opacity:.4">
-        Oops. Nothing here...
+        {{ $t('pageNotFound') }}
       </div>
 
       <q-btn
@@ -15,7 +15,7 @@
         text-color="blue"
         unelevated
         to="/list-employee"
-        label="Go Home"
+        :label="$t('goHomePage')"
         no-caps
       />
     </div>

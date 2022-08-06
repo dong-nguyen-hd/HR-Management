@@ -6,7 +6,7 @@
           <q-header class="bg-accent">
             <q-toolbar class="q-pl-md">
               <q-toolbar-title
-                >List employee of "{{ groupObj.name }}" project</q-toolbar-title
+                >{{ $t('listEmployee') }}</q-toolbar-title
               >
               <q-btn flat round dense icon="close" v-close-popup />
             </q-toolbar>
@@ -40,7 +40,7 @@
                         dense
                         color="info"
                         text-color="white"
-                        label="View"
+                        :label="$t('btnView')"
                         @click="openViewDialog(props.value)"
                       />
                     </div>
@@ -60,7 +60,7 @@
                 v-show="false"
                 dense
                 color="primary"
-                label="Save"
+                :label="$t('btnSave')"
                 class="q-px-lg"
               />
             </q-toolbar>
@@ -124,7 +124,7 @@
                         <div
                           class="col-4 q-pl-md flex items-center border-right"
                         >
-                          <span class="text-bold">Gender</span>
+                          <span class="text-bold">{{ $t('gender') }}</span>
                         </div>
                         <div class="col-8 q-pl-md flex items-center">
                           {{ converGender(viewObj.gender) }}
@@ -135,7 +135,7 @@
                         <div
                           class="col-4 q-pl-md flex items-center border-right text-bold"
                         >
-                          Date of Birth
+                          {{ $t('dob') }}
                         </div>
                         <div class="col-8 q-pl-md flex items-center">
                           {{ convertDateTimeToDate(viewObj.dateOfBirth) }}
@@ -151,7 +151,7 @@
                   <div
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                   >
-                    PROFESSIONAL OVERVIEW
+                    {{ $t('professionalOverview') }}
                   </div>
                   <div class="q-pa-md flex items-center height-view-sub">
                     {{ viewObj.description }}
@@ -161,7 +161,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(1)"
                   >
-                    SKILLS
+                    {{ $t('skill') }}
                   </div>
 
                   <div
@@ -194,7 +194,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(3)"
                   >
-                    WORKING HISTORY
+                    {{ $t('workingHistory') }}
                   </div>
 
                   <div
@@ -204,20 +204,20 @@
                     <div
                       class="col-1 q-pl-md flex items-center border-right text-bold"
                     >
-                      NO.
+                      {{ $t('no') }}
                     </div>
                     <div
                       class="col q-pl-md flex items-center border-right text-bold"
                     >
-                      PREIOD
+                      {{ $t('preiod') }}
                     </div>
                     <div
                       class="col q-pl-md flex items-center border-right text-bold"
                     >
-                      COMPANY
+                      {{ $t('company') }}
                     </div>
                     <div class="col q-pl-md flex items-center text-bold">
-                      JOB TITTLE
+                      {{ $t('jobTitle') }}
                     </div>
                   </div>
 
@@ -261,7 +261,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(4)"
                   >
-                    EDUCATION
+                    {{ $t('education') }}
                   </div>
 
                   <div
@@ -282,14 +282,14 @@
                                 education.endDate,
                                 "MMM YYYY"
                               )
-                            : "Now"
+                            : $t('now')
                         }}
                         | {{ education.collegeName }}</span
                       >
                     </div>
                     <div class="flex items-center col">
                       <span
-                        ><span class="text-bold">Major: </span
+                        ><span class="text-bold">{{ $t('major') }}: </span
                         >{{ education.major }}</span
                       >
                     </div>
@@ -299,7 +299,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(5)"
                   >
-                    CERTIFICATION
+                    {{ $t('certification') }}
                   </div>
 
                   <div
@@ -320,7 +320,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(2)"
                   >
-                    PROJECTS
+                    {{ $t('projects') }}
                   </div>
 
                   <div
@@ -330,20 +330,20 @@
                     <div
                       class="col-1 flex items-center q-pl-md border-right text-bold"
                     >
-                      NO.
+                      {{ $t('no') }}
                     </div>
                     <div
                       class="col flex items-center q-pl-md border-right text-bold"
                     >
-                      PREIOD
+                      {{ $t('preiod') }}
                     </div>
                     <div
                       class="col flex items-center q-pl-md border-right text-bold"
                     >
-                      POSITION
+                      {{ $t('position') }}
                     </div>
                     <div class="col-5 flex items-center q-pl-md text-bold">
-                      DESCRIPTION
+                      {{ $t('description') }}
                     </div>
                   </div>
 
@@ -378,7 +378,7 @@
                         class="q-pa-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
-                          ><span class="text-bold">Description: </span
+                          ><span class="text-bold">{{ $t('description') }}: </span
                           >{{ project.description }}</span
                         >
                       </div>
@@ -386,7 +386,7 @@
                         class="q-pa-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
-                          ><span class="text-bold">Responsibilities: </span
+                          ><span class="text-bold">{{ $t('responsibilities') }}: </span
                           >{{ project.responsibilities }}</span
                         >
                       </div>
@@ -394,7 +394,7 @@
                         class="q-pa-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
-                          ><span class="text-bold">Team size: </span
+                          ><span class="text-bold">{{ $t('teamSize') }}: </span
                           >{{ project.teamSize }}</span
                         >
                       </div>
@@ -402,7 +402,7 @@
                         class="q-pa-md flex items-center project-height-view"
                       >
                         <span
-                          ><span class="text-bold">Technologies used: </span
+                          ><span class="text-bold">{{ $t('technologiesUsed') }}: </span
                           ><span
                             v-for="(technology, i) in project.technologies"
                             :key="i"
@@ -428,7 +428,7 @@
                 v-show="false"
                 dense
                 color="primary"
-                label="Download"
+                :label="$t('download')"
                 class="q-px-lg"
               />
             </q-toolbar>
@@ -467,7 +467,7 @@
                   :label-color="labelColorFocus[0]"
                   @focus="
                     labelColorFocus[0] = 'black';
-                    labelNameFocus[0] = 'Search by name';
+                    labelNameFocus[0] = $t('searchByName');
                     widthOfName = '170px';
                   "
                   @blur="
@@ -503,7 +503,7 @@
                   v-model="filter.available"
                   color="accent"
                   @update:model-value="getGroupWithFilter(false)"
-                  label="Continuous"
+                  :label="$t('continuous')"
                 />
               </div>
             </q-th>
@@ -517,7 +517,7 @@
                   dense
                   color="info"
                   text-color="white"
-                  label="View"
+                  :label="$t('btnView')"
                   @click="openView(props.value)"
                 />
               </div>
