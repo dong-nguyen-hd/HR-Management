@@ -40,7 +40,7 @@
               <q-item-section avatar>
                 <q-icon name="fas fa-user-edit" />
               </q-item-section>
-              <q-item-section>Update personal information</q-item-section>
+              <q-item-section>{{ $t('updatePersonalInfor') }}</q-item-section>
             </q-item>
 
             <q-item
@@ -54,14 +54,14 @@
               <q-item-section avatar>
                 <q-icon name="fas fa-key" />
               </q-item-section>
-              <q-item-section>Change password</q-item-section>
+              <q-item-section>{{ $t('changePassword') }}</q-item-section>
             </q-item>
 
             <q-item clickable v-ripple @click.once="logOutButton">
               <q-item-section avatar>
                 <q-icon name="fas fa-sign-out-alt" />
               </q-item-section>
-              <q-item-section>Log Out</q-item-section>
+              <q-item-section>{{ $t('logOut') }}</q-item-section>
             </q-item>
           </q-list>
         </div>
@@ -91,7 +91,7 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>Employee 3</q-item-section>
+            <q-item-section>{{ $t('employee') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -106,7 +106,7 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>Employee 2</q-item-section>
+            <q-item-section>{{ $t('employee') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -121,7 +121,7 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>Employee</q-item-section>
+            <q-item-section>{{ $t('employee') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -137,7 +137,7 @@
             <q-item-section avatar>
               <q-icon name="business_center" />
             </q-item-section>
-            <q-item-section>Project</q-item-section>
+            <q-item-section>{{ $t('project') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -153,7 +153,7 @@
             <q-item-section avatar>
               <q-icon name="business_center" />
             </q-item-section>
-            <q-item-section>Project</q-item-section>
+            <q-item-section>{{ $t('project') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -169,7 +169,7 @@
             <q-item-section avatar>
               <q-icon name="category" />
             </q-item-section>
-            <q-item-section>Category</q-item-section>
+            <q-item-section>{{ $t('category') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -185,7 +185,7 @@
             <q-item-section avatar>
               <q-icon name="badge" />
             </q-item-section>
-            <q-item-section>Position</q-item-section>
+            <q-item-section>{{ $t('position') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -201,7 +201,7 @@
             <q-item-section avatar>
               <q-icon name="workspaces" />
             </q-item-section>
-            <q-item-section>Department</q-item-section>
+            <q-item-section>{{ $t('department') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -217,7 +217,7 @@
             <q-item-section avatar>
               <q-icon name="account_circle" />
             </q-item-section>
-            <q-item-section>Account</q-item-section>
+            <q-item-section>{{ $t('account') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -233,7 +233,7 @@
             <q-item-section avatar>
               <q-icon name="account_circle" />
             </q-item-section>
-            <q-item-section>Account</q-item-section>
+            <q-item-section>{{ $t('account') }}</q-item-section>
           </q-item>
         </q-list>
       </div>

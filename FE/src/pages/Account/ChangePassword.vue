@@ -15,11 +15,11 @@
           v-model="oldPassword"
           :type="showPassword[0] ? 'text' : 'password'"
           hide-bottom-space
-          label="Old password:"
+          :label="$t('oldPassword')"
           :label-color="labelColorFocus[0]"
           @focus="labelColorFocus[0] = 'white'"
           @blur="labelColorFocus[0] = ''"
-          :rules="[(val) => !!val || 'Old password is required']"
+          :rules="[(val) => !!val || $t('oldPwdRequired')]"
         >
           <template v-slot:prepend>
             <q-icon name="fas fa-lock" />
@@ -42,18 +42,18 @@
           v-model="newPassword"
           :type="showPassword[1] ? 'text' : 'password'"
           hide-bottom-space
-          label="New password:"
+          :label="$t('newPassword')"
           :label-color="labelColorFocus[1]"
           @focus="labelColorFocus[1] = 'white'"
           @blur="labelColorFocus[1] = ''"
           :rules="[
-            (val) => !!val || 'New password is required',
+            (val) => !!val || $t('newPwdRequired'),
             (val) =>
               (val && val.length > 5) ||
-              'Password must be more than 5 characters',
+              $t('pwdLength'),
             (val) =>
               val != oldPassword ||
-              'New password cannot be the same the old password',
+              $t('pwdSame'),
           ]"
         >
           <template v-slot:prepend>
@@ -77,18 +77,18 @@
           v-model="confirmPassword"
           :type="showPassword[1] ? 'text' : 'password'"
           hide-bottom-space
-          label="Confirm password:"
+          :label="$t('confirmPwd')"
           :label-color="labelColorFocus[2]"
           @focus="labelColorFocus[2] = 'white'"
           @blur="labelColorFocus[2] = ''"
           :rules="[
-            (val) => !!val || 'Confirm password is required',
+            (val) => !!val || $t('confirmPwdRequired'),
             (val) =>
               (val && val.length > 5) ||
-              'Password must be more than 5 characters',
+              $t('confirmPwdLength'),
             (val) =>
               val == newPassword ||
-              'Confirm password does not match the new password',
+              $t('confirmPwdSame'),
           ]"
         >
           <template v-slot:prepend>
@@ -109,7 +109,7 @@
           :disable="loadingSave"
           @click="save"
           color="primary"
-          label="Save"
+          :label="$t('btnSave')"
           style="width: 100px"
         />
       </div>
