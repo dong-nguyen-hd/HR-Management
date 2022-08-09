@@ -25,7 +25,7 @@ namespace API.Controllers
 
         #region Action
         [HttpGet]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.EditorKT}")]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<DepartmentResource>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<DepartmentResource>>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<IEnumerable<DepartmentResource>>), StatusCodes.Status400BadRequest)]
@@ -37,7 +37,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.EditorKT}")]
         [ProducesResponseType(typeof(BaseResponse<DepartmentResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<DepartmentResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<DepartmentResource>), StatusCodes.Status400BadRequest)]

@@ -358,6 +358,7 @@ export default defineComponent({
         editorQTNS: 2,
         editorQTDA: 3,
         viewer: 4,
+        editorKT: 5,
       },
       arrRole: [
         {
@@ -375,6 +376,10 @@ export default defineComponent({
         {
           label: "viewer",
           value: 4,
+        },
+        {
+          label: "editor-kt",
+          value: 5,
         },
       ],
 
@@ -796,12 +801,14 @@ export default defineComponent({
       if (roleName == "admin") return "green-10";
       if (roleName == "editor-qtns") return "red-10";
       if (roleName == "editor-qtda") return "purple-10";
+      if (roleName == "editor-kt") return "cyan-10";
       if (roleName == "viewer") return "lime-10";
     },
     convertRoleStringToNumber(stringRole) {
       if (stringRole == "admin") return this.role.admin;
       if (stringRole == "editor-qtns") return this.role.editorQTNS;
       if (stringRole == "editor-qtda") return this.role.editorQTDA;
+      if (stringRole == "editor-kt") return this.role.editorKT;
       if (stringRole == "viewer") return this.role.viewer;
     },
     preventDeleteSelfAccount(id){

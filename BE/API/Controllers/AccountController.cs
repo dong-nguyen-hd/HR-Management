@@ -39,7 +39,7 @@ namespace API.Controllers
 
         #region Action
         [HttpPut("image/{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}, {Role.EditorKT}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), 200)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), 400)]
         public async Task<IActionResult> SaveImageAsync(int id, [FromForm] IFormFile image)
@@ -88,7 +88,7 @@ namespace API.Controllers
         }
 
         [HttpPut("reset-avatar/{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}, {Role.EditorKT}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ResetAvatarAsync(int id)
@@ -186,7 +186,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}, {Role.EditorKT}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
@@ -226,7 +226,7 @@ namespace API.Controllers
         }
 
         [HttpPut("self-update/{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}, {Role.EditorKT}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SelfUpdateAsync(int id, [FromBody] SelfUpdateAccountResource resource)
@@ -247,7 +247,7 @@ namespace API.Controllers
         }
 
         [HttpPut("change-password/{id:int}")]
-        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}")]
+        [Authorize(Roles = $"{Role.Admin}, {Role.EditorQTNS}, {Role.EditorQTDA}, {Role.Viewer}, {Role.EditorKT}")]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse<AccountResource>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdatePasswordAsync(int id, [FromBody] UpdatePasswordAccountResource resource)

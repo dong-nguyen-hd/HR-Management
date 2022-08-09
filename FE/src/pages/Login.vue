@@ -233,7 +233,7 @@ export default {
 }
 
 .title-login {
-  font-family: Poppins-Bold;
+  font-family: Montserrat-Bold;
   font-size: 24px;
   color: $grey;
   line-height: 1.2;

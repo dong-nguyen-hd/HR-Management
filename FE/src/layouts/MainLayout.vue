@@ -15,6 +15,7 @@
             <img src="../assets/images/logo-mono-white.svg" />
           </q-avatar>
         </q-toolbar-title>
+
         <div class="information q-pl-md" @click="isShowInfor = !isShowInfor">
           <div class="user-name q-mr-md">{{ showName }}</div>
           <div class="avatar q-mr-sm">
@@ -40,7 +41,7 @@
               <q-item-section avatar>
                 <q-icon name="fas fa-user-edit" />
               </q-item-section>
-              <q-item-section>{{ $t('updatePersonalInfor') }}</q-item-section>
+              <q-item-section>{{ $t("updatePersonalInfor") }}</q-item-section>
             </q-item>
 
             <q-item
@@ -54,14 +55,14 @@
               <q-item-section avatar>
                 <q-icon name="fas fa-key" />
               </q-item-section>
-              <q-item-section>{{ $t('changePassword') }}</q-item-section>
+              <q-item-section>{{ $t("changePassword") }}</q-item-section>
             </q-item>
 
             <q-item clickable v-ripple @click.once="logOutButton">
               <q-item-section avatar>
                 <q-icon name="fas fa-sign-out-alt" />
               </q-item-section>
-              <q-item-section>{{ $t('logOut') }}</q-item-section>
+              <q-item-section>{{ $t("logOut") }}</q-item-section>
             </q-item>
           </q-list>
         </div>
@@ -80,7 +81,7 @@
       <div class="left-side-bar bg-primary">
         <q-list dark separator>
           <q-item
-            v-show="getRole != 'viewer'"
+            v-show="getRole == 'editor-kt' || getRole == 'admin'"
             clickable
             v-ripple
             to="/list-employee-kt"
@@ -91,11 +92,11 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>{{ $t('employee') }}</q-item-section>
+            <q-item-section>{{ $t("employee") }}</q-item-section>
           </q-item>
 
           <q-item
-            v-show="getRole != 'viewer'"
+            v-show="getRole == 'editor-qtns' || getRole == 'admin'"
             clickable
             v-ripple
             to="/list-employee-qtns"
@@ -106,11 +107,11 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>{{ $t('employee') }}</q-item-section>
+            <q-item-section>{{ $t("employee") }}</q-item-section>
           </q-item>
 
           <q-item
-            v-show="getRole != 'viewer'"
+            v-show="getRole == 'editor-qtda' || getRole == 'admin'"
             clickable
             v-ripple
             to="/list-employee"
@@ -121,7 +122,7 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>{{ $t('employee') }}</q-item-section>
+            <q-item-section>{{ $t("employee") }}</q-item-section>
           </q-item>
 
           <q-item
@@ -137,11 +138,11 @@
             <q-item-section avatar>
               <q-icon name="business_center" />
             </q-item-section>
-            <q-item-section>{{ $t('project') }}</q-item-section>
+            <q-item-section>{{ $t("project") }}</q-item-section>
           </q-item>
 
           <q-item
-            v-show="getRole == 'viewer'"
+            v-show="getRole == 'admin' || getRole == 'viewer'"
             @click="isShowInfor = false"
             clickable
             v-ripple
@@ -153,11 +154,11 @@
             <q-item-section avatar>
               <q-icon name="business_center" />
             </q-item-section>
-            <q-item-section>{{ $t('project') }}</q-item-section>
+            <q-item-section>{{ $t("project") }}</q-item-section>
           </q-item>
 
           <q-item
-            v-show="getRole != 'viewer'"
+            v-show="getRole == 'admin' || getRole == 'editor-qtda'"
             @click="isShowInfor = false"
             clickable
             v-ripple
@@ -169,11 +170,11 @@
             <q-item-section avatar>
               <q-icon name="category" />
             </q-item-section>
-            <q-item-section>{{ $t('category') }}</q-item-section>
+            <q-item-section>{{ $t("category") }}</q-item-section>
           </q-item>
 
           <q-item
-            v-show="getRole != 'viewer'"
+            v-show="getRole == 'admin' || getRole == 'editor-qtns'"
             @click="isShowInfor = false"
             clickable
             v-ripple
@@ -185,11 +186,11 @@
             <q-item-section avatar>
               <q-icon name="badge" />
             </q-item-section>
-            <q-item-section>{{ $t('position') }}</q-item-section>
+            <q-item-section>{{ $t("position") }}</q-item-section>
           </q-item>
 
           <q-item
-            v-show="getRole != 'viewer'"
+            v-show="getRole == 'admin' || getRole == 'editor-qtns'"
             @click="isShowInfor = false"
             clickable
             v-ripple
@@ -201,7 +202,7 @@
             <q-item-section avatar>
               <q-icon name="workspaces" />
             </q-item-section>
-            <q-item-section>{{ $t('department') }}</q-item-section>
+            <q-item-section>{{ $t("department") }}</q-item-section>
           </q-item>
 
           <q-item
@@ -217,11 +218,11 @@
             <q-item-section avatar>
               <q-icon name="account_circle" />
             </q-item-section>
-            <q-item-section>{{ $t('account') }}</q-item-section>
+            <q-item-section>{{ $t("account") }}</q-item-section>
           </q-item>
 
           <q-item
-            v-show="getRole == 'editor-qtda'"
+            v-show="getRole == 'admin' || getRole == 'editor-qtda'"
             @click="isShowInfor = false"
             clickable
             v-ripple
@@ -233,7 +234,7 @@
             <q-item-section avatar>
               <q-icon name="account_circle" />
             </q-item-section>
-            <q-item-section>{{ $t('account') }}</q-item-section>
+            <q-item-section>{{ $t("account") }}</q-item-section>
           </q-item>
         </q-list>
       </div>
