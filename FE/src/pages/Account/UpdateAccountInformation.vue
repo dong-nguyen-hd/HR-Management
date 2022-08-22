@@ -15,7 +15,7 @@
               icon="restart_alt"
               @click="resetAvatar"
               ><q-tooltip anchor="top middle" self="bottom middle"
-                >Reset Avatar</q-tooltip
+                >{{ $t('resetAvatar') }}</q-tooltip
               >
             </q-btn>
           </div>
@@ -28,7 +28,7 @@
             input-style="width: 150px;"
             max-total-size="5242880"
             :display-value="
-              imageFile ? 'Image is uploaded' : 'Upload image here!'
+              imageFile ? $t('imageUploaded') : $t('uploadImageHere')
             "
             v-model="imageFile"
             accept=".jpg, .png, .gif, .bmp, image/*"
@@ -48,7 +48,7 @@
           standout
           v-model="accountInfor.userName"
           type="text"
-          label="User name:"
+          :label="$t('userNameDot')"
           :label-color="labelColorFocus[0]"
           @focus="labelColorFocus[0] = 'white'"
           @blur="labelColorFocus[0] = ''"
@@ -66,11 +66,11 @@
           maxlength="500"
           v-model="accountInfor.name"
           type="text"
-          label="Name:"
+          :label="$t('nameDot')"
           :label-color="labelColorFocus[1]"
           @focus="labelColorFocus[1] = 'white'"
           @blur="labelColorFocus[1] = ''"
-          :rules="[(val) => !!val || 'Name is required']"
+          :rules="[(val) => !!val || $t('nameRequired')]"
           hide-bottom-space
         >
           <template v-slot:prepend>
@@ -86,11 +86,11 @@
           maxlength="500"
           v-model="accountInfor.email"
           type="email"
-          label="Email:"
+          :label="$t('emailDot')"
           :label-color="labelColorFocus[2]"
           @focus="labelColorFocus[2] = 'white'"
           @blur="labelColorFocus[2] = ''"
-          :rules="[(val) => !!val || 'Email is required']"
+          :rules="[(val) => !!val || $t('emailRequired')]"
           hide-bottom-space
         >
           <template v-slot:prepend>
@@ -104,7 +104,7 @@
           :disable="loadingSave"
           @click="save"
           color="primary"
-          label="Save"
+          :label="$t('btnSave')"
           style="width: 100px"
         />
       </div>

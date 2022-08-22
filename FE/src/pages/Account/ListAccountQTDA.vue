@@ -4,14 +4,14 @@
       <q-dialog v-model="showDelete" :persistent="accountProcess">
         <q-card>
           <q-card-section class="row items-center">
-            <span class="text-h6">Delete {{ getNameDelete }}?</span>
+            <span class="text-h6">{{ $t('delete') }} {{ getNameDelete }}?</span>
           </q-card-section>
 
           <q-separator />
 
           <q-card-section>
             <span
-              >This can’t be undone and it will be removed from database.</span
+              >{{ $t('confirmDelete') }}</span
             >
           </q-card-section>
 
@@ -19,13 +19,13 @@
             <q-btn
               flat
               :disable="accountProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               @click="closeModifyPopup"
             />
             <q-btn
               flat
-              label="Delete"
+              :label="$t('btnDelete')"
               color="negative"
               @click="deleteAccount"
               :loading="accountProcess"
@@ -37,8 +37,8 @@
       <q-dialog v-model="show" :persistent="getPersistentAccount">
         <q-card style="width: 400px">
           <q-card-section class="row items-center">
-            <span v-show="!showEdit" class="text-h6">Add Account</span>
-            <span v-show="showEdit" class="text-h6">Edit Account</span>
+            <span v-show="!showEdit" class="text-h6">{{ $t('addAccount') }}</span>
+            <span v-show="showEdit" class="text-h6">{{ $t('editAccount') }}</span>
           </q-card-section>
 
           <q-separator />
@@ -52,11 +52,11 @@
                 maxlength="400"
                 v-model="tempAccountResource.name"
                 type="text"
-                label="Name:"
+                :label="$t('nameDot')"
                 :label-color="colorFocusModifyPopup[0]"
                 @focus="colorFocusModifyPopup[0] = 'white'"
                 @blur="colorFocusModifyPopup[0] = ''"
-                :rules="[(val) => !!val || 'Name is required']"
+                :rules="[(val) => !!val || $t('nameRequired')]"
                 lazy-rules="ondemand"
                 hide-bottom-space
               >
@@ -71,11 +71,11 @@
                 maxlength="250"
                 v-model="tempAccountResource.userName"
                 type="text"
-                label="Username:"
+                :label="$t('userNameDot')"
                 :label-color="colorFocusModifyPopup[1]"
                 @focus="colorFocusModifyPopup[1] = 'white'"
                 @blur="colorFocusModifyPopup[1] = ''"
-                :rules="[(val) => !!val || 'Username is required']"
+                :rules="[(val) => !!val || $t('userNameRequired')]"
                 lazy-rules="ondemand"
                 hide-bottom-space
               >
@@ -90,11 +90,11 @@
                 maxlength="250"
                 v-model="tempAccountResource.password"
                 type="text"
-                label="Password:"
+                :label="$t('pwdDot')"
                 :label-color="colorFocusModifyPopup[2]"
                 @focus="colorFocusModifyPopup[2] = 'white'"
                 @blur="colorFocusModifyPopup[2] = ''"
-                :rules="[(val) => !!val || 'Password is required']"
+                :rules="[(val) => !!val || $t('pwdRequired')]"
                 lazy-rules="ondemand"
                 hide-bottom-space
               >
@@ -108,7 +108,7 @@
                 standout
                 v-model="tempAccountResource.role"
                 :options="arrRole"
-                label="Role:"
+                :label="$t('roleDot')"
                 option-value="value"
                 option-label="label"
                 emit-value
@@ -117,7 +117,7 @@
                 :label-color="colorFocusModifyPopup[3]"
                 @focus="colorFocusModifyPopup[3] = 'white'"
                 @blur="colorFocusModifyPopup[3] = ''"
-                :rules="[(val) => !!val || 'Role is required']"
+                :rules="[(val) => !!val || $t('roleRequired')]"
                 lazy-rules="ondemand"
                 hide-bottom-space
               >
@@ -132,11 +132,11 @@
                 maxlength="400"
                 v-model="tempAccountResource.email"
                 type="text"
-                label="Email:"
+                :label="$t('emailDot')"
                 :label-color="colorFocusModifyPopup[4]"
                 @focus="colorFocusModifyPopup[4] = 'white'"
                 @blur="colorFocusModifyPopup[4] = ''"
-                :rules="[(val) => !!val || 'Email is required']"
+                :rules="[(val) => !!val || $t('emailRequired')]"
                 lazy-rules="ondemand"
                 hide-bottom-space
               >
@@ -148,14 +148,14 @@
             <q-btn
               flat
               :disable="accountProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               @click="closeModifyPopup"
             />
             <q-btn
               v-show="!showEdit"
               flat
-              label="Add"
+              :label="$t('btnAdd')"
               color="info"
               @click="saveInsert"
               :loading="accountProcess"
@@ -163,7 +163,7 @@
             <q-btn
               v-show="showEdit"
               flat
-              label="Edit"
+              :label="$t('btnEdit')"
               color="info"
               @click="saveUpdate"
               :loading="accountProcess"
@@ -185,7 +185,7 @@
                   clearable
                   v-model="tempAddProjectId"
                   :options="listTempProject"
-                  label="Search by name project"
+                  :label="$t('searchNameProject')"
                   option-value="id"
                   option-label="name"
                   emit-value
@@ -202,7 +202,7 @@
                   ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
-                        No results
+                        {{ $t('noResults') }}
                       </q-item-section>
                     </q-item>
                   </template>
@@ -246,7 +246,7 @@
                         dense
                         color="negative"
                         text-color="white"
-                        label="Remove"
+                        :label="$t('remove')"
                         @click="removeProject(props.value)"
                       />
                     </div>
@@ -265,7 +265,7 @@
               <q-btn
                 dense
                 color="primary"
-                label="Close"
+                :label="$t('close')"
                 class="q-px-lg"
                 @click="closeProject"
               />
@@ -282,7 +282,7 @@
           <q-btn
             @click="openInsert"
             color="primary"
-            label="New account"
+            :align="$t('newAccount')"
             unelevated
           />
         </div>
@@ -315,7 +315,7 @@
                   debounce="300"
                   @focus="
                     labelColorFocus[0] = 'black';
-                    labelNameFocus[0] = 'Search by username';
+                    labelNameFocus[0] = $t('searchUserName');
                     widthOfUserName = '154px';
                   "
                   @blur="
@@ -357,7 +357,7 @@
                   dense
                   color="white"
                   text-color="black"
-                  label="Edit"
+                  :label="$t('btnEdit')"
                   @click="openEdit(props.value)"
                 />
               </div>
@@ -367,7 +367,7 @@
                   dense
                   color="info"
                   text-color="white"
-                  label="Project"
+                  :label="$t('Project')"
                   @click="openProject(props.value)"
                 />
               </div>
@@ -376,7 +376,7 @@
                   style="width: 70px"
                   dense
                   color="negative"
-                  label="delete"
+                  :label="$t('btnDelete')"
                   @click="openDelete(props.value)"
                 />
               </div>
@@ -427,7 +427,7 @@ export default defineComponent({
   data() {
     return {
       labelColorFocus: ["white"],
-      labelNameFocus: ["Username"],
+      labelNameFocus: [this.$t('userName')],
 
       colorFocusModifyPopup: [],
 
@@ -485,19 +485,19 @@ export default defineComponent({
         {
           name: "name",
           align: "left",
-          label: "Name",
+          label: this.$t('name'),
           field: "name",
         },
         {
           name: "description",
           align: "left",
-          label: "Description",
+          label: this.$t('descriptionLower'),
           field: "description",
         },
         {
           name: "action",
           align: "center",
-          label: "Actions",
+          label: this.$t('actions'),
           field: (row) => row.id,
         },
       ],
@@ -547,37 +547,37 @@ export default defineComponent({
         {
           name: "userName",
           align: "left",
-          label: "Username",
+          label: this.$t('userName'),
           field: "userName",
         },
         {
           name: "role",
           align: "center",
-          label: "Role",
+          label: this.$t('role'),
           field: "role",
         },
         {
           name: "name",
           align: "left",
-          label: "Name",
+          label: this.$t('name'),
           field: "name",
         },
         {
           name: "email",
           align: "left",
-          label: "Email",
+          label: this.$t('email'),
           field: "email",
         },
         {
           name: "lastActivity",
           align: "left",
-          label: "Last Activity",
+          label: this.$t('lastActivity'),
           field: "lastActivity",
         },
         {
           name: "action",
           align: "center",
-          label: "Actions",
+          label: this.$t('actions'),
           field: (row) => row.id,
         },
       ],
