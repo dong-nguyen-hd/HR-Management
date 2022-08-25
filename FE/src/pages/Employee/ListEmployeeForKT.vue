@@ -4,14 +4,14 @@
       <q-dialog v-model="deletePay" :persistent="payProcess">
         <q-card>
           <q-card-section class="row items-center">
-            <span class="text-h6">Delete salary?</span>
+            <span class="text-h6">{{$t('deleteSalary')}}</span>
           </q-card-section>
 
           <q-separator />
 
           <q-card-section>
             <span
-              >This can’t be undone and it will be removed from database.</span
+              >{{$t('confirmDelete')}}</span
             >
           </q-card-section>
 
@@ -19,13 +19,13 @@
             <q-btn
               flat
               :disable="payProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               v-close-popup
             />
             <q-btn
               flat
-              label="Delete"
+              :label="$t('btnDelete')"
               color="negative"
               @click="deletePayAsync"
               :loading="payProcess"

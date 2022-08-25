@@ -4,14 +4,14 @@
       <q-dialog v-model="showDelete" :persistent="deleteProcess">
         <q-card>
           <q-card-section class="row items-center">
-            <span class="text-h6">Delete {{ getNameDelete }}?</span>
+            <span class="text-h6">{{$t('delete')}} {{ getNameDelete }}?</span>
           </q-card-section>
 
           <q-separator />
 
           <q-card-section>
             <span
-              >This can’t be undone and it will be removed from database.</span
+              >{{$t('confirmDelete')}}</span
             >
           </q-card-section>
 
@@ -19,13 +19,13 @@
             <q-btn
               flat
               :disable="deleteProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               v-close-popup
             />
             <q-btn
               flat
-              label="Delete"
+              :label="$t('btnDelete')"
               color="negative"
               @click="deleteEmployee"
               :loading="deleteProcess"
@@ -68,7 +68,7 @@
                 :loading="statusUpdate"
                 dense
                 color="primary"
-                label="Save"
+                :label="$t('btnSave')"
                 class="q-px-lg"
                 @click="saveUpdate"
               />
@@ -102,7 +102,7 @@
                 :loading="statusInsert"
                 dense
                 color="primary"
-                label="Save"
+                :label="$t('btnSave')"
                 class="q-px-lg"
                 @click="saveInsert"
               />
@@ -178,7 +178,7 @@
                         <div
                           class="col-4 q-pl-md flex items-center border-right text-bold"
                         >
-                          Date of Birth
+                          {{$t('dob')}}
                         </div>
                         <div class="col-8 q-pl-md flex items-center">
                           {{ convertDateTimeToDate(viewObj.dateOfBirth) }}
@@ -194,7 +194,7 @@
                   <div
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                   >
-                    PROFESSIONAL OVERVIEW
+                    {{$t('professionalOverview')}}
                   </div>
                   <div class="q-pa-md flex items-center height-view-sub">
                     {{ viewObj.description }}
@@ -204,7 +204,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(1)"
                   >
-                    SKILLS
+                    {{$t('skills')}}
                   </div>
 
                   <div
@@ -237,7 +237,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(3)"
                   >
-                    WORKING HISTORY
+                    {{$t('workingHistory')}}
                   </div>
 
                   <div
@@ -247,20 +247,20 @@
                     <div
                       class="col-1 q-pl-md flex items-center border-right text-bold"
                     >
-                      NO.
+                      {{$t('no')}}
                     </div>
                     <div
                       class="col q-pl-md flex items-center border-right text-bold"
                     >
-                      PREIOD
+                      {{$t('preiod')}}
                     </div>
                     <div
                       class="col q-pl-md flex items-center border-right text-bold"
                     >
-                      COMPANY
+                      {{$t('company')}}
                     </div>
                     <div class="col q-pl-md flex items-center text-bold">
-                      JOB TITTLE
+                      {{$t('jobTitle')}}
                     </div>
                   </div>
 
@@ -304,7 +304,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(4)"
                   >
-                    EDUCATION
+                    {{$t('education')}}
                   </div>
 
                   <div
@@ -325,14 +325,14 @@
                                 education.endDate,
                                 "MMM YYYY"
                               )
-                            : "Now"
+                            : $t('now')
                         }}
                         | {{ education.collegeName }}</span
                       >
                     </div>
                     <div class="flex items-center col">
                       <span
-                        ><span class="text-bold">Major: </span
+                        ><span class="text-bold">{{$t('major')}} </span
                         >{{ education.major }}</span
                       >
                     </div>
@@ -342,7 +342,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(5)"
                   >
-                    CERTIFICATION
+                    {{$t('certification')}}
                   </div>
 
                   <div
@@ -363,7 +363,7 @@
                     class="q-pl-md bg-cyan-3 height-view flex items-center text-bold"
                     v-show="viewObj.orderIndex.includes(2)"
                   >
-                    PROJECTS
+                    {{$t('projects')}}
                   </div>
 
                   <div
@@ -373,20 +373,20 @@
                     <div
                       class="col-1 flex items-center q-pl-md border-right text-bold"
                     >
-                      NO.
+                      {{$t('no')}}
                     </div>
                     <div
                       class="col flex items-center q-pl-md border-right text-bold"
                     >
-                      PREIOD
+                      {{$t('preiod')}}
                     </div>
                     <div
                       class="col flex items-center q-pl-md border-right text-bold"
                     >
-                      POSITION
+                      {{$t('position')}}
                     </div>
                     <div class="col-5 flex items-center q-pl-md text-bold">
-                      DESCRIPTION
+                      {{$t('description')}}
                     </div>
                   </div>
 
@@ -405,7 +405,7 @@
                       {{
                         project.endDate
                           ? convertDateTimeToDate(project.endDate, "MMM YYYY")
-                          : "Now"
+                          : $t('now')
                       }}
                     </div>
                     <div class="col q-pl-md flex items-center border-right">
@@ -421,7 +421,7 @@
                         class="q-pl-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
-                          ><span class="text-bold">Description: </span
+                          ><span class="text-bold">{{$t('descriptionColon')}} </span
                           >{{ project.description }}</span
                         >
                       </div>
@@ -429,7 +429,7 @@
                         class="q-pl-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
-                          ><span class="text-bold">Responsibilities: </span
+                          ><span class="text-bold">{{$t('responsibilitiesColon')}} </span
                           >{{ project.responsibilities }}</span
                         >
                       </div>
@@ -437,7 +437,7 @@
                         class="q-pl-md project-bottom-view flex items-center project-height-view"
                       >
                         <span
-                          ><span class="text-bold">Team size: </span
+                          ><span class="text-bold">{{$t('teamSizeColon')}} </span
                           >{{ project.teamSize }}</span
                         >
                       </div>
@@ -445,7 +445,7 @@
                         class="q-pl-md flex items-center project-height-view"
                       >
                         <span
-                          ><span class="text-bold">Technologies used: </span
+                          ><span class="text-bold">{{$t('technologiesUsedColon')}} </span
                           ><span
                             v-for="(technology, i) in project.technologies"
                             :key="i"
@@ -471,7 +471,7 @@
                 v-show="false"
                 dense
                 color="primary"
-                label="Download"
+                :label="$t('download')"
                 class="q-px-lg"
               />
             </q-toolbar>
@@ -493,7 +493,7 @@
               type="text"
               placeholder="YYYY-MM-DD"
               stack-label
-              label="Day finish project:"
+              :label="$t('dayFinishProject')"
               label-color="white"
               bg-color="primary"
               input-class="text-white"
@@ -515,14 +515,14 @@
                         <q-btn
                           v-close-popup
                           @click="clearLastDay"
-                          label="Clear"
+                          :label="$t('clear')"
                           color="primary"
                           flat
                         />
 
                         <q-btn
                           v-close-popup
-                          label="Close"
+                          :label="$t('close')"
                           color="primary"
                           flat
                         />
@@ -538,7 +538,7 @@
             class="q-ml-md"
             @click="openInsert"
             color="primary"
-            label="New employee"
+            :label="$t('newEmployee')"
             unelevated
           />
         </div>
@@ -571,7 +571,7 @@
                   debounce="300"
                   @focus="
                     labelColorFocus[0] = 'black';
-                    labelNameFocus[0] = 'Search by staff id';
+                    labelNameFocus[0] = $t('searchByStaffId');
                     widthOfStaffId = '154px';
                   "
                   @blur="
@@ -631,7 +631,7 @@
                   ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
-                        No results
+                        {{$t('noResults')}}
                       </q-item-section>
                     </q-item>
                   </template>
@@ -655,7 +655,7 @@
                   :label-color="labelColorFocus[2]"
                   @focus="
                     labelColorFocus[2] = 'black';
-                    labelNameFocus[2] = 'Search by first name';
+                    labelNameFocus[2] = $t('searchByFirstName');
                     widthOfFullName = '170px';
                   "
                   @blur="
@@ -691,7 +691,7 @@
                   v-model="filter.available"
                   color="accent"
                   @update:model-value="getEmployeeWithFilter(false)"
-                  label="Available"
+                  :label="$t('available')"
                 />
               </div>
             </q-th>
@@ -723,7 +723,7 @@
                   @filter="filterSkill"
                   @focus="
                     labelColorFocus[3] = 'black';
-                    labelNameFocus[3] = 'Search by skill';
+                    labelNameFocus[3] = $t('searchBySkill');
                     widthOfSkill = '250px';
                   "
                   @blur="
@@ -736,7 +736,7 @@
                   ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
-                        No results
+                        {{$t('noResults')}}
                       </q-item-section>
                     </q-item>
                   </template>
@@ -761,7 +761,7 @@
                   dense
                   color="white"
                   text-color="black"
-                  label="Edit"
+                  :label="$t('btnEdit')"
                   @click="openEdit(props.value)"
                 />
               </div>
@@ -770,7 +770,7 @@
                   style="width: 60px"
                   dense
                   color="negative"
-                  label="delete"
+                  :label="$t('btnDelete')"
                   @click="
                     idDelete = props.value;
                     showDelete = true;
@@ -860,7 +860,7 @@ export default defineComponent({
   data() {
     return {
       labelColorFocus: ["white", "white", "white", "white"],
-      labelNameFocus: ["Staff ID", "", "Full Name", "Skills"],
+      labelNameFocus: [this.$t('staffID'), "", this.$t('fullName'), this.$t('skillLower')],
 
       widthOfStaffId: "100px",
       widthOfPosition: "120px",
@@ -919,13 +919,13 @@ export default defineComponent({
         {
           name: "staffId",
           align: "left",
-          label: "Staff ID",
+          label: this.$t('staffID'),
           field: "staffId",
         },
         {
           name: "fullName",
           align: "left",
-          label: "Full Name",
+          label: this.$t('fullName'),
           field: (row) => `${row.firstName} ${row.lastName}`,
         },
         {
@@ -937,25 +937,25 @@ export default defineComponent({
         {
           name: "position",
           align: "left",
-          label: "Position",
+          label: this.$t('position'),
           field: (row) => row.position.name,
         },
         {
           name: "available",
           align: "center",
-          label: "Available",
+          label: this.$t('available'),
           field: (row) => row.available,
         },
         {
           name: "skill",
           align: "left",
-          label: "Skills",
+          label: this.$t('skillLower'),
           field: (row) => row.categoryPerson,
         },
         {
           name: "action",
           align: "center",
-          label: "Actions",
+          label: this.$t('actions'),
           field: (row) => row.id,
         },
       ],

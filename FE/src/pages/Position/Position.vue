@@ -52,7 +52,7 @@
                 maxlength="250"
                 v-model="tempPositionResource.name"
                 type="text"
-                :label="$t('nameDot')"
+                :label="$t('nameColon')"
                 :label-color="colorFocusCategory[0]"
                 @focus="colorFocusCategory[0] = 'white'"
                 @blur="colorFocusCategory[0] = ''"

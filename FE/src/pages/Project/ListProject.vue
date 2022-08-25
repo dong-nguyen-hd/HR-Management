@@ -52,7 +52,7 @@
                 maxlength="250"
                 v-model="groupResource.name"
                 type="text"
-                :label="$t('nameDot')"
+                :label="$t('nameColon')"
                 :label-color="colorFocusGroup[0]"
                 @focus="colorFocusGroup[0] = 'white'"
                 @blur="colorFocusGroup[0] = ''"

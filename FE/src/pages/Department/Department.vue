@@ -4,14 +4,14 @@
       <q-dialog v-model="showDelete" :persistent="deleteProcess">
         <q-card>
           <q-card-section class="row items-center">
-            <span class="text-h6">Delete {{ getNameDelete }}?</span>
+            <span class="text-h6">{{$t('delete')}} {{ getNameDelete }}?</span>
           </q-card-section>
 
           <q-separator />
 
           <q-card-section>
             <span
-              >This can’t be undone and it will be removed from database.</span
+              >{{$t('confirmDelete')}}</span
             >
           </q-card-section>
 
@@ -19,13 +19,13 @@
             <q-btn
               flat
               :disable="deleteProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               v-close-popup
             />
             <q-btn
               flat
-              label="Delete"
+              :label="$t('btnDelete')"
               color="negative"
               @click="deleteDepartment"
               :loading="deleteProcess"
@@ -37,8 +37,8 @@
       <q-dialog v-model="showDepartment" :persistent="getPersistentDepartment">
         <q-card style="width: 400px">
           <q-card-section class="row items-center">
-            <span v-show="!showEdit" class="text-h6">Add Department</span>
-            <span v-show="showEdit" class="text-h6">Edit Department</span>
+            <span v-show="!showEdit" class="text-h6">{{$t('addDepartment')}}</span>
+            <span v-show="showEdit" class="text-h6">{{$t('editDepartment')}}</span>
           </q-card-section>
 
           <q-separator />
@@ -52,11 +52,11 @@
                 maxlength="250"
                 v-model="tempDepartmentResource.name"
                 type="text"
-                label="Name:"
+                :label="$t('nameColon')"
                 :label-color="colorFocusCategory[0]"
                 @focus="colorFocusCategory[0] = 'white'"
                 @blur="colorFocusCategory[0] = ''"
-                :rules="[(val) => !!val || 'Name is required']"
+                :rules="[(val) => !!val || $t('nameRequired')]"
                 lazy-rules="ondemand"
                 hide-bottom-space
               >
@@ -68,14 +68,14 @@
             <q-btn
               flat
               :disable="departmentProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               v-close-popup
             />
             <q-btn
               v-show="!showEdit"
               flat
-              label="Add"
+              :label="$t('btnAdd')"
               color="info"
               @click="addDepartment"
               :loading="departmentProcess"
@@ -83,7 +83,7 @@
             <q-btn
               v-show="showEdit"
               flat
-              label="Edit"
+              :label="$t('btnEdit')"
               color="info"
               @click="editDepartment"
               :loading="departmentProcess"
@@ -95,7 +95,7 @@
       <div class="table-component full-height full-width flex flex-center q-px-md">
         <div class="q-mb-md full-width" style="height: 36px">
           <div class="full-width flex justify-end">
-            <q-btn color="primary" label="New Department" @click="openAddDepartment" />
+            <q-btn color="primary" :label="$t('newDepartment')" @click="openAddDepartment" />
           </div>
         </div>
 
@@ -125,7 +125,7 @@
                   :label-color="labelColorFocus[0]"
                   @focus="
                     labelColorFocus[0] = 'black';
-                    labelNameFocus[0] = 'Search by name';
+                    labelNameFocus[0] = $t('searchByName');
                     widthName = '200px';
                   "
                   @blur="
@@ -159,7 +159,7 @@
                   dense
                   color="white"
                   text-color="black"
-                  label="Edit"
+                  :label="$t('btnEdit')"
                   @click="openEditDepartment(props.value)"
                 />
               </div>
@@ -168,7 +168,7 @@
                   style="width: 60px"
                   dense
                   color="negative"
-                  label="delete"
+                  :label="$t('btnDelete')"
                   @click="
                     idDelete = props.value;
                     showDelete = true;
@@ -200,7 +200,7 @@ export default defineComponent({
     return {
       labelColorFocus: ["white", "white"],
       colorFocusCategory: ["", ""],
-      labelNameFocus: ["Category", "Skills"],
+      labelNameFocus: [this.$t('category'), this.$t('skillLower')],
 
       widthName: "130px",
 
@@ -241,13 +241,13 @@ export default defineComponent({
         {
           name: "name",
           align: "left",
-          label: "Name",
+          label: this.$t('name'),
           field: (row) => row.name,
         },
         {
           name: "action",
           align: "center",
-          label: "Actions",
+          label: this.$t('actions'),
           field: (row) => row.id,
         },
       ],

@@ -52,7 +52,7 @@
                 maxlength="400"
                 v-model="tempAccountResource.name"
                 type="text"
-                :label="$t('nameDot')"
+                :label="$t('nameColon')"
                 :label-color="colorFocusModifyPopup[0]"
                 @focus="colorFocusModifyPopup[0] = 'white'"
                 @blur="colorFocusModifyPopup[0] = ''"

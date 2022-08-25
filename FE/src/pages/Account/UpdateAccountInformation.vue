@@ -66,7 +66,7 @@
           maxlength="500"
           v-model="accountInfor.name"
           type="text"
-          :label="$t('nameDot')"
+          :label="$t('nameColon')"
           :label-color="labelColorFocus[1]"
           @focus="labelColorFocus[1] = 'white'"
           @blur="labelColorFocus[1] = ''"

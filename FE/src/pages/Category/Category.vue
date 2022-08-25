@@ -4,14 +4,14 @@
       <q-dialog v-model="showDelete" :persistent="deleteProcess">
         <q-card>
           <q-card-section class="row items-center">
-            <span class="text-h6">Delete {{ getNameDelete }}?</span>
+            <span class="text-h6">{{$t('delete')}} {{ getNameDelete }}?</span>
           </q-card-section>
 
           <q-separator />
 
           <q-card-section>
             <span
-              >This can’t be undone and it will be removed from database.</span
+              >{{$t('confirmDelete')}}</span
             >
           </q-card-section>
 
@@ -19,13 +19,13 @@
             <q-btn
               flat
               :disable="deleteProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               v-close-popup
             />
             <q-btn
               flat
-              label="Delete"
+              :label="$t('btnDelete')"
               color="negative"
               @click="deleteCategory"
               :loading="deleteProcess"
@@ -37,8 +37,8 @@
       <q-dialog v-model="showCategory" :persistent="getPersistentCategory">
         <q-card style="width: 400px">
           <q-card-section class="row items-center">
-            <span v-show="!showEdit" class="text-h6">Add Category</span>
-            <span v-show="showEdit" class="text-h6">Edit Category</span>
+            <span v-show="!showEdit" class="text-h6">{{$t('addCategory')}}</span>
+            <span v-show="showEdit" class="text-h6">{{$t('editCategory')}}</span>
           </q-card-section>
 
           <q-separator />
@@ -52,11 +52,11 @@
                 maxlength="250"
                 v-model="tempCategoryResource.name"
                 type="text"
-                label="Name:"
+                :label="$t('nameColon')"
                 :label-color="colorFocusCategory[0]"
                 @focus="colorFocusCategory[0] = 'white'"
                 @blur="colorFocusCategory[0] = ''"
-                :rules="[(val) => !!val || 'Name is required']"
+                :rules="[(val) => !!val || $t('nameRequired')]"
                 lazy-rules="ondemand"
                 hide-bottom-space
               >
@@ -70,7 +70,7 @@
                 hide-dropdown-icon
                 multiple
                 v-model="tempCategoryResource.technologies"
-                label="Skills"
+                :label="$t('skillLower')"
                 option-label="name"
                 @new-value="createSkillBelongWithCategory"
                 input-debounce="0"
@@ -88,14 +88,14 @@
             <q-btn
               flat
               :disable="categoryProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               v-close-popup
             />
             <q-btn
               v-show="!showEdit"
               flat
-              label="Add"
+              :label="$t('btnAdd')"
               color="info"
               @click="addCategory"
               :loading="categoryProcess"
@@ -103,7 +103,7 @@
             <q-btn
               v-show="showEdit"
               flat
-              label="Edit"
+              :label="$t('btnEdit')"
               color="info"
               @click="editCategory"
               :loading="categoryProcess"
@@ -117,7 +117,7 @@
           <div class="full-width flex justify-end">
             <q-btn
               color="primary"
-              label="New Category"
+              :label="$t('newCategory')"
               @click="openAddCategory"
             />
           </div>
@@ -151,7 +151,7 @@
                   debounce="300"
                   @focus="
                     labelColorFocus[0] = 'black';
-                    labelNameFocus[0] = 'Search by category name';
+                    labelNameFocus[0] = $t('searchByCategoryName');
                     widthCategory = '200px';
                   "
                   @blur="
@@ -192,7 +192,7 @@
                   debounce="300"
                   @focus="
                     labelColorFocus[1] = 'black';
-                    labelNameFocus[1] = 'Search by skill name';
+                    labelNameFocus[1] = $t('searchBySkillName');
                     widthCategory = '154px';
                   "
                   @blur="
@@ -226,7 +226,7 @@
                   dense
                   color="white"
                   text-color="black"
-                  label="Edit"
+                  :label="$t('btnEdit')"
                   @click="openEditCategory(props.value)"
                 />
               </div>
@@ -235,7 +235,7 @@
                   style="width: 60px"
                   dense
                   color="negative"
-                  label="delete"
+                  :label="$t('btnDelete')"
                   @click="
                     idDelete = props.value;
                     showDelete = true;
@@ -289,7 +289,7 @@ export default defineComponent({
     return {
       labelColorFocus: ["white", "white"],
       colorFocusCategory: ["", ""],
-      labelNameFocus: ["Category", "Skills"],
+      labelNameFocus: [this.$t('category'), this.$t('skillLower')],
 
       widthCategory: "130px",
       widthSkill: "110px",
@@ -339,19 +339,19 @@ export default defineComponent({
         {
           name: "category",
           align: "left",
-          label: "Category",
+          label: this.$t('category'),
           field: (row) => row.name,
         },
         {
           name: "skill",
           align: "left",
-          label: "Skills",
+          label: this.$t('skillLower'),
           field: (row) => row.technologies,
         },
         {
           name: "action",
           align: "center",
-          label: "Actions",
+          label: this.$t('actions'),
           field: (row) => row.id,
         },
       ],
