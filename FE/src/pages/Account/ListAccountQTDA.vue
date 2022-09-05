@@ -108,7 +108,7 @@
                 standout
                 v-model="tempAccountResource.role"
                 :options="arrRole"
-                :label="$t('roleDot')"
+                :label="$t('roleColon')"
                 option-value="value"
                 option-label="label"
                 emit-value
@@ -132,7 +132,7 @@
                 maxlength="400"
                 v-model="tempAccountResource.email"
                 type="text"
-                :label="$t('emailDot')"
+                :label="$t('emailColon')"
                 :label-color="colorFocusModifyPopup[4]"
                 @focus="colorFocusModifyPopup[4] = 'white'"
                 @blur="colorFocusModifyPopup[4] = ''"
@@ -282,7 +282,7 @@
           <q-btn
             @click="openInsert"
             color="primary"
-            :align="$t('newAccount')"
+            :label="$t('newAccount')"
             unelevated
           />
         </div>
@@ -367,7 +367,7 @@
                   dense
                   color="info"
                   text-color="white"
-                  :label="$t('Project')"
+                  :label="$t('project')"
                   @click="openProject(props.value)"
                 />
               </div>
@@ -439,6 +439,7 @@ export default defineComponent({
         editorQTNS: 2,
         editorQTDA: 3,
         viewer: 4,
+        editorKT: 5,
       },
       arrRole: [
         {
@@ -456,6 +457,10 @@ export default defineComponent({
         {
           label: "viewer",
           value: 4,
+        },
+        {
+          label: "editor-kt",
+          value: 5,
         },
       ],
 
@@ -1087,12 +1092,14 @@ export default defineComponent({
       if (roleName == "editor-qtns") return "red-10";
       if (roleName == "editor-qtda") return "purple-10";
       if (roleName == "viewer") return "lime-10";
+      if (roleName == "editor-kt") return "cyan-10";
     },
     convertRoleStringToNumber(stringRole) {
       if (stringRole == "admin") return this.role.admin;
       if (stringRole == "editor-qtns") return this.role.editorQTNS;
       if (stringRole == "editor-qtda") return this.role.editorQTDA;
       if (stringRole == "viewer") return this.role.viewer;
+      if (stringRole == "editor-kt") return this.role.editorKT;
     },
   },
   computed: {

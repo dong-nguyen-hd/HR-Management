@@ -86,7 +86,7 @@
           maxlength="500"
           v-model="accountInfor.email"
           type="email"
-          :label="$t('emailDot')"
+          :label="$t('emailColon')"
           :label-color="labelColorFocus[2]"
           @focus="labelColorFocus[2] = 'white'"
           @blur="labelColorFocus[2] = ''"

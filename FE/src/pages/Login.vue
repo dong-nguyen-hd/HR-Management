@@ -30,7 +30,7 @@ License: CC BY 3.0
                     alt="Human Resource Management"
                   />
                 </div>
-                {{ $t('welcome') }}
+                {{ $t("welcome") }}
               </div>
               <q-input
                 class="q-pb-sm"
@@ -42,8 +42,7 @@ License: CC BY 3.0
                 :placeholder="$t('userName')"
                 lazy-rules="ondemand"
                 :rules="[
-                  (val) =>
-                    (val && val.length > 0) || $t('userNameNotEmpty'),
+                  (val) => (val && val.length > 0) || $t('userNameNotEmpty'),
                 ]"
               >
                 <template v-slot:prepend>
@@ -62,11 +61,9 @@ License: CC BY 3.0
                 :placeholder="$t('password')"
                 lazy-rules="ondemand"
                 :rules="[
+                  (val) => (val && val.length > 0) || $t('passwordNotEmpty'),
                   (val) =>
-                    (val && val.length > 0) || $t('passwordNotEmpty'),
-                  (val) =>
-                    (val && val.length > 5) ||
-                    $t('passwordLengthInvalid'),
+                    (val && val.length > 5) || $t('passwordLengthInvalid'),
                 ]"
               >
                 <template v-slot:prepend>
@@ -90,7 +87,7 @@ License: CC BY 3.0
         <div class="bottom-login display-center">
           <a href="https://github.com/dong-nguyen-hd" target="_blank">
             <q-icon size="18px" name="fab fa-github" />
-            {{ $t('myself') }}
+            {{ $t("myself") }}
           </a>
         </div>
       </div>
@@ -147,6 +144,10 @@ export default {
         if (result.success) {
           await this.login(result);
           if (this.getRole == "viewer") this.$router.replace("/project-view");
+          else if (this.getRole == "editor-kt")
+            this.$router.replace("/list-employee-kt");
+          else if (this.getRole == "editor-qtns")
+            this.$router.replace("/list-employee-qtns");
           else this.$router.replace("/list-employee");
         } else {
           this.$q.notify({
@@ -168,6 +169,10 @@ export default {
   created() {
     if (this.isAuthenticated) {
       if (this.getRole == "viewer") this.$router.replace("/project-view");
+      else if (this.getRole == "editor-kt")
+        this.$router.replace("/list-employee-kt");
+      else if (this.getRole == "editor-qtns")
+        this.$router.replace("/list-employee-qtns");
       else this.$router.replace("/list-employee");
     }
   },

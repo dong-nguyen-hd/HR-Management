@@ -107,7 +107,7 @@
                 standout
                 v-model="tempAccountResource.role"
                 :options="arrRole"
-                :label="$t('roleDot')"
+                :label="$t('roleColon')"
                 option-value="value"
                 option-label="label"
                 emit-value
@@ -131,7 +131,7 @@
                 maxlength="400"
                 v-model="tempAccountResource.email"
                 type="text"
-                :label="$t('emailDot')"
+                :label="$t('emailColon')"
                 :label-color="colorFocusModifyPopup[4]"
                 @focus="colorFocusModifyPopup[4] = 'white'"
                 @blur="colorFocusModifyPopup[4] = ''"
