@@ -37,7 +37,7 @@
       <q-dialog v-model="insertPay" :persistent="payProcess">
         <q-card style="width: 400px">
           <q-card-section class="row items-center">
-            <span class="text-h6">Create Salary</span>
+            <span class="text-h6">{{ $t('createSalary') }}</span>
           </q-card-section>
 
           <q-separator />
@@ -48,7 +48,7 @@
                 standout
                 v-model="insertPayObj.firstName"
                 type="text"
-                label="First Name:"
+                label="{{ $t('firstNameColon') }}"
                 readonly
               >
               </q-input>
@@ -62,7 +62,7 @@
                 type="text"
                 placeholder="YYYY-MM-DD"
                 stack-label
-                label="Date:"
+                :label="$t('date')"
                 label-color="white"
                 bg-color="primary"
                 input-class="text-white"
@@ -100,7 +100,7 @@
                 maxlength="250"
                 v-model="insertPayResource.baseSalary"
                 type="number"
-                label="Base salary:"
+                :label="$t('baseSalaryColon')"
                 :label-color="colorFocusPay[0]"
                 @focus="colorFocusPay[0] = 'white'"
                 @blur="colorFocusPay[0] = ''"
@@ -118,7 +118,7 @@
                 maxlength="250"
                 v-model="insertPayResource.allowance"
                 type="number"
-                label="Allowance:"
+                :label="$t('allowanceColon')"
                 :label-color="colorFocusPay[1]"
                 @focus="colorFocusPay[1] = 'white'"
                 @blur="colorFocusPay[1] = ''"
@@ -133,7 +133,7 @@
                 maxlength="250"
                 v-model="insertPayResource.bonus"
                 type="number"
-                label="Bonus:"
+                :label="$t('bonusColon')"
                 :label-color="colorFocusPay[2]"
                 @focus="colorFocusPay[2] = 'white'"
                 @blur="colorFocusPay[2] = ''"
@@ -146,13 +146,13 @@
             <q-btn
               flat
               :disable="payProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               v-close-popup
             />
             <q-btn
               flat
-              label="Add"
+              :label="$t('btnAdd')"
               color="info"
               @click="createPay"
               :loading="payProcess"
@@ -174,7 +174,7 @@
             type="text"
             placeholder="YYYY-MM-DD"
             stack-label
-            label="Date:"
+            :label="$t('date')"
             label-color="white"
             bg-color="primary"
             input-class="text-white"
@@ -230,7 +230,7 @@
                   debounce="300"
                   @focus="
                     labelColorFocus[0] = 'black';
-                    labelNameFocus[0] = 'Search by staff id';
+                    labelNameFocus[0] = $t('searchByStaffId');
                     widthOfStaffId = '154px';
                   "
                   @blur="
@@ -271,7 +271,7 @@
                   :label-color="labelColorFocus[1]"
                   @focus="
                     labelColorFocus[1] = 'black';
-                    labelNameFocus[1] = 'Search by first name';
+                    labelNameFocus[1] = $t('searchByFirstName');
                     widthOfFullName = '170px';
                   "
                   @blur="
@@ -333,7 +333,7 @@
                   ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
-                        No results
+                        {{ $t('noResults') }}
                       </q-item-section>
                     </q-item>
                   </template>
@@ -498,7 +498,7 @@ export default defineComponent({
   data() {
     return {
       labelColorFocus: ["white", "white", "white", "white"],
-      labelNameFocus: ["Staff ID", "Full Name", "Department", "Position"],
+      labelNameFocus: [this.$t('staffID'), this.$t('fullName'), this.$t('department'), this.$t('position')],
 
       colorFocusPay: [],
 
@@ -558,13 +558,13 @@ export default defineComponent({
         {
           name: "staffId",
           align: "left",
-          label: "Staff ID",
+          label: this.$t('staffID'),
           field: "staffId",
         },
         {
           name: "fullName",
           align: "left",
-          label: "Full Name",
+          label: this.$t('fullName'),
           field: (row) => `${row.firstName} ${row.lastName}`,
         },
         {
@@ -576,13 +576,13 @@ export default defineComponent({
         {
           name: "department",
           align: "left",
-          label: "Department",
+          label: this.$t('department'),
           field: (row) => row.department.name,
         },
         {
           name: "position",
           align: "left",
-          label: "Position",
+          label: this.$t('position'),
           field: (row) => row.position.name,
         },
         {
@@ -600,43 +600,43 @@ export default defineComponent({
         {
           name: "baseSalary",
           align: "center",
-          label: "Base Salary",
+          label: this.$t('baseSalary'),
           field: (row) => row.pay,
         },
         {
           name: "allowance",
           align: "center",
-          label: "Allowance",
+          label: this.$t('allowance'),
           field: (row) => row.pay,
         },
         {
           name: "bonus",
           align: "center",
-          label: "Bonus",
+          label: this.$t('bonus'),
           field: (row) => row.pay,
         },
         {
           name: "pit",
           align: "center",
-          label: "PIT",
+          label: this.$t('pit'),
           field: (row) => row.pay,
         },
         {
           name: "socialInsurance",
           align: "center",
-          label: "Social Insurance",
+          label: this.$t('socialInsurance'),
           field: (row) => row.pay,
         },
         {
           name: "healthInsurance",
           align: "center",
-          label: "Health Insurance",
+          label: this.$t('healthInsurance'),
           field: (row) => row.pay,
         },
         {
           name: "action",
           align: "center",
-          label: "Actions",
+          label: this.$t('actions'),
           field: (row) => row.id,
         },
       ],

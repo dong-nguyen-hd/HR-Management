@@ -92,7 +92,7 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>{{ $t("employee") }}</q-item-section>
+            <q-item-section>{{ $t('employeeForKT') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -107,7 +107,7 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>{{ $t("employee") }}</q-item-section>
+            <q-item-section>{{ $t('employeeForQTNS') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -122,7 +122,7 @@
             <q-item-section avatar>
               <q-icon name="summarize" />
             </q-item-section>
-            <q-item-section>{{ $t("employee") }}</q-item-section>
+            <q-item-section>{{ $t('employeeForQTDA') }}</q-item-section>
           </q-item>
 
           <q-item
@@ -138,7 +138,7 @@
             <q-item-section avatar>
               <q-icon name="business_center" />
             </q-item-section>
-            <q-item-section>{{ $t("project") }}</q-item-section>
+            <q-item-section>{{ $t("projectForQTDA") }}</q-item-section>
           </q-item>
 
           <q-item
@@ -154,7 +154,7 @@
             <q-item-section avatar>
               <q-icon name="business_center" />
             </q-item-section>
-            <q-item-section>{{ $t("project") }}</q-item-section>
+            <q-item-section>{{ $t("projectForViewer") }}</q-item-section>
           </q-item>
 
           <q-item
@@ -218,7 +218,7 @@
             <q-item-section avatar>
               <q-icon name="account_circle" />
             </q-item-section>
-            <q-item-section>{{ $t("account") }}</q-item-section>
+            <q-item-section>{{ $t("accountForAdmin") }}</q-item-section>
           </q-item>
 
           <q-item
@@ -234,7 +234,7 @@
             <q-item-section avatar>
               <q-icon name="account_circle" />
             </q-item-section>
-            <q-item-section>{{ $t("account") }}</q-item-section>
+            <q-item-section>{{ $t("accountForQTDA") }}</q-item-section>
           </q-item>
         </q-list>
       </div>
