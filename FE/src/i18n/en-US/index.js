@@ -145,4 +145,15 @@ export default {
     pit: 'PIT',
     socialInsurance: 'Social Insurance',
     healthInsurance: 'Health Insurance',
+
+    totalWorkDay: 'Total work day:',
+    fullDay: 'FULL DAY:',
+    halfDay: '1/2 DAY:',
+    absent: 'ABSENT:',
+    holiday: 'HOLIDAY:',
+    dayOff: 'DAY OFF:',
+    unpaidLeave: 'UNPAID LEAVE:',
+    paidLeave: 'PAID LEAVE:',
+    timesheetUploaded: 'Timesheet is uploaded',
+    timesheetHere: 'Upload timesheet here!',
 }

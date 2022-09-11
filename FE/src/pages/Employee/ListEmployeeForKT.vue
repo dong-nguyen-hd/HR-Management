@@ -48,7 +48,7 @@
                 standout
                 v-model="insertPayObj.firstName"
                 type="text"
-                label="{{ $t('firstNameColon') }}"
+                :label="$t('firstNameColon')"
                 readonly
               >
               </q-input>

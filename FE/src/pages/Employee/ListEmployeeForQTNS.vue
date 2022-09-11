@@ -4,14 +4,14 @@
       <q-dialog v-model="showDelete" :persistent="deleteProcess">
         <q-card>
           <q-card-section class="row items-center">
-            <span class="text-h6">Delete {{ getNameDelete }}?</span>
+            <span class="text-h6">{{ $t('delete') }} {{ getNameDelete }}?</span>
           </q-card-section>
 
           <q-separator />
 
           <q-card-section>
             <span
-              >This can’t be undone and it will be removed from database.</span
+              >{{ $t('confirmDelete') }}</span
             >
           </q-card-section>
 
@@ -19,13 +19,13 @@
             <q-btn
               flat
               :disable="deleteProcess"
-              label="Cancel"
+              :label="$t('cancel')"
               color="primary"
               v-close-popup
             />
             <q-btn
               flat
-              label="Delete"
+              :label="$t('btnDelete')"
               color="negative"
               @click="deleteEmployee"
               :loading="deleteProcess"
@@ -68,7 +68,7 @@
                 :loading="statusUpdate"
                 dense
                 color="primary"
-                label="Save"
+                :label="$t('btnSave')"
                 class="q-px-lg"
                 @click="saveUpdate"
               />
@@ -102,7 +102,7 @@
                 :loading="statusInsert"
                 dense
                 color="primary"
-                label="Save"
+                :label="$t('btnSave')"
                 class="q-px-lg"
                 @click="saveInsert"
               />
@@ -149,30 +149,30 @@
                         {{ convertDateTimeToDate(timesheet.date, "YYYY/MM") }}
                       </div>
                       <div>
-                        Total work day: {{ timesheet.workDay }} /
+                        {{ $t('totalWorkDay') }} {{ timesheet.workDay }} /
                         {{ timesheet.totalWorkDay }}
                       </div>
                       <div class="column">
                         <q-chip color="light-green-6" text-color="white">
-                          FULL DAY
+                          {{ $t('fullDay') }}
                         </q-chip>
                         <q-chip color="amber-6" text-color="white">
-                          1/2 DAY
+                          {{ $t('halfDay') }}
                         </q-chip>
                         <q-chip color="red-6" text-color="white">
-                          ABSENT: {{ timesheet.absent }}
+                          {{ $t('absent') }} {{ timesheet.absent }}
                         </q-chip>
                         <q-chip color="indigo-6" text-color="white">
-                          HOLIDAY: {{ timesheet.holiday }}
+                          {{ $t('holiday') }} {{ timesheet.holiday }}
                         </q-chip>
                         <q-chip color="cyan-6" text-color="white">
-                          DAY OFF
+                          {{ $t('dayOff') }}
                         </q-chip>
                         <q-chip color="grey-6" text-color="white">
-                          UNPAID LEAVE: {{ timesheet.unpaidLeave }}
+                          {{ $t('unpaidLeave') }} {{ timesheet.unpaidLeave }}
                         </q-chip>
                         <q-chip color="yellow-6" text-color="white">
-                          PAID LEAVE: {{ timesheet.paidLeave }}
+                          {{ $t('paidLeave') }} {{ timesheet.paidLeave }}
                         </q-chip>
                       </div>
                     </div>
@@ -199,7 +199,7 @@
             v-model="timesheetFile"
             accept=".xlsx"
             :display-value="
-              timesheetFile ? 'Timesheet is uploaded' : 'Upload timesheet here!'
+              timesheetFile ? $t('timesheetUploaded') : $t('timesheetHere')
             "
             @update:model-value="importTimesheet"
           >
@@ -212,7 +212,7 @@
             class="q-ml-md"
             @click="openInsert"
             color="primary"
-            label="New employee"
+            :label="$t('newEmployee')"
             unelevated
           />
         </div>
@@ -245,7 +245,7 @@
                   debounce="300"
                   @focus="
                     labelColorFocus[0] = 'black';
-                    labelNameFocus[0] = 'Search by staff id';
+                    labelNameFocus[0] = $t('searchByStaffId');
                     widthOfStaffId = '154px';
                   "
                   @blur="
@@ -286,7 +286,7 @@
                   :label-color="labelColorFocus[1]"
                   @focus="
                     labelColorFocus[1] = 'black';
-                    labelNameFocus[1] = 'Search by first name';
+                    labelNameFocus[1] = $t('searchByFirstName');
                     widthOfFullName = '170px';
                   "
                   @blur="
@@ -348,7 +348,7 @@
                   ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
-                        No results
+                        {{ $t('noResults') }}
                       </q-item-section>
                     </q-item>
                   </template>
@@ -391,7 +391,7 @@
                   ><template v-slot:no-option>
                     <q-item>
                       <q-item-section class="text-grey">
-                        No results
+                        {{ $t('noResults') }}
                       </q-item-section>
                     </q-item>
                   </template>
@@ -475,7 +475,7 @@ export default defineComponent({
   data() {
     return {
       labelColorFocus: ["white", "white", "white", "white"],
-      labelNameFocus: ["Staff ID", "Full Name", "Department", "Position"],
+      labelNameFocus: [this.$t('staffID'), this.$t('fullName'), this.$t('department'), this.$t('position')],
 
       widthOfStaffId: "80px",
       widthOfFullName: "130px",
@@ -547,13 +547,13 @@ export default defineComponent({
         {
           name: "staffId",
           align: "left",
-          label: "Staff ID",
+          label: this.$t('staffID'),
           field: "staffId",
         },
         {
           name: "fullName",
           align: "left",
-          label: "Full Name",
+          label: this.$t('fullName'),
           field: (row) => `${row.firstName} ${row.lastName}`,
         },
         {
@@ -565,19 +565,19 @@ export default defineComponent({
         {
           name: "department",
           align: "left",
-          label: "Department",
+          label: this.$t('department'),
           field: (row) => row.department.name,
         },
         {
           name: "position",
           align: "left",
-          label: "Position",
+          label: this.$t('position'),
           field: (row) => row.position.name,
         },
         {
           name: "action",
           align: "center",
-          label: "Actions",
+          label: this.$t('actions'),
           field: (row) => row.id,
         },
       ],

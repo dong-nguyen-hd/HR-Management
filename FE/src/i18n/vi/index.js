@@ -124,7 +124,7 @@ export default {
     deleteSalary: 'Xoá phiếu lương?',
 
     employeeForKT: 'Quản lí nhân viên (kế toán)',
-    employeeForQTNS: 'Quản lí nhân viên (kế toán)',
+    employeeForQTNS: 'Quản lí nhân viên (nhân sự)',
     employeeForQTDA: 'Quản lí nhân viên (dự án)',
     projectForQTDA: 'Quản lí dự án',
     projectForViewer: 'Quản lí dự án (khách hàng)',
@@ -143,4 +143,15 @@ export default {
     pit: 'Thuế thu nhập',
     socialInsurance: 'BHXH',
     healthInsurance: 'BHYT',
+
+    totalWorkDay: 'Tổng ngày công:',
+    fullDay: 'Cả ngày:',
+    halfDay: '1/2 Ngày:',
+    absent: 'Vắng mặt:',
+    holiday: 'Ngày lễ:',
+    dayOff: 'Ngày nghỉ:',
+    unpaidLeave: 'Nghỉ không lương:',
+    paidLeave: 'Nghỉ có lương:',
+    timesheetUploaded: 'Bảng công đã tải lên',
+    timesheetHere: 'Tải lên bảng công!',
 }
