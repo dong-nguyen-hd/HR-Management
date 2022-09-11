@@ -415,6 +415,7 @@
                 text-color="black"
                 icon="add"
                 direction="left"
+                style='z-index: 1'
               >
                 <q-fab-action
                   color="negative"

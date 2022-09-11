@@ -401,7 +401,7 @@
                   dense
                   color="white"
                   text-color="black"
-                  label="new"
+                  :label="$t('new')"
                   v-show="!showOrHide(props.value)"
                   @click="openInsertPay(props.value)"
                 />
@@ -411,7 +411,7 @@
                   style="width: 60px"
                   dense
                   color="negative"
-                  label="delete"
+                  :label="$t('delete')"
                   v-show="showOrHide(props.value)"
                   @click="openDeletePay(props.value)"
                 />

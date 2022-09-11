@@ -156,4 +156,6 @@ export default {
     paidLeave: 'PAID LEAVE:',
     timesheetUploaded: 'Timesheet is uploaded',
     timesheetHere: 'Upload timesheet here!',
+
+    new: 'new',
 }

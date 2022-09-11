@@ -154,4 +154,6 @@ export default {
     paidLeave: 'Nghỉ có lương:',
     timesheetUploaded: 'Bảng công đã tải lên',
     timesheetHere: 'Tải lên bảng công!',
+
+    new: 'Thêm',
 }
