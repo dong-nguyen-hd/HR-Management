@@ -1,4 +1,6 @@
+using Infrastructure.Contexts;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Security.Authentication;
 
@@ -19,7 +21,19 @@ namespace API
             try
             {
                 Log.Information("Application is starting.");
-                CreateHostBuilder(args).Build().Run();
+
+                var host = CreateHostBuilder(args).Build();
+                using (var scope = host.Services.CreateScope())
+                {
+                    var services = scope.ServiceProvider;
+
+                    var context = services.GetRequiredService<AppDbContext>();
+                    if (context.Database.GetPendingMigrations().Any())
+                    {
+                        context.Database.Migrate();
+                    }
+                }
+                host.Run();
             }
             catch (Exception ex)
             {

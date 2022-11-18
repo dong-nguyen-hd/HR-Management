@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  web_fe:
+    image: dongnguyenhdkt/hr-management-fe:v1
+    container_name: hr-fe
+    ports:
+      - "8080:8080"
+  web_be:
+    image: dongnguyenhdkt/hr-management-be:v1
+    container_name: hr-be
+    ports:
+      - "5000:5000"
+  db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server2022
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=A&VeryComplex123Password
+    volumes:
+      - store:/usr/src/db
+volumes:
+  store:
