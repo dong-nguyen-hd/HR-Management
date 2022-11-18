@@ -14,8 +14,10 @@ services:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
     container_name: sql_server2022
     environment:
-      - ACCEPT_EULA=y
       - SA_PASSWORD=A&VeryComplex123Password
+      - ACCEPT_EULA=y
+    ports:
+      - "1433:1433"
     volumes:
       - store:/usr/src/db
 volumes:
