@@ -16,8 +16,6 @@ services:
     environment:
       - SA_PASSWORD=A&VeryComplex123Password
       - ACCEPT_EULA=y
-    ports:
-      - "1433:1433"
     volumes:
       - store:/usr/src/db
 volumes:

@@ -6,6 +6,10 @@ ENV ASPNETCORE_URLS http://*:5000
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
+
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
 COPY HRManagement.sln ./
 COPY API/*.csproj ./API/
 COPY Business/*.csproj ./Business/
@@ -30,6 +34,8 @@ FROM build AS publish
 RUN dotnet publish -c Release -o /app
 
 FROM base AS final
+
 WORKDIR /app
 COPY --from=publish /app .
+
 ENTRYPOINT ["dotnet", "API.dll"]
