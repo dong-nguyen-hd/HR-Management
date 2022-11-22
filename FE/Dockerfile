@@ -1,4 +1,4 @@
-#docker build -t dongnguyenhdkt/hr-management-fe .
+#docker build -t hr-management-fe .
 FROM node:12.22.12
 WORKDIR /usr/src/app/fe
 

@@ -38,13 +38,15 @@ This project building on **.NET 6**, using for Human Resource Management for IT 
 
 * Following CLI:
 
-1. Install the latest [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download)
-2. Editing connection string in **appsettings.json**
-3. Run `dotnet ef migrations add "Initial"` to add migration.
-4. Run `dotnet ef database update` to update database.
-5. Run `dotnet run` to runs source code without any explicit compile or launch commands.
-
 **Note:** you must directive to root project before run CLI.
+1. Install [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download)
+2. Install [MS SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
+3. Editing connection string in **appsettings.json**
+4. Run `cd ./Infrastructure`.
+5. Run `dotnet ef --startup-project ../API/ migrations add Initial` to add migration.
+6. Run `dotnet ef --startup-project ../API/ database update` to update database.
+7. Run `cd ../API`.
+8. Run `dotnet run` to runs source code without any explicit compile or launch commands.
 
 * Seeding data: 
 

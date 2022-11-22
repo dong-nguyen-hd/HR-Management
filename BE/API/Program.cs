@@ -22,18 +22,7 @@ namespace API
             {
                 Log.Information("Application is starting.");
 
-                var host = CreateHostBuilder(args).Build();
-                using (var scope = host.Services.CreateScope())
-                {
-                    var services = scope.ServiceProvider;
-
-                    var context = services.GetRequiredService<AppDbContext>();
-                    if (context.Database.GetPendingMigrations().Any())
-                    {
-                        context.Database.Migrate();
-                    }
-                }
-                host.Run();
+                CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
             {

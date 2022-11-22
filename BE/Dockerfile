@@ -1,4 +1,4 @@
-#docker build -t dongnguyenhdkt/hr-management-be .
+#docker build -t hr-management-be .
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 5000
@@ -18,20 +18,24 @@ COPY UnitTest/*.csproj ./UnitTest/
 
 RUN dotnet restore
 COPY . .
-WORKDIR /src/Business
-RUN dotnet build -c Release -o /app
+# WORKDIR /src/Business
+# RUN dotnet build -c Release -o /app
 
-WORKDIR /src/Infrastructure
-RUN dotnet build -c Release -o /app
+# WORKDIR /src/Infrastructure
+# RUN dotnet build -c Release -o /app
 
-WORKDIR /src/UnitTest
-RUN dotnet build -c Release -o /app
+# WORKDIR /src/UnitTest
+# RUN dotnet build -c Release -o /app
 
 WORKDIR /src/API
 RUN dotnet build -c Release -o /app
 
 FROM build AS publish
 RUN dotnet publish -c Release -o /app
+
+WORKDIR /src/Infrastructure
+RUN dotnet ef --startup-project ../API/ migrations add Initial2
+RUN dotnet ef --startup-project ../API/ database update
 
 FROM base AS final
 
