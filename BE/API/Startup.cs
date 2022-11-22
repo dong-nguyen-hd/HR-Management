@@ -111,7 +111,7 @@ namespace API
                 });
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseStaticFiles();
             app.UseRouting();

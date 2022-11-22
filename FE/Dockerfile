@@ -10,6 +10,6 @@ RUN npm install -g @vue/cli
 RUN npm install -g @quasar/cli 
 
 COPY . .
-#RUN quasar build
+RUN quasar build
 
 CMD ["quasar", "dev"]
