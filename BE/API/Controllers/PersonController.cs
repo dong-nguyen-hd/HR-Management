@@ -149,7 +149,7 @@ namespace API.Controllers
 
             var insertResult = await _personService.InsertAsync(resource);
 
-            if(!insertResult.Success)
+            if (!insertResult.Success)
                 return BadRequest(insertResult);
 
             return StatusCode(201, insertResult);

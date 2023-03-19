@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Business.Resources.Information;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -20,10 +21,10 @@ namespace API.Extensions
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true, // default True
-                    ValidIssuer = Startup.JwtConfig.Issuer,
+                    ValidIssuer = JwtConfig.Issuer,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Startup.JwtConfig.Secret)),
-                    ValidAudience = Startup.JwtConfig.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(JwtConfig.Secret)),
+                    ValidAudience = JwtConfig.Audience,
                     ValidateAudience = true, // default True
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(1)

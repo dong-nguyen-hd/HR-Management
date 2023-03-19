@@ -2,10 +2,10 @@
 {
     public class JwtConfig
     {
-        public string Secret { get; set; }
-        public string Issuer { get; set; }
-        public string Audience { get; set; }
-        public int AccessTokenExpiration { get; set; }
-        public int RefreshTokenExpiration { get; set; }
+        public static string Secret { get; set; }
+        public static string Issuer { get; set; }
+        public static string Audience { get; set; }
+        public static int AccessTokenExpiration { get; set; }
+        public static int RefreshTokenExpiration { get; set; }
     }
 }

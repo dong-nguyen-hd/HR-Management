@@ -1,14 +1,21 @@
-version: '3.9'
+version: '3.4'
+
 services:
-  web_fe:
+  web_be:
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    container_name: hr-fe
+web_fe:
     image: hr-management-fe
     build:
-      context: FE
-      dockerfile: Dockerfile
+      context: ./FE
+      dockerfile: ./FE/Dockerfile
     container_name: hr-fe
     ports:
       - "8080:8080"
-  db:
+db:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
     container_name: sql_server2022
     environment:

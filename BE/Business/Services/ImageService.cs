@@ -13,6 +13,8 @@ using Microsoft.Extensions.Options;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using Image = System.Drawing.Image;
+using Size = System.Drawing.Size;
 
 namespace Business.Services
 {

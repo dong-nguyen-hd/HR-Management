@@ -24,7 +24,6 @@ namespace Business.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly byte[] _secret;
-        private readonly JwtConfig _jwtConfig;
         #endregion
 
         #region Constructor
@@ -32,15 +31,13 @@ namespace Business.Services
             ITokenRepository tokenRepository,
             IMapper mapper,
             IUnitOfWork unitOfWork,
-            IOptionsMonitor<JwtConfig> jwtConfig,
         IOptionsMonitor<ResponseMessage> responseMessage) : base(responseMessage)
         {
             this._accountRepository = accountRepository;
             this._tokenRepository = tokenRepository;
             this._mapper = mapper;
             this._unitOfWork = unitOfWork;
-            this._jwtConfig = jwtConfig.CurrentValue;
-            this._secret = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+            this._secret = Encoding.ASCII.GetBytes(JwtConfig.Secret);
         }
         #endregion
 
@@ -159,10 +156,10 @@ namespace Business.Services
             var shouldAddAudienceClaim = string.IsNullOrWhiteSpace(claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Aud)?.Value);
 
             var jwtToken = new JwtSecurityToken(
-                _jwtConfig.Issuer,
-                shouldAddAudienceClaim ? _jwtConfig.Audience : string.Empty,
+                JwtConfig.Issuer,
+                shouldAddAudienceClaim ? JwtConfig.Audience : string.Empty,
                 claims,
-                expires: now.AddMinutes(_jwtConfig.AccessTokenExpiration),
+                expires: now.AddMinutes(JwtConfig.AccessTokenExpiration),
                 signingCredentials: new SigningCredentials(new SymmetricSecurityKey(_secret), SecurityAlgorithms.HmacSha256Signature));
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
@@ -188,7 +185,7 @@ namespace Business.Services
             => new()
             {
                 RefreshToken = GenerateRefreshTokenString(),
-                ExpireTime = now.AddMinutes(_jwtConfig.RefreshTokenExpiration),
+                ExpireTime = now.AddMinutes(JwtConfig.RefreshTokenExpiration),
                 UserAgent = userAgent,
                 IsUsed = false
             };

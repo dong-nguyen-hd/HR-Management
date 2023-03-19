@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Business.Communication;
 using Business.Data;
 using Business.Domain.Models;

@@ -10,9 +10,7 @@ using Business.Resources.Information;
 using Business.Resources.Person;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
-using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Processing;
 
 namespace Business.Services
 {
@@ -94,9 +92,10 @@ namespace Business.Services
         {
             try
             {
-                IImageFormat imageFormat;
-                using (var rawImage = Image.Load(imageStream, out imageFormat))
+                using (var rawImage = await Image.LoadAsync(imageStream))
                 {
+                    var imageFormat = await Image.DetectFormatAsync(imageStream);
+
                     // Validate properties of image
                     var validateImage = ValidateImage<AccountResource>(imageStream, imageFormat);
                     if (!validateImage.isSuccess)
@@ -125,9 +124,10 @@ namespace Business.Services
         {
             try
             {
-                IImageFormat imageFormat;
-                using (var rawImage = Image.Load(imageStream, out imageFormat))
+                using (var rawImage = await Image.LoadAsync(imageStream))
                 {
+                    var imageFormat = await Image.DetectFormatAsync(imageStream);
+
                     // Validate properties of image
                     var validateImage = ValidateImage<PersonResource>(imageStream, imageFormat);
                     if (!validateImage.isSuccess)

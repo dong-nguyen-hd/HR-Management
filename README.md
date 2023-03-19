@@ -1,18 +1,19 @@
 ﻿# Web API Project:<p/>Human Resource Management for IT Company
 
-This project building on **.NET 6**, using for Human Resource Management for IT Company.
+This project building on **.NET 7**, using for Human Resource Management for IT Company.
 
 ## Technologies
 
-* [ASP.NET Core 6](https://docs.microsoft.com/en-us/aspnet/core/release-notes/aspnetcore-6.0?view=aspnetcore-6.0)
-* [Entity Framework Core 6](https://docs.microsoft.com/en-us/ef/core/)
-* [AutoMapper](https://automapper.org/)
-* [Swagger UI - Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)
+* [ASP.NET Core API 7](https://learn.microsoft.com/en-us/aspnet/core/release-notes/aspnetcore-7.0)
+* [Entity Framework Core 7](https://docs.microsoft.com/en-us/ef/core/)
 * [Cronos](https://github.com/HangfireIO/Cronos)
 * [Serilog](https://serilog.net/)
 * [EPPlus](https://github.com/EPPlusSoftware/EPPlus)
 * [xUnit Test](https://xunit.net/)
 * [Quasar](https://quasar.dev/)
+* [SixLabors.ImageSharp](https://docs.sixlabors.com/index.html)
+* [AutoMapper](https://automapper.org/)
+* [Swagger UI - Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)
 
 ## Features
 * Human resources management with following information: personal, work history, project, certificate, education, skill, timesheet, salary,...
@@ -22,6 +23,7 @@ This project building on **.NET 6**, using for Human Resource Management for IT 
 * Import excel file.
 * Getting data with pagination.
 * Logging information to console and file.
+* Cron-job supports cleaning refresh-token.
 
 ## Diagram
 
@@ -39,7 +41,7 @@ This project building on **.NET 6**, using for Human Resource Management for IT 
 * Following CLI:
 
 **Note:** you must directive to root project before run CLI.
-1. Install [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download)
+1. Install [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download)
 2. Install [MS SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
 3. Editing connection string in **appsettings.json**
 4. Run `cd ./Infrastructure`.
