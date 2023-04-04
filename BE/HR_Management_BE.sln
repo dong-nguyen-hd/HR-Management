@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{74E36C5F-1D45-4C8C-9F72-592AE258AA8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "TestProject1\UnitTest.csproj", "{CA8713BB-3F78-401D-B631-FB85A6474985}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{CA8713BB-3F78-401D-B631-FB85A6474985}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

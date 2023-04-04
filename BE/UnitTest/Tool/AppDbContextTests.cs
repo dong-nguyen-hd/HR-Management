@@ -1,11 +1,10 @@
 ﻿using Infrastructure.Contexts;
-using Xunit;
 
 namespace UnitTest.Tool
 {
     public class AppDbContextTests : TestWithSqlite<AppDbContext>
     {
-        
+
         [Fact]
         public void CanConnect_ReturnTrue_AppDbContext()
         {

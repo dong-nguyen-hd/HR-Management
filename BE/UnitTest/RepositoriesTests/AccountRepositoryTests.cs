@@ -5,7 +5,6 @@ using Business.Resources.Authentication;
 using Infrastructure.Contexts;
 using Infrastructure.Repositories;
 using UnitTest.Tool;
-using Xunit;
 
 namespace UnitTest.RepositoriesTests
 {
