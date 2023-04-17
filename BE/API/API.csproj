@@ -23,7 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Business\Business.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-	<None Remove="..\.dockerignore" />
   </ItemGroup>
 
   <ItemGroup>
